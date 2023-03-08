@@ -32,7 +32,7 @@ F = Point(-4,0)
 G = Point(9,0)
 
 for i in A,B,C,D,E:
-    layer.picture(i, "router.png", width=1.5, height=1)
+    layer.picture(i, "router.png", width=1, height=0.7)
     
 layer.text(A + Point(0,0.5), "A", position="above")
 layer.text(B + Point(0,0.5), "B", position="above")

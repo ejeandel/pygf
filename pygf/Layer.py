@@ -1,6 +1,6 @@
 import math
 from abc import ABC, abstractmethod
-from .Geometry import Point
+from .Geometry import Point, Transform
 
 
 
@@ -69,7 +69,10 @@ class Layer(ABC):
     """
     
     __slots__ = ('nodes')
-    def __init__(self):
+    def __init__(self, transform = None):
+        if transform is None:
+            transform = Transform()
+        self.transform = transform
         self.nodes = {}
 
     @abstractmethod

@@ -16,12 +16,11 @@ def escape(x):
 
 class TikzLayer(Layer):
     __slots__=('nodelayer', 'edgelayer', 'transform', 'nodes','names')
-    def __init__(self, transform):
-        Layer.__init__(self)
+    def __init__(self, transform = None):
+        Layer.__init__(self, transform)
         self.nodelayer = ""
         self.edgelayer = ""
         self.nodes = {}
-        self.transform = transform
         self.names = 0
 
 
@@ -284,7 +283,6 @@ class TikzLayer(Layer):
             print(r"\tikzstyle{%s}=[%s]" % (key, dic_to_list(style)), file=f)
             
             #code for shape
-        print(r"\makeatletter\pgfkeys{/tikz/stretch/.code 2 args=\tikz@stretch{#1}{#2}}\def\tikz@stretch#1#2{\pgfpointtransformed{\pgfpoint{0cm}{0cm}}\pgf@xa=\pgf@x\pgf@ya=\pgf@y\pgfpointtransformed{\pgfpoint{#1cm}{#2cm}}\advance\pgf@x by-\pgf@xa\ifdim\pgf@x<0pt\pgf@x=-\pgf@x\fi\advance\pgf@y by-\pgf@ya\ifdim\pgf@y<0pt\pgf@y=-\pgf@y\fi\pgfkeysalso{/tikz/minimum width/.expanded=\the\pgf@x}\pgfkeysalso{/tikz/minimum height/.expanded=\the\pgf@y}}\makeatother", file=f)
 
 
 

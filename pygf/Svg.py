@@ -8,14 +8,14 @@ def dic_to_svglist(d):
     return ' '.join(f'{x}="{y}"' for (x,y) in d.items())
 
 class SvgLayer(Layer):
-    def __init__(self, transform):
+    def __init__(self, transform = None):
+        Layer.__init__(self, transform)
         self.nodes = {}
         self.names = 0
         self.nodelayer = []
         self.edgelayer = []
         self.defs = {}
         self.svgtransform = Transform(50,-50)
-        self.transform = transform
 
         self.arrows = {
             "->": '<marker id="marker_{_id}"  markerUnits = "userSpaceOnUse" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polyline points="0 0, 10 3.5, 0 7" /></marker>',
