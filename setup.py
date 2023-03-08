@@ -4,7 +4,7 @@ setup(
     name='pygf',
     version='0.1.0',    
     description='A Python Graphics Format',
-    url='???',
+    url='https://github.com/ejeandel/pygf',
     author='Emmanuel Jeandel',
     author_email='emmanuel.jeandel@loria.fr',
     license='BSD 2-clause',
