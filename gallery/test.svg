@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600" viewBox="-100 -100 600 600">
+ <g  stroke-width="0.5" stroke="black" fill="none" marker-end="url(#marker_1)" >  <path id="1" d="M 0.000,0.000 L 250.000,250.000" /> <marker id="marker_1"  markerUnits = "userSpaceOnUse" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polyline points="0 0, 10 3.5, 0 7" /></marker> </g>
+ <g  stroke-width="0.5" stroke="Red" fill="none" >  <path id="2" d="M 0.000,0.000C -39.510,-0.000 -39.510,100.000 0.000,100.000C 39.510,100.000 80.245,134.217 100.000,100.000" />  </g>
+ <g  stroke-width="0.5" stroke="Blue" fill="none" >  <path id="3" d="M 0.000,0.000C 0.000,39.510 -27.938,72.062 0.000,100.000C 27.938,127.938 60.490,100.000 100.000,100.000" />  </g>
+ <g  stroke-width="0.5" stroke="Blue" fill="Red" >  <path id="4" d="M 0.000,150.000C 0.000,189.510 -27.938,222.062 0.000,250.000C 27.938,277.938 60.490,250.000 100.000,250.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="Red" >  <path id="5" d="M 250.000,100.000 a 50.0 50.0 0 1 1 -100.000,0.000 a 50.0 50.0 0 1 1 100.000,0.000" />  </g>
+<text x="0" y="-5"   font-family="sans-serif" text-anchor="middle"  dominant-baseline="text-top" transform="translate(0.000,0.000)">A</text>
+<text  font-family="sans-serif" dy="-5" text-anchor="end" ><textPath href="#1"  startOffset="100%"> line with text at the end </textPath></text>
+<rect x="50" y="100" width="150" height="100" stroke-width="0.5" stroke="black" fill="Blue"/>
+</svg>

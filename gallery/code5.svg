@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600" viewBox="-300 -300 600 600">
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="1" d="M 260.000,0.000 L 106.066,106.066" />  </g>
+<path id="r-1" d="M 106.066,106.066 L 260.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="2" d="M 260.000,0.000 L 106.066,-106.066" />  </g>
+<path id="r-2" d="M 106.066,-106.066 L 260.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="3" d="M 260.000,0.000 L 183.848,183.848" />  </g>
+<path id="r-3" d="M 183.848,183.848 L 260.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="4" d="M 260.000,0.000 L 183.848,-183.848" />  </g>
+<path id="r-4" d="M 183.848,-183.848 L 260.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="5" d="M 260.000,0.000 L 210.000,0.000" />  </g>
+<path id="r-5" d="M 210.000,0.000 L 260.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="6" d="M 210.000,0.000 L 63.640,63.640" />  </g>
+<path id="r-6" d="M 63.640,63.640 L 210.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="7" d="M 210.000,0.000 L 63.640,-63.640" />  </g>
+<path id="r-7" d="M 63.640,-63.640 L 210.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="8" d="M 210.000,0.000 L 148.492,148.492" />  </g>
+<path id="r-8" d="M 148.492,148.492 L 210.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="9" d="M 210.000,0.000 L 148.492,-148.492" />  </g>
+<path id="r-9" d="M 148.492,-148.492 L 210.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="10" d="M 183.848,-183.848 L 0.000,-150.000" />  </g>
+<path id="r-10" d="M 0.000,-150.000 L 183.848,-183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="11" d="M 183.848,-183.848 L 0.000,-260.000" />  </g>
+<path id="r-11" d="M 0.000,-260.000 L 183.848,-183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="12" d="M 183.848,-183.848 L 150.000,0.000" />  </g>
+<path id="r-12" d="M 150.000,0.000 L 183.848,-183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="13" d="M 183.848,-183.848 L 148.492,-148.492" />  </g>
+<path id="r-13" d="M 148.492,-148.492 L 183.848,-183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="14" d="M 148.492,-148.492 L 0.000,-90.000" />  </g>
+<path id="r-14" d="M 0.000,-90.000 L 148.492,-148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="15" d="M 148.492,-148.492 L 0.000,-210.000" />  </g>
+<path id="r-15" d="M 0.000,-210.000 L 148.492,-148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="16" d="M 148.492,-148.492 L 90.000,0.000" />  </g>
+<path id="r-16" d="M 90.000,0.000 L 148.492,-148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="17" d="M 183.848,183.848 L 0.000,260.000" />  </g>
+<path id="r-17" d="M 0.000,260.000 L 183.848,183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="18" d="M 183.848,183.848 L 0.000,150.000" />  </g>
+<path id="r-18" d="M 0.000,150.000 L 183.848,183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="19" d="M 183.848,183.848 L 150.000,0.000" />  </g>
+<path id="r-19" d="M 150.000,0.000 L 183.848,183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="20" d="M 183.848,183.848 L 148.492,148.492" />  </g>
+<path id="r-20" d="M 148.492,148.492 L 183.848,183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="21" d="M 148.492,148.492 L 0.000,210.000" />  </g>
+<path id="r-21" d="M 0.000,210.000 L 148.492,148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="22" d="M 148.492,148.492 L 0.000,90.000" />  </g>
+<path id="r-22" d="M 0.000,90.000 L 148.492,148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="23" d="M 148.492,148.492 L 90.000,0.000" />  </g>
+<path id="r-23" d="M 90.000,0.000 L 148.492,148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="24" d="M 150.000,0.000 L -106.066,106.066" />  </g>
+<path id="r-24" d="M -106.066,106.066 L 150.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="25" d="M 150.000,0.000 L -106.066,-106.066" />  </g>
+<path id="r-25" d="M -106.066,-106.066 L 150.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="26" d="M 150.000,0.000 L 90.000,0.000" />  </g>
+<path id="r-26" d="M 90.000,0.000 L 150.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="27" d="M 90.000,0.000 L -63.640,63.640" />  </g>
+<path id="r-27" d="M -63.640,63.640 L 90.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="28" d="M 90.000,0.000 L -63.640,-63.640" />  </g>
+<path id="r-28" d="M -63.640,-63.640 L 90.000,0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="29" d="M 106.066,-106.066 L -150.000,-0.000" />  </g>
+<path id="r-29" d="M -150.000,-0.000 L 106.066,-106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="30" d="M 106.066,-106.066 L 0.000,150.000" />  </g>
+<path id="r-30" d="M 0.000,150.000 L 106.066,-106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="31" d="M 106.066,-106.066 L 0.000,-260.000" />  </g>
+<path id="r-31" d="M 0.000,-260.000 L 106.066,-106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="32" d="M 106.066,-106.066 L 63.640,-63.640" />  </g>
+<path id="r-32" d="M 63.640,-63.640 L 106.066,-106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="33" d="M 63.640,-63.640 L -90.000,-0.000" />  </g>
+<path id="r-33" d="M -90.000,-0.000 L 63.640,-63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="34" d="M 63.640,-63.640 L 0.000,90.000" />  </g>
+<path id="r-34" d="M 0.000,90.000 L 63.640,-63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="35" d="M 63.640,-63.640 L 0.000,-210.000" />  </g>
+<path id="r-35" d="M 0.000,-210.000 L 63.640,-63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="36" d="M 0.000,-260.000 L -183.848,-183.848" />  </g>
+<path id="r-36" d="M -183.848,-183.848 L 0.000,-260.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="37" d="M 0.000,-260.000 L -106.066,-106.066" />  </g>
+<path id="r-37" d="M -106.066,-106.066 L 0.000,-260.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="38" d="M 0.000,-260.000 L 0.000,-210.000" />  </g>
+<path id="r-38" d="M 0.000,-210.000 L 0.000,-260.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="39" d="M 0.000,-210.000 L -148.492,-148.492" />  </g>
+<path id="r-39" d="M -148.492,-148.492 L 0.000,-210.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="40" d="M 0.000,-210.000 L -63.640,-63.640" />  </g>
+<path id="r-40" d="M -63.640,-63.640 L 0.000,-210.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="41" d="M 0.000,150.000 L -183.848,183.848" />  </g>
+<path id="r-41" d="M -183.848,183.848 L 0.000,150.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="42" d="M 0.000,150.000 L -106.066,-106.066" />  </g>
+<path id="r-42" d="M -106.066,-106.066 L 0.000,150.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="43" d="M 0.000,150.000 L 0.000,90.000" />  </g>
+<path id="r-43" d="M 0.000,90.000 L 0.000,150.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="44" d="M 0.000,90.000 L -148.492,148.492" />  </g>
+<path id="r-44" d="M -148.492,148.492 L 0.000,90.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="45" d="M 0.000,90.000 L -63.640,-63.640" />  </g>
+<path id="r-45" d="M -63.640,-63.640 L 0.000,90.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="46" d="M -106.066,-106.066 L -260.000,-0.000" />  </g>
+<path id="r-46" d="M -260.000,-0.000 L -106.066,-106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="47" d="M -106.066,-106.066 L -63.640,-63.640" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="48" d="M -63.640,-63.640 L -210.000,-0.000" />  </g>
+<path id="r-48" d="M -210.000,-0.000 L -63.640,-63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="49" d="M 106.066,106.066 L -150.000,-0.000" />  </g>
+<path id="r-49" d="M -150.000,-0.000 L 106.066,106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="50" d="M 106.066,106.066 L 0.000,260.000" />  </g>
+<path id="r-50" d="M 0.000,260.000 L 106.066,106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="51" d="M 106.066,106.066 L 0.000,-150.000" />  </g>
+<path id="r-51" d="M 0.000,-150.000 L 106.066,106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="52" d="M 106.066,106.066 L 63.640,63.640" />  </g>
+<path id="r-52" d="M 63.640,63.640 L 106.066,106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="53" d="M 63.640,63.640 L -90.000,-0.000" />  </g>
+<path id="r-53" d="M -90.000,-0.000 L 63.640,63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="54" d="M 63.640,63.640 L 0.000,210.000" />  </g>
+<path id="r-54" d="M 0.000,210.000 L 63.640,63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="55" d="M 63.640,63.640 L 0.000,-90.000" />  </g>
+<path id="r-55" d="M 0.000,-90.000 L 63.640,63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="56" d="M 0.000,-150.000 L -183.848,-183.848" />  </g>
+<path id="r-56" d="M -183.848,-183.848 L 0.000,-150.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="57" d="M 0.000,-150.000 L -106.066,106.066" />  </g>
+<path id="r-57" d="M -106.066,106.066 L 0.000,-150.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="58" d="M 0.000,-150.000 L 0.000,-90.000" />  </g>
+<path id="r-58" d="M 0.000,-90.000 L 0.000,-150.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="59" d="M 0.000,-90.000 L -148.492,-148.492" />  </g>
+<path id="r-59" d="M -148.492,-148.492 L 0.000,-90.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="60" d="M 0.000,-90.000 L -63.640,63.640" />  </g>
+<path id="r-60" d="M -63.640,63.640 L 0.000,-90.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="61" d="M 0.000,260.000 L -183.848,183.848" />  </g>
+<path id="r-61" d="M -183.848,183.848 L 0.000,260.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="62" d="M 0.000,260.000 L -106.066,106.066" />  </g>
+<path id="r-62" d="M -106.066,106.066 L 0.000,260.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="63" d="M 0.000,260.000 L 0.000,210.000" />  </g>
+<path id="r-63" d="M 0.000,210.000 L 0.000,260.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="64" d="M 0.000,210.000 L -148.492,148.492" />  </g>
+<path id="r-64" d="M -148.492,148.492 L 0.000,210.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="65" d="M 0.000,210.000 L -63.640,63.640" />  </g>
+<path id="r-65" d="M -63.640,63.640 L 0.000,210.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="66" d="M -106.066,106.066 L -260.000,-0.000" />  </g>
+<path id="r-66" d="M -260.000,-0.000 L -106.066,106.066" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="67" d="M -106.066,106.066 L -63.640,63.640" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="68" d="M -63.640,63.640 L -210.000,-0.000" />  </g>
+<path id="r-68" d="M -210.000,-0.000 L -63.640,63.640" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="69" d="M -150.000,-0.000 L -183.848,183.848" />  </g>
+<path id="r-69" d="M -183.848,183.848 L -150.000,-0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="70" d="M -150.000,-0.000 L -183.848,-183.848" />  </g>
+<path id="r-70" d="M -183.848,-183.848 L -150.000,-0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="71" d="M -150.000,-0.000 L -90.000,-0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="72" d="M -90.000,-0.000 L -148.492,148.492" />  </g>
+<path id="r-72" d="M -148.492,148.492 L -90.000,-0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="73" d="M -90.000,-0.000 L -148.492,-148.492" />  </g>
+<path id="r-73" d="M -148.492,-148.492 L -90.000,-0.000" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="74" d="M -183.848,-183.848 L -260.000,-0.000" />  </g>
+<path id="r-74" d="M -260.000,-0.000 L -183.848,-183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="75" d="M -183.848,-183.848 L -148.492,-148.492" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="76" d="M -148.492,-148.492 L -210.000,-0.000" />  </g>
+<path id="r-76" d="M -210.000,-0.000 L -148.492,-148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="77" d="M -183.848,183.848 L -260.000,-0.000" />  </g>
+<path id="r-77" d="M -260.000,-0.000 L -183.848,183.848" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="78" d="M -183.848,183.848 L -148.492,148.492" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="79" d="M -148.492,148.492 L -210.000,-0.000" />  </g>
+<path id="r-79" d="M -210.000,-0.000 L -148.492,148.492" display="none"/>
+ <g  stroke-width="0.5" stroke="black" fill="none" >  <path id="80" d="M -260.000,-0.000 L -210.000,-0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="Red" >  <path id="81" d="M 276.500,0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="82" d="M 122.566,-106.066 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="83" d="M 122.566,106.066 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="84" d="M -133.500,-0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="85" d="M 200.348,183.848 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="86" d="M 16.500,150.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="87" d="M 16.500,260.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="88" d="M -167.348,183.848 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="89" d="M 200.348,-183.848 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="90" d="M 16.500,-260.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="91" d="M 16.500,-150.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="92" d="M -167.348,-183.848 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="93" d="M 166.500,0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="94" d="M -89.566,-106.066 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="95" d="M -89.566,106.066 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="Red" >  <path id="96" d="M -243.500,-0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="97" d="M 226.500,0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="98" d="M 80.140,-63.640 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="99" d="M 80.140,63.640 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="Red" >  <path id="100" d="M -73.500,-0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="101" d="M 164.992,148.492 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="102" d="M 16.500,90.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="103" d="M 16.500,210.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="104" d="M -131.992,148.492 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="105" d="M 164.992,-148.492 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="106" d="M 16.500,-210.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="107" d="M 16.500,-90.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="108" d="M -131.992,-148.492 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="Red" >  <path id="109" d="M 106.500,0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="110" d="M -47.140,-63.640 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="111" d="M -47.140,63.640 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+ <g  stroke-width="0.5" stroke="black" fill="White" >  <path id="112" d="M -193.500,-0.000 a 16.5 16.5 0 1 1 -33.000,0.000 a 16.5 16.5 0 1 1 33.000,0.000" />  </g>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(260.000,0.000)">00000</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(106.066,-106.066)">01000</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(106.066,106.066)">10000</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-150.000,-0.000)">11000</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(183.848,183.848)">00100</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,150.000)">01100</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,260.000)">10100</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-183.848,183.848)">11100</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(183.848,-183.848)">00010</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,-260.000)">01010</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,-150.000)">10010</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-183.848,-183.848)">11010</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(150.000,0.000)">00110</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-106.066,-106.066)">01110</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-106.066,106.066)">10110</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-260.000,-0.000)">11110</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(210.000,0.000)">00001</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(63.640,-63.640)">01001</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(63.640,63.640)">10001</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-90.000,-0.000)">11001</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(148.492,148.492)">00101</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,90.000)">01101</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,210.000)">10101</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-148.492,148.492)">11101</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(148.492,-148.492)">00011</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,-210.000)">01011</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(0.000,-90.000)">10011</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-148.492,-148.492)">11011</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(90.000,0.000)">00111</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-63.640,-63.640)">01111</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-63.640,63.640)">10111</text>
+<text x="0" y="0"   font-size="x-small" font-family="sans-serif" text-anchor="middle"  dominant-baseline="central" transform="translate(-210.000,-0.000)">11111</text>
+</svg>
