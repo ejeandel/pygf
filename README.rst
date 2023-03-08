@@ -1,14 +1,6 @@
-angles to bezier
+pygf (for Python Graphics Format) is a library inspired by PGF (https://ctan.org/pkg/pgf).
 
-(p1:angle1) to (p2:angle2) ==>
-
-(p1)
-(p1 + 0.3951 dist(p1,p2) à l'angle angle1)
-(p2 - 0.3951 dist(p1,p2) à l'angle angle2)
-(p2)
-
-
-bezier to angle
+It provides the user with a common framework that can generate either .svg files or .tex files (to be compiled to a pdf).
 
 
 
