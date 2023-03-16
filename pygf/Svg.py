@@ -10,7 +10,6 @@ def dic_to_svglist(d):
 class SvgLayer(Layer):
     def __init__(self, transform = None):
         Layer.__init__(self, transform)
-        self.nodes = {}
         self.names = 0
         self.nodelayer = []
         self.edgelayer = []
@@ -84,11 +83,17 @@ class SvgLayer(Layer):
             del style["fill"]
             if fill == None:
                 fill = "none"
+            if "opacity" in style:
+                svg_style["fill-opacity"] = style["opacity"]
+                del style["opacity"]
         else:
             fill = "none"
         svg_style["fill"] = fill
 
-        
+        if "rounded" in style and style["rounded"]:
+            del style["rounded"]
+            svg_style["stroke-linejoin"]="round"
+                
         #self.parse_arrows(style, svg_style) TODO
 
     def parse_text_style(self, style, text_style):
@@ -215,14 +220,19 @@ class SvgLayer(Layer):
  
         
     def rectangle(self, p1, p2, **style):
-        tf = self.svgtransform * self.transform
         r = Rectangle(p1,p2)
-        svg_style = {}
-        self.parse_style(style, svg_style)
-        if "rounded" in style and style["rounded"]:
-            svg_style.update({"rx": "2%"})            
+        self.polyline([r.northwest, r.northeast, r.southeast, r.southwest], closed=True, **style)
+
+        #tf = self.svgtransform * self.transform
+        #svg_style = {}
+        #if "rounded" in style and style["rounded"]:
+        #    svg_style.update({"rx": "2%"})
+        #    del style["rounded"]
+        #self.parse_style(style, svg_style)
+
+        #se
         #self.nodelayer += [f'<polygon  points="{tf(r.southeast)} {tf(r.southwest)} {tf(r.northwest)} {tf(r.northeast)}" {dic_to_svglist(svg_style)}/>']
-        self.nodelayer += [f'<rect x="{tf(r.northwest).x}" y="{tf(r.northwest).y}" width="{(tf(r.northeast)-tf(r.northwest)).x}" height="{(tf(r.southwest)-tf(r.northwest)).y}" {dic_to_svglist(svg_style)}/>']        
+        #self.nodelayer += [f'<rect x="{tf(r.northwest).x}" y="{tf(r.northwest).y}" width="{(tf(r.northeast)-tf(r.northwest)).x}" height="{(tf(r.southwest)-tf(r.northwest)).y}" {dic_to_svglist(svg_style)}/>']        
                 
             
 
@@ -270,133 +280,6 @@ class SvgLayer(Layer):
         
         self.nodelayer += [f'<text x="{x}" y="{y}"   {dic_to_svglist(text_style)} text-anchor="{align}"  dominant-baseline="{valign}" transform="translate({self.svgtransform(point)})">{text}</text>']
         
-
-
-        
-    def do_style(self, style):
-        r = 0.1
-        thickness = 1        
-        attributes = {}
-        attributes['vector-effect'] = "non-scaling-stroke"
-        object_transform = Transform(1,1)
-
-            
-        attributes["fill"] = style["fill"] if "fill" in style else "none"
-        if "draw" in style:
-            if style["draw"] != '':
-                attributes["stroke"] = style["draw"]
-            else:
-                attributes["stroke"] = "black"
-        else:
-            attributes["stroke"] = "black"
-        scale = (self.svgtransform(Point(1,1))).x
-        attributes["stroke-width"] = "%.3g" % (0.03*scale)
-        return dic_to_svglist(attributes)
-        
-        
-
-    
-    def parse_style_old(self, style, pos):
-        r = 0.1
-        thickness = 1        
-        attributes = {}
-        attributes['vector-effect'] = "non-scaling-stroke"
-        attributes['transform'] = f"translate({self.svgtransform(pos)})"
-        object_transform = Transform(1,1)
-
-            
-        attributes["fill"] = style["fill"] if "fill" in style else "none"
-        if "draw" in style:
-            if style["draw"] != '':
-                attributes["stroke"] = style["draw"]
-            else:
-                attributes["stroke"] = "black"
-        else:
-            attributes["stroke"] = "none"
-        scale = (self.svgtransform(Point(1,1))).x
-        attributes["stroke-width"] = "%.3g" % (0.01*scale)
-        return dic_to_svglist(attributes)
-        
-
-    def do_text(self, style,pos, placement = lambda x:Point(0,0)):
-        if not "label" in style:
-            return
-        
-        def parse_position(position):
-            angles = {'right': 0, 'above right': 45, 'above': 90, 'above left': 135,
-                      'left': 180, 'below left': 225, 'below': 270, 'below right' : 315}
-            if position in angles:
-                return angles[position]
-            else:
-                try:
-                    position = int(position)
-                    if position < 0:
-                        position = 360+position                
-                    return position
-                except:
-                    raise TypeError
-                
-        def compute_anchors(position):
-            x = 0
-            y = 0
-            if position in [92,91,90,89,88,268, 269,270,271,272]:
-                align = "center"
-                x = -50
-            elif position < 90 or position > 270:
-                align = "left"
-                x = 0
-            else:
-                x = -100
-                align = "right"
-
-            if position in [358,359,0,1,2,178,179,180,181,182]:
-                valign = "middle"
-                y = -50
-            elif position < 180:
-                valign = "bottom"
-                y = -100
-            else:
-                valign = "top"
-                y = 0
-            return (x,y,align, valign)
-            
-        if not "label_hints" in style:
-            label_hints = {"label position": "right"}
-        else:
-            label_hints = style["label_hints"]
-        position = label_hints["label position"] if "label position" in label_hints else "right"
-        if position == "center":
-            tpos = pos
-            x = -50
-            y = -50
-            valign='middle'
-            align='center'
-        else:
-            angle = parse_position(position)
-            (x,y,align,valign)= compute_anchors(angle)
-            where = placement(angle*math.pi/180)            
-            tpos = pos + where
-        self.nodelayer += [f'<text x="{x}" y="{y}" font-family="sans-serif" font-size="0.2" text-anchor="center"  transform="translate({self.svgtransform(tpos)})">{style["label"]}</text>']
-
-        pass
-
-    def new_node(self, node):
-        Layer.new_node(self, node)        
-        if node.style is not None:
-            st = {}
-            st.update(node.style)
-            if "style" in node.style:
-                st.update(Options.styles[style['style']])
-            style = st
-            if not ("shape" in node.style):
-                self.do_text(style, name, self.transform(node.position))
-            elif style["shape"] == "circle":
-                self.circle_node(node,self.transform(node.position))
-            elif style["shape"] == "rectangle":
-                self.rectangle_node(node.style, name, self.transform(pos))
-        pass
-
-
     
     def edge(self, points, labels = None, **style):
        
@@ -438,6 +321,64 @@ class SvgLayer(Layer):
         self.__path(path, reverse_path, reverse_start, reverse_end, labels, style)
         
 
+    def polyline(self, points, labels = None, closed = False, **style):       
+        tf = self.svgtransform * self.transform
+
+        if closed:
+            points += [points[0]]            
+        
+        if "rounded" in style and style["rounded"] and len(points) != 2:
+            path = ""
+            reverse_path = ""
+            for i in range(len(points) - 2):
+                p0 = points[i]
+                p1 = points[i+1]
+                p2 = points[i+2]
+                if p1.distance(p2) > p0.distance(p1):
+                    ratio = min(12,p1.distance(p2)/p0.distance(p1))
+                    t1 = 0.04*ratio
+                    t2 = 0.04
+                else:
+                    ratio = min(12,p0.distance(p1)/p1.distance(p2))                    
+                    t1 = 0.04
+                    t2 = 0.04*ratio
+                beforep1 = p0 * t1 + p1 * (1-t1)
+                afterp1 = p1 * (1-t2) + p2 * t2
+                path += f" L {tf(beforep1)}"
+                path += f" Q {tf(p1)} {tf(afterp1)}"
+                # reverse_path starts from p2, goes to afterp1 
+                reverse_path = f" Q {tf(p1)} {tf(beforep1)}" + reverse_path
+                reverse_path = f" L {tf(afterp1)}" + reverse_path
+            if not closed:
+                path = f"M {tf(points[0])}" + path + f" L {tf(p2)}"
+                reverse_path = f"M {tf(p2)}" + reverse_path + f"L {tf(points[0])}"
+            else:
+                p0 = points[-2]
+                p1 = points[0]
+                p2 = points[1]
+                if p1.distance(p2) > p0.distance(p1):
+                    ratio = min(12,p1.distance(p2)/p0.distance(p1))
+                    t1 = 0.04*ratio
+                    t2 = 0.04
+                else:
+                    ratio = min(12,p0.distance(p1)/p1.distance(p2))                    
+                    t1 = 0.04
+                    t2 = 0.04*ratio
+                beforep1 = p0 * t1 + p1 * (1-t1)
+                afterp1 = p1 * (1-t2) + p2 * t2
+                path = f"M {tf(afterp1)}" + path + f" L {tf(beforep1)} Q {tf(p1)} {tf(afterp1)}"
+                reverse_path = f"M {tf(afterp1)} Q {tf(p1)} {tf(beforep1)}" + reverse_path + f" L {tf(afterp1)}"                
+        else:
+            # not rounded
+            path = f"M {tf(points[0])} L " + " ".join(str(tf(p)) for p in points[1:])
+            reverse_path = f"M {tf(points[-1])} L " + " ".join(str(tf(p)) for p in points[-2::-1])
+            
+        # todo: on peut faire mieux je pense
+        reverse_start = abs((points[1] - points[0]).angle) > math.pi/2
+        reverse_end = abs((points[-1] - points[-2]).angle) > math.pi/2
+        self.__path(path, reverse_path, reverse_start, reverse_end, labels, style)
+       
+        
                 
 
     def draw(self, rect,f= None, commands = "", preamble = False):

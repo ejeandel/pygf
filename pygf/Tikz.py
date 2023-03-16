@@ -15,12 +15,10 @@ def escape(x):
     return x
 
 class TikzLayer(Layer):
-    __slots__=('nodelayer', 'edgelayer', 'transform', 'nodes','names')
     def __init__(self, transform = None):
         Layer.__init__(self, transform)
         self.nodelayer = ""
         self.edgelayer = ""
-        self.nodes = {}
         self.names = 0
 
 
@@ -55,9 +53,6 @@ class TikzLayer(Layer):
         r = Rectangle(p1,p2)        
         tikz_style={}
         self.parse_style(style, tikz_style)
-        if "rounded" in style and style["rounded"]:
-            del style["rounded"]
-            tikz_style.update({"rounded corners": None})
         tikz_style.update(style)
         self.nodelayer += "\\path[{opts}] ({sw}) rectangle ({ne});\n".format(opts = dic_to_list(tikz_style), sw=self.transform(r.southwest), ne=self.transform(r.northeast))
         
@@ -99,6 +94,9 @@ class TikzLayer(Layer):
             return
         fill = gen_style["fill"]
         tikz_style.update({"fill": fill})
+        if "opacity" in gen_style:
+            tikz_style.update({"fill opacity": gen_style["opacity"]})
+            del gen_style["opacity"]
         del gen_style["fill"]
 
     def parse_drawness(self, gen_style, tikz_style):
@@ -144,6 +142,10 @@ class TikzLayer(Layer):
         self.parse_fillness(style, tikz_style)
         self.parse_arrows(style, tikz_style)
         self.parse_text(style, tikz_style)
+        if "rounded" in style and style["rounded"]:
+            del style["rounded"]
+            tikz_style.update({"rounded corners": None})
+        
         
 
     def convert_angle(self, angle):
@@ -225,10 +227,40 @@ class TikzLayer(Layer):
                   s += f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} " 
         self.edgelayer+= s + ";\n"
 
+    def polyline(self, points, labels = None, closed = False, **style):
+        todraw = points
+        (current_node, _) = todraw[0]
+        if style is None:
+            style = {}
 
+        tikz_style={}
+        self.parse_style(style, tikz_style)
+        tikz_style.update(style)
+
+        reverse_start = abs((points[1] - points[0]).angle) > math.pi/2
+        if closed:
+            reverse_end = abs((points[0] - points[-1]).angle) > math.pi/2
+        else:
+            reverse_end = abs((points[-1] - points[-2]).angle) > math.pi/2
+
+        listpoints = list(map(lambda x: f"({x})", points))
+        if closed:
+            listpoints += ["cycle"]
+            
+        if labels is not None:
+             if "above start" in labels:
+                 listpoints[1] = listpoints[1] + f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'} ] {{{labels['above start']}}} " 
+             if "below start" in labels:
+                 listpoints[1] = listpoints[1] + f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}] {{{labels['below start']}}} " 
+             if "above end" in labels:
+                 listpoints[-1] = listpoints[-1] + f"node [sloped,pos=100,above {'left' if not reverse_end else 'right'}] {{{labels['above end']}}} " 
+             if "below end" in labels:
+                 listpoints[-1] = listpoints[-1] + f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} "
+
+        s = "\\draw[%s] " % dic_to_list(tikz_style) + "--".join(listpoints)
         
-
-
+        self.edgelayer+= s + ";\n"
+                
     def draw(self, rect,f, options = {}, preamble = False):
 
         if preamble:

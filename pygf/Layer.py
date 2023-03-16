@@ -58,14 +58,6 @@ class Wire:
 
 class Layer(ABC):
     """Abstract class that represents a graphics system
-
-    From the point of view of this class, a graphic system can represent:
-    - Text 
-    - Nodes, possibly with a label
-    - Edges, that can connect nodes, possibly with a given orientation (an angle)             
-    .. todo::
-       parameters of style
-
     """
     
     __slots__ = ('nodes')
@@ -91,6 +83,14 @@ class Layer(ABC):
     def circle(self, p1, radius, labels = None, **style):
         pass
 
+    @abstractmethod
+    def edge(self, points, labels = None, **style):
+        pass
+
+    @abstractmethod
+    def polyline(self, points, closed = False, labels = None, **style):
+        pass
+    
     
     @abstractmethod
     def picture(self, point, img_name, width, height):
@@ -99,15 +99,9 @@ class Layer(ABC):
     def writeStyle(f):
         pass
 
-
-    def new_node(self, node):
-        pass
-        #self.nodes[name] = node
-
-
+    @abstractmethod
     def draw(self, r, fs= None, commands = "", preamble = False):
         pass
-    pass
 
     def find_angles(self, points):
         def in_angle(node1, node2):
@@ -161,12 +155,15 @@ class NoLayer(Layer):
     def writeStyle(f):
         pass
 
-    def new_node(self, node):
-        pass
-
     def picture(self, point, img_name, width, height):
         pass
     
     def draw(self, r, fs= None, commands = "", preamble = False):
         pass
 
+    def polyline(self, points, closed = False, labels = None, **style):
+        pass
+
+    def edge(self, points, labels = None, **style):
+        pass
+    

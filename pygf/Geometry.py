@@ -68,7 +68,7 @@ class Point:
             raise IndexError
 
     def distance(self, p):
-        return math.sqrt((self.x-p.x)**2 + (self.y-p.y)**2)
+        return math.hypot(self.x-p.x,self.y-p.y)
 
     @property
     def angle(self):
@@ -83,6 +83,9 @@ class Point:
     def __rmul__(self, m):
         return Point(m*self.x, m*self.y)
 
+    def __mul__(self, m):
+        return Point(m*self.x, m*self.y)
+    
     def __or__(self, p):
         return Point(self.x, p.y)
     
