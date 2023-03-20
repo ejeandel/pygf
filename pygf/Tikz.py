@@ -104,7 +104,8 @@ class TikzLayer(Layer):
             tikz_style.update({"draw": "black"})            
             return
         color = gen_style["draw"]
-        tikz_style.update({"draw": color})            
+        if color is not None:
+            tikz_style.update({"draw": color})            
         del gen_style["draw"]
         
     def parse_arrows(self, gen_style, tikz_style):
@@ -163,7 +164,7 @@ class TikzLayer(Layer):
         tikz_style={}
         self.parse_style(style, tikz_style)
         tikz_style.update(style)
-        s += "\\draw[%s] (%s) -- (%s)" % (dic_to_list(tikz_style),p1, p2)
+        s += "\\path[%s] (%s) -- (%s)" % (dic_to_list(tikz_style),p1, p2)
 
 
         reverse_start = abs((p2 - p1).angle) > math.pi/2
@@ -204,7 +205,7 @@ class TikzLayer(Layer):
         tikz_style={}
         self.parse_style(style, tikz_style)
         tikz_style.update(style)
-        s += "\\draw[%s] (%s)" % (dic_to_list(tikz_style),points[0][0])
+        s += "\\path[%s] (%s)" % (dic_to_list(tikz_style),points[0][0])
             
         for i in range(len(points)-1):
             (current_node, _) = points[i+1]
@@ -257,11 +258,13 @@ class TikzLayer(Layer):
              if "below end" in labels:
                  listpoints[-1] = listpoints[-1] + f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} "
 
-        s = "\\draw[%s] " % dic_to_list(tikz_style) + "--".join(listpoints)
+        s = "\\path[%s] " % dic_to_list(tikz_style) + "--".join(listpoints)
         
         self.edgelayer+= s + ";\n"
                 
-    def draw(self, rect,f, options = {}, preamble = False):
+    def draw(self, rect,f, options = None, preamble = False):
+        if options is None:
+            options = {}
 
         if preamble:
             print(r"""\documentclass{standalone}

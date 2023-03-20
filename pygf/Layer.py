@@ -4,75 +4,22 @@ from .Geometry import Point, Transform
 
 
 
-class Node:
-    """ A node has a position (a Diagram.Geometry.Point) and a style
-    """
-
-    def __init__(self, position, style = None):
-        self.position = position
-        if style is not None:
-            self.style = style
-        else:
-            self.style = {}
-        pass
-
-    def __str__(self):
-        return f"{self.position} {self.style}"
-    
-class Wire:
-    """A wire represents a succession of points, and is associated with a certain style
-
-    :param point: the first point on the wire
-    :type point: Point
-    :param angle: the angle 
-    :type angle: float, optional
-    :param wire_style: the style of the wire
-    :type wire_style: dict
-
-    .. todo::
-       Point
-
-"""
-    __slots__ = ('l', 'wire_style')
-    def __init__(self,point,angle=None, wire_style=None):
-        if wire_style is None:
-            raise TypeError
-        if type(wire_style) != dict:
-            raise TypeError
-        self.l = [(point,angle)]
-        self.wire_style = wire_style
-
-    def add(self, point,angle=None):
-        """add a point to the wire, same arguments as the constructor        
-        """
-        if type(point) == int:
-            raise oups
-        self.l += [(point,angle)]
-        
-    def __len__(self):
-        return len(self.l)
-
-    def __getitem__(self, x):
-        return self.l[x]
-
 
 class Layer(ABC):
     """Abstract class that represents a graphics system
     """
     
-    __slots__ = ('nodes')
     def __init__(self, transform = None):
         if transform is None:
             transform = Transform()
         self.transform = transform
-        self.nodes = {}
 
     @abstractmethod
-    def line(self, p1, p2, labels = None, style = None):        
+    def line(self, p1, p2, labels = None, **style):        
         pass
     
     @abstractmethod
-    def text(self, text):
+    def text(self, point, text, **style):
         pass
 
     @abstractmethod
@@ -88,7 +35,7 @@ class Layer(ABC):
         pass
 
     @abstractmethod
-    def polyline(self, points, closed = False, labels = None, **style):
+    def polyline(self, points, labels = None, closed = False, **style):
         pass
     
     
@@ -96,11 +43,8 @@ class Layer(ABC):
     def picture(self, point, img_name, width, height):
         pass
     
-    def writeStyle(f):
-        pass
-
     @abstractmethod
-    def draw(self, r, fs= None, commands = "", preamble = False):
+    def draw(self, r, fs= None, commands = None, preamble = False):
         pass
 
     def find_angles(self, points):
@@ -140,30 +84,73 @@ class NoLayer(Layer):
     def __init__(self):
         pass
 
-    def line(self, p1, p2, labels = None, style = None):        
-        pass
-    
-    def text(self, text):
+    def line(self, p1, p2, labels = None, **style):        
         pass
 
+    def text(self, point, text, **style):
+        pass
+    
     def rectangle(self, p1, p2, **style):
         pass
 
     def circle(self, p1, radius, labels = None, **style):
         pass
     
-    def writeStyle(f):
-        pass
-
     def picture(self, point, img_name, width, height):
         pass
     
-    def draw(self, r, fs= None, commands = "", preamble = False):
+    def draw(self, r, fs= None, commands = None, preamble = False):
         pass
 
-    def polyline(self, points, closed = False, labels = None, **style):
+    def polyline(self, points, labels = None, closed = False,  **style):
         pass
 
     def edge(self, points, labels = None, **style):
         pass
     
+
+
+class MultiLayer(Layer):
+    def __init__(self, layers):
+        self.layers = layers
+
+    def line(self, p1, p2, labels = None, **style):        
+        for layer in self.layers:
+            layer.line(p1, p2, labels, **style)
+
+    def text(self, point, text, **style):
+        for layer in self.layers:
+            layer.text(point, text, **style)
+
+    def rectangle(self, p1, p2, **style):
+        for layer in self.layers:
+            layer.rectangle(p1, p2, **style)
+        
+    def circle(self, p1, radius, labels = None, **style):
+        for layer in self.layers:
+            layer.circle(p1, radius, labels, **style)
+
+            
+    def edge(self, points, labels = None, **style):
+        for layer in self.layers:
+            layer.edge(points, labels, **style)
+
+    def polyline(self, points, labels = None, closed = False, **style):
+        for layer in self.layers:
+            layer.polyline(points, labels,closed,  **style)
+
+    
+    
+    def picture(self, point, img_name, width, height):
+        for layer in self.layers:
+            layer.polyline(points, img_name, width, height)
+
+    
+    def draw(self, r, files= None, commands = None, preamble = False):
+        if files is not None:
+            for (layer,fs) in zip(self.layers,files):
+                layer.draw(r, fs, commands, preamble)
+        else:
+            for layer in self.layers:
+                layer.draw(r, None, commands, preamble)
+        
