@@ -285,7 +285,7 @@ class SvgLayer(Layer):
        
         tf = self.svgtransform * self.transform
         angles = list(map(lambda x: x*math.pi/180, self.find_angles(points)))
-        (current_node, _) = points[0]
+        current_node = points[0]
         
         if "looseness" in style:
             looseness = style["looseness"]
@@ -296,7 +296,7 @@ class SvgLayer(Layer):
         curve = []
         point=current_node
         for i in range(len(points)-1):            
-            (current_node, _) = points[i+1]
+            current_node = points[i+1]
             newpoint = current_node
             dst = looseness * 0.3951*newpoint.distance(point)
             fstcontrol = point + Point(dst, angles[i], polar=True)
@@ -316,8 +316,8 @@ class SvgLayer(Layer):
             reverse_path += f"C {tf(c)} {tf(b)} {tf(a)}"
             
         # todo: on peut faire mieux je pense
-        reverse_start = abs((points[1][0] - points[0][0]).angle) > math.pi/2
-        reverse_end = abs((points[-1][0] - points[-2][0]).angle) > math.pi/2
+        reverse_start = abs((points[1] - points[0]).angle) > math.pi/2
+        reverse_end = abs((points[-1] - points[-2]).angle) > math.pi/2
         self.__path(path, reverse_path, reverse_start, reverse_end, labels, style)
         
 

@@ -1,12 +1,11 @@
 import sys
 from pygf.Tikz import TikzLayer
 from pygf.Svg import SvgLayer
-from pygf.Layer import Wire,Node
-from pygf.Geometry import Transform,Point, Rectangle
+from pygf.Geometry import Transform,Point as p, Rectangle
 import math
 
 """ choose if you want to you Svg or Tikz to render the picture """
-tikz = False
+tikz = True
 
 if tikz:
     layer = TikzLayer()
@@ -16,10 +15,10 @@ else:
 
 """ add a point """
 
-layer.text(Point(0,0),"A", position="above")
+layer.text(p(0,0),"A", position="above")
 
 """ add a line """
-layer.line(Point(0,0), Point(5,-5), arrow="->", 
+layer.line(p(0,0), p(5,-5), arrow="->", 
            labels = {
                "above end" : "line with text at the end"
            })
@@ -28,27 +27,27 @@ layer.line(Point(0,0), Point(5,-5), arrow="->",
 You need to specify at which angle the curve should leave through the point.
 """
 
-layer.edge([(Point(0,0), 180), (Point(0, -2), 0), (Point(2,-2), 60)], draw="Red")
+layer.edge([p(0,0)['angle':180], p(0, -2)['angle':0], p(2,-2)['angle':60]], draw="Red")
 
-layer.edge([(Point(0,0), None), (Point(0, -2), None), (Point(2,-2), None)], draw = "Blue")
+layer.edge([p(0,0), p(0, -2), p(2,-2)], draw = "Blue")
 
-layer.edge([(Point(0,-3), None), (Point(0,-5), None), (Point(2,-5), None)], draw = "Blue", fill="Red")
+layer.edge([p(0,-3), p(0,-5), p(2,-5)], draw = "Blue", fill="Red")
 
 
 """ draw a circle and a rectangle """
 
-layer.circle(Point(4,-2),1,fill="Red")
+layer.circle(p(4,-2),1,fill="Red")
 
-layer.rectangle(Point(4,-2), Point(1,-4) ,fill="Blue")
+layer.rectangle(p(4,-2), p(1,-4) ,fill="Blue")
 
 
 
 """ draw the result. You need to specify the bounding box you want """
 
 if tikz:
-    layer.draw(Rectangle(Point(-2,-10), Point(10,2)), open("test.tex", "w"), preamble=True)
+    layer.draw(Rectangle(p(-2,-10), p(10,2)), open("test.tex", "w"), preamble=True)
 else:
-    layer.draw(Rectangle(Point(-2,-10), Point(10,2)), open("test.svg", "w"), preamble=True)
+    layer.draw(Rectangle(p(-2,-10), p(10,2)), open("test.svg", "w"), preamble=True)
 
 
 sys.exit(0)

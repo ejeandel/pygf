@@ -191,8 +191,7 @@ class TikzLayer(Layer):
         
     def edge(self, points, labels = None, **style):
         l = self.find_angles(points)
-        todraw = points
-        (current_node, _) = todraw[0]
+        current_node = points[0]
         s = ""
         if style is None:
             style = {}
@@ -205,17 +204,17 @@ class TikzLayer(Layer):
         tikz_style={}
         self.parse_style(style, tikz_style)
         tikz_style.update(style)
-        s += "\\path[%s] (%s)" % (dic_to_list(tikz_style),points[0][0])
+        s += "\\path[%s] (%s)" % (dic_to_list(tikz_style),points[0])
             
         for i in range(len(points)-1):
-            (current_node, _) = points[i+1]
+            current_node = points[i+1]
             if looseness != 1:
                 s += " to[out=%3.3g, in=%3.3g, looseness=%3.3g] (%s) " % (self.convert_angle(l[i]),self.convert_angle(180+l[i+1]), looseness, current_node)
             else:
                 s += " to[out=%3.3g, in=%3.3g] (%s) " % (self.convert_angle(l[i]),self.convert_angle(180+l[i+1]), current_node)
 
-        reverse_start = abs((points[1][0] - points[0][0]).angle) > math.pi/2
-        reverse_end = abs((points[-1][0] - points[-2][0]).angle) > math.pi/2
+        reverse_start = abs((points[1] - points[0]).angle) > math.pi/2
+        reverse_end = abs((points[-1] - points[-2]).angle) > math.pi/2
 
         if labels is not None:
              if "above start" in labels:
@@ -229,8 +228,6 @@ class TikzLayer(Layer):
         self.edgelayer+= s + ";\n"
 
     def polyline(self, points, labels = None, closed = False, **style):
-        todraw = points
-        (current_node, _) = todraw[0]
         if style is None:
             style = {}
 
@@ -272,9 +269,6 @@ class TikzLayer(Layer):
 \usepackage{tikz}
 \usepackage{mathtools}
 \usetikzlibrary{backgrounds,shapes.geometric,arrows.meta}
-\pgfdeclarelayer{edgelayer}
-\pgfdeclarelayer{nodelayer}
-\pgfsetlayers{background,edgelayer,nodelayer,main}
             """, file = f)
 
             self.writeStyle(f)
@@ -293,32 +287,12 @@ class TikzLayer(Layer):
         rect = Rectangle(x,y)        
 
         print(rf"\clip ({rect.northwest}) rectangle ({rect.southeast});", file=f)
-        print(r"\begin{pgfonlayer}{nodelayer}", file = f)
-        print(self.nodelayer, file = f, end="")
-        print(r"\end{pgfonlayer}", file = f)
-        print(r"\begin{pgfonlayer}{edgelayer}", file = f)
         print(self.edgelayer, file = f, end="")
-        print(r"\end{pgfonlayer}", file = f)
+        print(self.nodelayer, file = f, end="")
         print(r"\end{tikzpicture}", file = f)
         if preamble:
             print(r"\end{document}", file=f)
             
-    def writeStyle(self, f):
-        styles = Options.styles
-        # layers
-        print(r"\pgfdeclarelayer{edgelayer}\pgfdeclarelayer{nodelayer}\pgfsetlayers{background,edgelayer,nodelayer,main}",file=f)
-
-        for key in styles:
-            style = {}
-            style.update(styles[key])
-            if 'labelstyle' in style:
-                del style['labelstyle']
-            if 'alt_label' in style:
-                del style['alt_label']
-            print(r"\tikzstyle{%s}=[%s]" % (key, dic_to_list(style)), file=f)
-            
-            #code for shape
-
 
 
 register_layer('tikz',TikzLayer)

@@ -59,17 +59,22 @@ class Layer(ABC):
         """ Helper function: find the angles for the wires """
         l = []
         todraw = points
-        (current_node, current_hint) = todraw[0]
-        (next_node, next_hint) = todraw[1]
+        current_node = todraw[0]
+        current_hint = current_node.get('angle')
+        next_node = todraw[1]
+        next_hint = next_node.get('angle')
         angle = current_hint
         if angle is None:
             angle = in_angle(current_node, next_node)
         l += [angle]
         for i in range(len(points)-1):
-            (prev_node, prev_hint) = todraw[i]
-            (current_node, current_hint) = todraw[i+1]
+            prev_node = todraw[i]
+            prev_hint = prev_node.get('angle')
+            current_node = todraw[i+1]
+            current_hint = current_node.get('angle')
             if i != len(points) - 2:
-                (next_node, next_hint) = todraw[i+2]
+                next_node = todraw[i+2]
+                next_hint = next_node.get('angle')
             else:
                 next_node = None
             if current_hint is None:

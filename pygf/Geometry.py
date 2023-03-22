@@ -1,4 +1,5 @@
 import math
+import copy
 
 """ The Transform class """
 class Transform:
@@ -49,7 +50,7 @@ class Transform:
 """ The famous Point class """
 
 class Point:
-    __slots__ = ('x', 'y')
+    __slots__ = ('x', 'y', 'dico')
     
     def __init__(self, fst, snd, polar = False):
         if polar is False:
@@ -58,15 +59,23 @@ class Point:
         else:
             self.x = fst*math.cos(snd)
             self.y = fst*math.sin(snd)
+        self.dico = {}
 
     def __getitem__(self, key):
-        if key == 0:
+        if isinstance(key, slice):
+            x = copy.deepcopy(self)
+            x.dico[key.start] = key.stop
+            return x        
+        elif key == 0:
             return self.x
         elif key == 1:
             return self.y
         else:
-            raise IndexError
+            return self.dico[key]
 
+    def get(self, key, default = None):
+        return self.dico.get(key, default)
+    
     def distance(self, p):
         return math.hypot(self.x-p.x,self.y-p.y)
 
