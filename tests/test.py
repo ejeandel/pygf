@@ -5,7 +5,7 @@ from pygf.Geometry import Transform,Point as p, Rectangle
 import math
 
 """ choose if you want to you Svg or Tikz to render the picture """
-tikz = True
+tikz = False
 
 if tikz:
     layer = TikzLayer()
@@ -27,7 +27,7 @@ layer.line(p(0,0), p(5,-5), arrow="->",
 You need to specify at which angle the curve should leave through the point.
 """
 
-layer.edge([p(0,0)['angle':180], p(0, -2)['angle':0], p(2,-2)['angle':60]], draw="Red")
+layer.edge([p(0,0)@{'angle':180}, p(0, -2)@{'angle':0}, p(2,-2)@{'angle':60}], draw="Red")
 
 layer.edge([p(0,0), p(0, -2), p(2,-2)], draw = "Blue")
 

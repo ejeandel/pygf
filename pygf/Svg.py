@@ -168,29 +168,29 @@ class SvgLayer(Layer):
                     
                 
                 if "above start" == position:
-                    self.nodelayer+= [f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>']
+                    self.edgelayer+= [f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>']
                 elif "above" == position :
                     if not reverse_start:
-                        self.nodelayer+= [f'<text   {dic_to_svglist(label_style)} ><textPath href="#{_id}" startOffset="50%"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text   {dic_to_svglist(label_style)} ><textPath href="#{_id}" startOffset="50%"> {text} </textPath></text>']
                     else:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)} ><textPath href="#r-{_id}" startOffset="50%"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)} ><textPath href="#r-{_id}" startOffset="50%"> {text} </textPath></text>']
                 elif  "above end" == position:
                     if not reverse_end:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)} ><textPath href="#{_id}"  startOffset="100%"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)} ><textPath href="#{_id}"  startOffset="100%"> {text} </textPath></text>']
                     else:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)} ><textPath href="#r-{_id}"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)} ><textPath href="#r-{_id}"> {text} </textPath></text>']
                 elif "below start" == position:
-                    self.nodelayer+= [f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>']
+                    self.edgelayer+= [f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>']
                 elif  "below end" == position:
                     if not reverse_end:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#{_id}"  startOffset="100%"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#{_id}"  startOffset="100%"> {text} </textPath></text>']
                     else:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#r-{_id}"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#r-{_id}"> {text} </textPath></text>']
                 elif "below" == position:
                     if not reverse_end:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#{_id}"  startOffset="50%"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#{_id}"  startOffset="50%"> {text} </textPath></text>']
                     else:
-                        self.nodelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#r-{_id}" startOffset="50%"> {text} </textPath></text>']
+                        self.edgelayer+= [f'<text  {dic_to_svglist(label_style)}><textPath href="#r-{_id}" startOffset="50%"> {text} </textPath></text>']
                     
         
     def line(self, p1, p2, labels = None, **style):

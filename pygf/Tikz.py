@@ -271,7 +271,6 @@ class TikzLayer(Layer):
 \usetikzlibrary{backgrounds,shapes.geometric,arrows.meta}
             """, file = f)
 
-            self.writeStyle(f)
             print(r"\begin{document}", file = f)
             
         if options == {}:

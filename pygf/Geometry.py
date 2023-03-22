@@ -61,12 +61,13 @@ class Point:
             self.y = fst*math.sin(snd)
         self.dico = {}
 
+    def __matmul__(self, dico):
+        x = copy.deepcopy(self)
+        x.dico.update(dico)
+        return x
+        
     def __getitem__(self, key):
-        if isinstance(key, slice):
-            x = copy.deepcopy(self)
-            x.dico[key.start] = key.stop
-            return x        
-        elif key == 0:
+        if key == 0:
             return self.x
         elif key == 1:
             return self.y
