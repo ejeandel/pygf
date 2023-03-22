@@ -29,7 +29,8 @@ This can be found in the pgfmanual (Section 15: Actions on Path) or in the file 
 
 ## Dash Patterns
 
-Dash patterns are defined only in the file `tikz.code.tex`. Each format is a list lengths, the odd ones for the length of the dashes, and the even ones for the length of the gaps.
+Dash patterns are defined only in the file `tikz.code.tex`. Each format is a list of lengths, the odd ones for the length of the dashes, and the even ones for the length of the gaps.
+This is similar to `stroke-dasharray` in SVG.
 
 
 

@@ -47,8 +47,7 @@ class TikzLayer(Layer):
         self.parse_style(style, tikz_style)
         tikz_style.update(style)
         self.edgelayer += "\\path[{opts}] ({p1}) circle ({r});\n".format(opts = dic_to_list(tikz_style), p1=self.transform(p1), r=radius)
-        
-        
+                
     def rectangle(self, p1, p2, **style):
         r = Rectangle(p1,p2)        
         tikz_style={}
@@ -68,7 +67,14 @@ class TikzLayer(Layer):
     def parse_thickness(self, gen_style, tikz_style):
         if not "thickness" in gen_style:
             return
-        dic = {1 : "thin", 2: "thick", 3: "very thick", 4: "ultra thick"}
+        dic = {
+            0.25: "ultra thin", #0.1pt
+            0.5: "very thin", #0.2pt
+            1 : "thin",  # 0.4pt
+            1.5: "semithick", # 0.6pt
+            2: "thick", # 0.8pt
+            3: "very thick", #1.2pt
+            4: "ultra thick"} #1.6pt
         thick = gen_style["thickness"]
         if thick in dic:
             tikz_style.update({dic[thick]: None})

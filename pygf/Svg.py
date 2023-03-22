@@ -7,6 +7,17 @@ import sys
 def dic_to_svglist(d):    
     return ' '.join(f'{x}="{y}"' for (x,y) in d.items())
 
+""" TeX to SVG
+
+The common unit between TeX and SVG are centimeters.
+
+1cm is represented here by 50 pixels via the svgtransform that takes care automatically of the conversion
+
+"""
+
+def pt_to_cm(x):
+    return x*2.54/72.27
+
 class SvgLayer(Layer):
     def __init__(self, transform = None):
         Layer.__init__(self, transform)
@@ -35,8 +46,7 @@ class SvgLayer(Layer):
             self.nodelayer+= [f'<image xlink:href="data:image/png;base64,{str(base64.b64encode(data),"utf-8")}" transform="translate({self.svgtransform(point)-r.center})" width="{r.width}" height="{r.height}" preserveAspectRatio="none"/>']
             
         # TODO: none ou xMidYMid
-        
-        
+
     def parse_style(self, style, svg_style):
         """ ---------
             thickness
@@ -47,8 +57,9 @@ class SvgLayer(Layer):
             del style["thickness"]
         else:
             thickness = 1
-        scale = 0.01 * self.svgtransform(Point(1,1)).x
-        strokewidth = thickness * scale
+        pt = pt_to_cm(1) * self.svgtransform(Point(1,1)).x
+        # in thickness 1, the strokewidth should be 0.4pt
+        strokewidth = 0.4 * pt * thickness
         svg_style["stroke-width"] = f"{strokewidth:.2g}"
 
         """ ---------
@@ -57,11 +68,29 @@ class SvgLayer(Layer):
         if "dash" in style:
             dash = style["dash"]
             del style["dash"]
-            if dash == "dotted":
-                svg_style["stroke-dasharray"] = f"{thickness * scale:.2g} {5*scale:.2g}"
-            elif dash == "dashed":
-                svg_style["stroke-dasharray"] = f"{6* scale:.2g} {6*scale:.2g}"
-
+                
+            if dash== "solid":                   dasharray = f"none"
+            elif dash== "dotted":                dasharray = f"{strokewidth:.2g} {2*pt:.2g}"
+            elif dash== "densely dotted":        dasharray = f"{strokewidth:.2g} {1*pt:.2g}"
+            elif dash== "loosely dotted":        dasharray = f"{strokewidth:.2g} {4*pt:.2g}"
+            elif dash== "dashed":                dasharray = f"{3*pt:.2g}"
+            elif dash== "densely dashed":        dasharray = f"{3*pt:.2g} {2*pt:.2g}"
+            elif dash== "loosely dashed":        dasharray = f"{3*pt:.2g} {6*pt:.2g}"
+            elif dash== "dashdotted":            dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
+            elif dash== "dash dot":              dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
+            elif dash== "densely dashdotted":    dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
+            elif dash== "densely dash dot":      dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
+            elif dash== "loosely dashdotted":    dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
+            elif dash== "loosely dash dot":      dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
+            elif dash== "dashdotdotted":         dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
+            elif dash== "densely dashdotdotted": dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
+            elif dash== "loosely dashdotdotted": dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
+            elif dash== "dash dot dot":          dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
+            elif dash== "densely dash dot dot":  dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
+            elif dash== "loosely dash dot dot":  dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
+            else: raise ValueError("not a valid dash style")
+            svg_style["stroke-dasharray"] = dasharray
+            
         """ -------
             draw
             -------- """
