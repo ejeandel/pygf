@@ -327,7 +327,7 @@ class SvgLayer(Layer):
         for i in range(len(points)-1):            
             current_node = points[i+1]
             newpoint = current_node
-            dst = looseness * 0.3951*newpoint.distance(point)
+            dst = looseness * 0.3902*newpoint.distance(point)
             fstcontrol = point + Point(dst, angles[i], polar=True)
             sndcontrol = newpoint - Point(dst, angles[i+1], polar=True)
             curve += [(point, fstcontrol, sndcontrol, newpoint)]
