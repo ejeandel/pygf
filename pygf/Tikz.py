@@ -23,10 +23,11 @@ class TikzLayer(Layer):
 
 
     def picture(self, point, img_name, width, height):
-        r = Rectangle(Point(0,0), self.transform(Point(width, height)))
-        self.nodelayer += "\\node at ({position}) {{\includegraphics[width={w}cm, height={h}cm]{{{name}}}}};\n".format(position=self.transform(point), name=img_name, h=r.height, w=r.width)
+        # pictures are NOT subject to the transform (only the position is)
+        self.nodelayer += "\\node at ({position}) {{\includegraphics[width={w:f}cm, height={h:f}cm]{{{name}}}}};\n".format(position=self.transform(point), name=img_name, h=height, w=width)
         
     def text(self, point, text, **hints):
+        #  text is NOT subject to the transform (only the position is)
         text = str(text)
         opts = {}
         self.parse_text(hints, opts)
@@ -164,6 +165,7 @@ class TikzLayer(Layer):
         
 
     def line(self, p1, p2, labels = None, **style):
+        (p1,p2) = map(self.transform, (p1,p2))
         s = ""
         if style is None:
             style = {}
@@ -172,8 +174,11 @@ class TikzLayer(Layer):
         tikz_style.update(style)
         s += "\\path[%s] (%s) -- (%s)" % (dic_to_list(tikz_style),p1, p2)
 
-
-        reverse_start = abs((p2 - p1).angle) > math.pi/2
+        if (abs((p2 - p1).angle) - math.pi/2) < 0.01:
+            # hack 
+            reverse_start = False
+        else:            
+            reverse_start = abs((p2 - p1).angle) > math.pi/2
         reverse_end = reverse_start
 
 
@@ -287,9 +292,10 @@ class TikzLayer(Layer):
                     options["baseline"] = "(current bounding box.center)"
                 del options["center"]
             print(r"\begin{tikzpicture}[%s]" % dic_to_list(options), file = f)
-        x = self.transform(rect.fst)
-        y = self.transform(rect.snd)
-        rect = Rectangle(x,y)        
+
+        tf = self.transform
+
+        rect = Rectangle.bounding_box([*map(tf, [rect.northwest, rect.northeast, rect.southeast, rect.southwest])])
 
         print(rf"\clip ({rect.northwest}) rectangle ({rect.southeast});", file=f)
         print(self.edgelayer, file = f, end="")

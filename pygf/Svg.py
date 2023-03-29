@@ -40,10 +40,11 @@ class SvgLayer(Layer):
     
 
     def picture(self, point, img_name, width, height):
+        tf = self.svgtransform * self.transform       
         r = Rectangle(Point(0,0), self.svgtransform(Point(width, -height)))
         with open(img_name, 'rb') as f:
             data = f.read()
-            self.nodelayer+= [f'<image xlink:href="data:image/png;base64,{str(base64.b64encode(data),"utf-8")}" transform="translate({self.svgtransform(point)-r.center})" width="{r.width}" height="{r.height}" preserveAspectRatio="none"/>']
+            self.nodelayer+= [f'<image xlink:href="data:image/png;base64,{str(base64.b64encode(data),"utf-8")}" transform="translate({tf(point)-r.center})" width="{r.width}" height="{r.height}" preserveAspectRatio="none"/>']
             
         # TODO: none ou xMidYMid
 
@@ -223,10 +224,9 @@ class SvgLayer(Layer):
                     
         
     def line(self, p1, p2, labels = None, **style):
-
-        tf = self.svgtransform * self.transform
-        path = f"M {tf(p1)} L {tf(p2)}"
-        reverse_path = f"M {tf(p2)} L {tf(p1)}"
+        (p1,p2) = map(self.svgtransform * self.transform, (p1,p2))
+        path = f"M {p1} L {p2}"
+        reverse_path = f"M {p2} L {p1}"
                 
         reverse_start = abs((p2 - p1).angle) > math.pi/2
         reverse_end = reverse_start
@@ -239,6 +239,7 @@ class SvgLayer(Layer):
 
         x1 = tf(p1+Point(radius, 0))
         x2 = tf(p1-Point(radius, 0))
+
         path = f"M {x1} a {r} {r} 0 1 1 {x2 - x1} a {r} {r} 0 1 1 {x1 - x2}"
         reverse_path = f"M {x2} a {r} {r} 0 1 0 {x1 - x2} a {r} {r} 0 1 0 {x2 - x1}"        
         
@@ -307,7 +308,7 @@ class SvgLayer(Layer):
         text_style = {}
         self.parse_text_style(style, text_style)        
         
-        self.nodelayer += [f'<text x="{x}" y="{y}"   {dic_to_svglist(text_style)} text-anchor="{align}"  dominant-baseline="{valign}" transform="translate({self.svgtransform(point)})">{text}</text>']
+        self.nodelayer += [f'<text x="{x}" y="{y}"   {dic_to_svglist(text_style)} text-anchor="{align}"  dominant-baseline="{valign}" transform="translate({self.svgtransform(self.transform(point))})">{text}</text>']
         
     
     def edge(self, points, labels = None, **style):
@@ -411,9 +412,9 @@ class SvgLayer(Layer):
                 
 
     def draw(self, rect,f= None, commands = "", preamble = False):
-        x = self.svgtransform(self.transform(rect.fst))
-        y = self.svgtransform(self.transform(rect.snd))
-        rect = Rectangle(x,y)        
+        tf = self.svgtransform * self.transform
+        rect = Rectangle.bounding_box([*map(tf, [rect.northwest, rect.northeast, rect.southeast, rect.southwest])])
+
         print(fr'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{rect.width}" height="{rect.height}" viewBox="{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}">', file=f)
         print("\n".join(self.edgelayer), file = f)
         print("\n".join(self.nodelayer), file = f)
