@@ -257,6 +257,8 @@ class TikzLayer(Layer):
         self.edgelayer+= s + ";\n"
 
     def polyline(self, points, labels = None, closed = False, **style):
+        points = [*map(self.transform, points)]
+
         if style is None:
             style = {}
 
