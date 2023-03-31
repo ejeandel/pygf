@@ -233,15 +233,22 @@ class SvgLayer(Layer):
         self.__path(path, reverse_path, reverse_start, reverse_end, labels, style)
 
     def circle(self, p1, radius, labels = None, **style):
-
         tf = self.svgtransform * self.transform
         r = tf(Point(radius,0)).distance(tf(Point(0,0)))
 
+        pointx = tf(Point(radius,0)+p1)
+        pointy = tf(Point(0, radius)+p1)
+
+        rx = tf(p1).distance(pointx)
+        ry = tf(p1).distance(pointy)
+        
         x1 = tf(p1+Point(radius, 0))
         x2 = tf(p1-Point(radius, 0))
 
-        path = f"M {x1} a {r} {r} 0 1 1 {x2 - x1} a {r} {r} 0 1 1 {x1 - x2}"
-        reverse_path = f"M {x2} a {r} {r} 0 1 0 {x1 - x2} a {r} {r} 0 1 0 {x2 - x1}"        
+        x_axis_rotation = tf(Point(radius,0)).angle*180/math.pi
+
+        path = f"M {x1} A {rx} {ry} {x_axis_rotation:f} 1 1 {x2} A {rx} {ry} {x_axis_rotation:f} 1 1 {x1}"
+        reverse_path = f"M {x1} A {rx} {ry} {x_axis_rotation:f} 1 0 {x2} A {rx} {ry} {x_axis_rotation:f} 1 0 {x1}"        
         
         reverse_start = False
         reverse_end = False

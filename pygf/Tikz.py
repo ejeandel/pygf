@@ -43,18 +43,35 @@ class TikzLayer(Layer):
         
 
     def circle(self, p1, radius, **style):
-        r = self.transform(Point(radius,0)).distance(self.transform(Point(0,0)))
+        tf = self.transform
+
+        pointx = tf(Point(radius,0)+p1)
+        pointy = tf(Point(0, radius)+p1)
+
+        rx = tf(p1).distance(pointx)
+        ry = tf(p1).distance(pointy)
+        
+        x1 = tf(p1+Point(radius, 0))
+        x2 = tf(p1-Point(radius, 0))
+        x = tf(p1)
+        
+        x_axis_rotation = tf(Point(radius,0)).angle*180/math.pi
+
         tikz_style={}
         self.parse_style(style, tikz_style)
         tikz_style.update(style)
-        self.edgelayer += "\\path[{opts}] ({p1}) circle ({r});\n".format(opts = dic_to_list(tikz_style), p1=self.transform(p1), r=radius)
-                
+        if rx != ry:
+            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) circle[x radius={rx:2f}, y radius={ry:2f}, rotate={x_axis_rotation:2f}];\n"
+        else:
+            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) circle[radius={rx:2f}];\n"
+                 
     def rectangle(self, p1, p2, **style):
-        r = Rectangle(p1,p2)        
+        r = Rectangle(p1,p2)
         tikz_style={}
         self.parse_style(style, tikz_style)
         tikz_style.update(style)
-        self.nodelayer += "\\path[{opts}] ({sw}) rectangle ({ne});\n".format(opts = dic_to_list(tikz_style), sw=self.transform(r.southwest), ne=self.transform(r.northeast))
+        (sw,se,nw,ne) = map(self.transform, (r.southwest,r.southeast, r.northwest, r.northeast))
+        self.nodelayer += f"\\path[{dic_to_list(tikz_style)}] ({sw}) -- ({se}) -- ({ne}) -- ({nw}) -- cycle;\n"
         
          
     def new_brace(self, end, path, msg):
@@ -158,9 +175,8 @@ class TikzLayer(Layer):
 
     def convert_angle(self, angle):
         p = Point(1, angle*math.pi/180, polar=True)
-        p = self.transform.inverse(p)
+        p = self.transform(p)
         a = p.angle * 180/math.pi
-        #print(a)
         return int(a*10+0.5)/10        
         
 
@@ -202,6 +218,8 @@ class TikzLayer(Layer):
         
     def edge(self, points, labels = None, **style):
         l = self.find_angles(points)
+        points = [*map(self.transform, points)]
+        
         current_node = points[0]
         s = ""
         if style is None:

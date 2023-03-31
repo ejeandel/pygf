@@ -6,7 +6,8 @@ from .Geometry import Point, Transform
 
 
 class Layer(ABC):
-    """Abstract class that represents a graphics system
+    """Layer is the abstract class that represents a graphics system.
+    All relevant classes are subclasses of this one.
     """
     
     def __init__(self, transform = None):
@@ -15,28 +16,121 @@ class Layer(ABC):
         self.transform = transform
 
     @abstractmethod
-    def line(self, p1, p2, labels = None, **style):        
+    def line(self, p1, p2, labels = None, **style):
+        """ Draw a line from one point to the other
+
+        :param p1: the first point
+        :type p1: Point
+        :param p2: the second point
+        :type p2: Point
+        :param labels: dictionary of possible labels to put on the line
+        :type labels: dict
+        :param style: additional styling elements
+        :type style: dict
+                
+        """
+        
         pass
     
     @abstractmethod
     def text(self, point, text, **style):
+        """Place a text at a given point
+
+        :param point: the point where the text will be placed
+        :type point: Point
+        :param text: The text
+        :type text: str
+        :param style: additional styling elements for the text
+        :type style: dict
+
+        The position of the text is affected by the transform, but the text
+        itself is not: it will always appear horizontally and will not be
+        stretched.
+        """
+        
         pass
 
     @abstractmethod
     def rectangle(self, p1, p2, **style):
-        pass
+        """Draws a rectangle whose corners are the two given points 
 
-    @abstractmethod
-    def circle(self, p1, radius, labels = None, **style):
-        pass
+        :param p1: one of the corner of the rectangle
+        :type p1: Point
+        :param p2: the other corner of the rectangle
+        :type point: Point
+        :param style: additional styling elements for the rectangle
+        :type style: dict
 
-    @abstractmethod
-    def edge(self, points, labels = None, **style):
+        The rectangle is affected by the transform: If the transform
+        specifies that everything is rotated, then the rectangle will
+        be rotated as well.
+        """
         pass
 
     @abstractmethod
     def polyline(self, points, labels = None, closed = False, **style):
+        """Draw line segments from one point to the next
+
+        :param points: list of points
+        :type points: List[Point]
+        :param labels: possible labels to put on the lines
+        :type labels: dict
+        :param closed: If true, draws a last line segment from the last point to the first point.         
+        :type closed: bool
+        :param style: additional styling elements
+        :type style: dict
+
+
+        ``closed = True`` is slightly different from adding the first point as the last point.
+
+        Here is an example. Let ``p0`` be the first point, ``p1`` the
+        second point, and ``px`` the last point.  If ``closed =
+        False`` and we add explicitely ``p0`` again at the end of the
+        list of points, then a straight line would be drawn from
+        ``px`` to ``p0`` and one from ``p0`` to ``p1``. However, the
+        two lines intersecting at ``p0`` will not be considered a
+        corner.  If one of the styling element involves the corner to
+        be rounded, this corner would not be rounded.
+
+        In general, it is therefore best to use ``closed = True`` for closed polylines.
+       
+        """
         pass
+    
+    @abstractmethod
+    def circle(self, p1, radius, labels = None, **style):
+        """Draws a circle given a point and a radius
+
+        :param p1: center of the circle
+        :type point: Point
+        :param radius: radius of the circle
+        :type radius: float
+        :param labels: possible labels to put on the circle
+        :type labels: dict
+        :param style: additional styling elements
+        :type style: dict
+
+        The circle is affected by the transform. It becomes an ellipse if for instance we use different scales for the x-axis and the y-axis.
+
+        """
+        pass
+
+    @abstractmethod
+    def edge(self, points, labels = None, **style):
+        """Draw a curve passing through the points
+
+        :param points: list of points
+        :type points: List[Point]
+        :param labels: possible labels to put on the lines
+        :type labels: dict
+        :param style: additional styling elements
+        :type style: dict
+
+        The points might be decorated to specify at which angle the curve should pass through the point.
+        """
+        pass
+        pass
+
     
     
     @abstractmethod
