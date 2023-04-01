@@ -1,4 +1,4 @@
-""" The Transform class """
+""" Geometry classes """
 # pylint: disable=invalid-name
 import math
 import copy
