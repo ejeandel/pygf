@@ -75,27 +75,28 @@ class SvgLayer(Layer):
         if "dash" in style:
             dash = style["dash"]
             del style["dash"]
+            sw = strokewidth
             dasharray = {
                 "solid": "none",
-                "dotted": "{sw:.2g} {2*pt:.2g}",
-                "densely dotted": "{sw:.2g} {1*pt:.2g}",
-                "loosely dotted": "{sw:.2g} {4*pt:.2g}",
-                "dashed": "{3*pt:.2g}",
-                "densely dashed": "{3*pt:.2g} {2*pt:.2g}",
-                "loosely dashed": "{3*pt:.2g} {6*pt:.2g}",
-                "dashdotted": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
-                "dash dot": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
-                "densely dashdotted": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
-                "densely dash dot": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
-                "loosely dashdotted": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
-                "loosely dash dot": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
-                "dashdotdotted": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
-                "densely dashdotdotted": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
-                "loosely dashdotdotted": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
-                "dash dot dot": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
-                "densely dash dot dot": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
-                "loosely dash dot dot": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}"
-            }.get(dash).format(pt=pt, sw=strokewidth)
+                "dotted": f"{sw:.2g} {2*pt:.2g}",
+                "densely dotted": f"{sw:.2g} {1*pt:.2g}",
+                "loosely dotted": f"{sw:.2g} {4*pt:.2g}",
+                "dashed": f"{3*pt:.2g}",
+                "densely dashed": f"{3*pt:.2g} {2*pt:.2g}",
+                "loosely dashed": f"{3*pt:.2g} {6*pt:.2g}",
+                "dashdotted": f"{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "dash dot": f"{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "densely dashdotted": f"{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "densely dash dot": f"{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "loosely dashdotted": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
+                "loosely dash dot": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
+                "dashdotdotted": f"{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "densely dashdotdotted": f"{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "loosely dashdotdotted": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
+                "dash dot dot": f"{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "densely dash dot dot": f"{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "loosely dash dot dot": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}"
+            }.get(dash)
             svg_style["stroke-dasharray"] = dasharray
         """ -------
             draw

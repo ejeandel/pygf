@@ -30,7 +30,7 @@ class TikzLayer(Layer):
 
     def picture(self, point, img_name, width, height):
         # pictures are NOT subject to the transform (only the position is)
-        self.nodelayer += r"\\node at ({position}) {{\includegraphics[width={w:f}cm, height={h:f}cm]{{{name}}}}};\n".format(
+        self.nodelayer += "\\node at ({position}) {{\\includegraphics[width={w:f}cm, height={h:f}cm]{{{name}}}}};\n".format(
             position=self.transform(point), name=img_name, h=height, w=width)
 
     def text(self, point, text, **hints):
@@ -282,7 +282,7 @@ class TikzLayer(Layer):
                 listpoints[-1] = listpoints[
                     -1] + f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} "
 
-        s = rf"\\path[{dic_to_list(tikz_style)}] " + "--".join(listpoints)
+        s = rf"\path[{dic_to_list(tikz_style)}] " + "--".join(listpoints)
 
         self.edgelayer += s + ";\n"
 

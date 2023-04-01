@@ -1,14 +1,17 @@
 # pylint: disable=invalid-name
 import math
 from abc import ABC, abstractmethod
+from .Geometry import Transform
 
 class Layer(ABC):
     """Layer is the abstract class that represents a graphics system.
     All relevant classes are subclasses of this one.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, transform = None):
+        if transform is None:
+            transform = Transform()
+        self.transform = transform
 
     @abstractmethod
     def line(self, p1, p2, labels=None, **style):
@@ -172,8 +175,8 @@ class Layer(ABC):
 
 class NoLayer(Layer):
 
-    def __init__(self):
-        pass
+    def __init__(self, transform = None):
+        Layer.__init__(self, transform)
 
     def line(self, p1, p2, labels=None, **style):
         pass
@@ -203,6 +206,7 @@ class NoLayer(Layer):
 class MultiLayer(Layer):
 
     def __init__(self, layers):
+        Layer.__init__(self, None)
         self.layers = layers
 
     def line(self, p1, p2, labels=None, **style):
