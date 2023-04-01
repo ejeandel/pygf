@@ -1,17 +1,14 @@
+# pylint: disable=invalid-name
 import math
 from abc import ABC, abstractmethod
-from .Geometry import Transform
-
 
 class Layer(ABC):
     """Layer is the abstract class that represents a graphics system.
     All relevant classes are subclasses of this one.
     """
 
-    def __init__(self, transform=None):
-        if transform is None:
-            transform = Transform()
-        self.transform = transform
+    def __init__(self):
+        pass
 
     @abstractmethod
     def line(self, p1, p2, labels=None, **style):
@@ -28,7 +25,6 @@ class Layer(ABC):
 
         """
 
-        pass
 
     @abstractmethod
     def text(self, point, text, **style):
@@ -46,8 +42,6 @@ class Layer(ABC):
         stretched.
         """
 
-        pass
-
     @abstractmethod
     def rectangle(self, p1, p2, **style):
         """Draws a rectangle whose corners are the two given points
@@ -63,7 +57,6 @@ class Layer(ABC):
         specifies that everything is rotated, then the rectangle will
         be rotated as well.
         """
-        pass
 
     @abstractmethod
     def polyline(self, points, labels=None, closed=False, **style):
@@ -95,7 +88,6 @@ class Layer(ABC):
         In general, it is therefore best to use ``closed = True`` for
         closed polylines.
         """
-        pass
 
     @abstractmethod
     def circle(self, p1, radius, labels=None, **style):
@@ -115,7 +107,6 @@ class Layer(ABC):
         for the x-axis and the y-axis.
 
         """
-        pass
 
     @abstractmethod
     def edge(self, points, labels=None, **style):
@@ -131,18 +122,17 @@ class Layer(ABC):
         The points might be decorated to specify at which angle the curve
         should pass through the point.
         """
-        pass
-        pass
 
     @abstractmethod
     def picture(self, point, img_name, width, height):
         pass
 
     @abstractmethod
-    def draw(self, r, fs=None, commands=None, preamble=False):
+    def draw(self, rect, fs=None, commands=None, preamble=False):
         pass
 
     def find_angles(self, points):
+        """ Helper function: find the angles for the wires """
 
         def in_angle(node1, node2):
             c1 = node1
@@ -152,7 +142,6 @@ class Layer(ABC):
             angle = math.atan2(y, x) * 180 / math.pi
             return round(angle)
 
-        """ Helper function: find the angles for the wires """
         the_list = []
         todraw = points
         current_node = todraw[0]
@@ -201,7 +190,7 @@ class NoLayer(Layer):
     def picture(self, point, img_name, width, height):
         pass
 
-    def draw(self, r, fs=None, commands=None, preamble=False):
+    def draw(self, rect, fs=None, commands=None, preamble=False):
         pass
 
     def polyline(self, points, labels=None, closed=False, **style):
@@ -244,10 +233,10 @@ class MultiLayer(Layer):
         for layer in self.layers:
             layer.picture(point, img_name, width, height)
 
-    def draw(self, r, files=None, commands=None, preamble=False):
+    def draw(self, rect, files=None, commands=None, preamble=False):
         if files is not None:
             for (layer, fs) in zip(self.layers, files):
-                layer.draw(r, fs, commands, preamble)
+                layer.draw(rect, fs, commands, preamble)
         else:
             for layer in self.layers:
-                layer.draw(r, None, commands, preamble)
+                layer.draw(rect, None, commands, preamble)

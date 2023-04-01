@@ -1,3 +1,4 @@
+# pylint: disable=invalid-name
 import math
 import copy
 """ The Transform class """
@@ -50,6 +51,7 @@ class Transform:
 
         return result
 
+    @staticmethod
     def Rotation(angle):
         x = Transform()
         x.a = x.d = math.cos(angle)
@@ -250,6 +252,7 @@ class Rectangle:
             output += [Rectangle(Point(x1, y1), Point(x2, y2))]
         return output
 
+    @staticmethod
     def bounding_box(the_list):
         """ returns the smallest rectangle that contains all points in l """
         x0 = x1 = the_list[0].x

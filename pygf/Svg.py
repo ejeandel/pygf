@@ -1,8 +1,9 @@
+# pylint: disable=invalid-name
+import math
+import base64
 from .Layer import Layer
 from .Geometry import Point, Rectangle, Transform
 from .Options import register_layer
-import math
-import base64
 
 
 def dic_to_svglist(d):
@@ -38,7 +39,6 @@ class SvgLayer(Layer):
             "-x":
             '<marker id="marker_{_id}"  markerUnits = "userSpaceOnUse" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><polyline points="0 0, 7 7" /><line x1="0" y1="7" x2="7" y2="0"  /></marker>'
         }
-        pass
 
     def new_name(self):
         self.names += 1
@@ -75,47 +75,27 @@ class SvgLayer(Layer):
         if "dash" in style:
             dash = style["dash"]
             del style["dash"]
-
-            if dash == "solid":
-                dasharray = "none"
-            elif dash == "dotted":
-                dasharray = f"{strokewidth:.2g} {2*pt:.2g}"
-            elif dash == "densely dotted":
-                dasharray = f"{strokewidth:.2g} {1*pt:.2g}"
-            elif dash == "loosely dotted":
-                dasharray = f"{strokewidth:.2g} {4*pt:.2g}"
-            elif dash == "dashed":
-                dasharray = f"{3*pt:.2g}"
-            elif dash == "densely dashed":
-                dasharray = f"{3*pt:.2g} {2*pt:.2g}"
-            elif dash == "loosely dashed":
-                dasharray = f"{3*pt:.2g} {6*pt:.2g}"
-            elif dash == "dashdotted":
-                dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
-            elif dash == "dash dot":
-                dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
-            elif dash == "densely dashdotted":
-                dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
-            elif dash == "densely dash dot":
-                dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
-            elif dash == "loosely dashdotted":
-                dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
-            elif dash == "loosely dash dot":
-                dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
-            elif dash == "dashdotdotted":
-                dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
-            elif dash == "densely dashdotdotted":
-                dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
-            elif dash == "loosely dashdotdotted":
-                dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
-            elif dash == "dash dot dot":
-                dasharray = f"{3*pt:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g} {strokewidth:.2g} {2*pt:.2g}"
-            elif dash == "densely dash dot dot":
-                dasharray = f"{3*pt:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g} {strokewidth:.2g} {1*pt:.2g}"
-            elif dash == "loosely dash dot dot":
-                dasharray = f"{3*pt:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g} {strokewidth:.2g} {4*pt:.2g}"
-            else:
-                raise ValueError("not a valid dash style")
+            dasharray = {
+                "solid": "none",
+                "dotted": "{sw:.2g} {2*pt:.2g}",
+                "densely dotted": "{sw:.2g} {1*pt:.2g}",
+                "loosely dotted": "{sw:.2g} {4*pt:.2g}",
+                "dashed": "{3*pt:.2g}",
+                "densely dashed": "{3*pt:.2g} {2*pt:.2g}",
+                "loosely dashed": "{3*pt:.2g} {6*pt:.2g}",
+                "dashdotted": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "dash dot": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "densely dashdotted": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "densely dash dot": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "loosely dashdotted": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
+                "loosely dash dot": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
+                "dashdotdotted": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "densely dashdotdotted": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "loosely dashdotdotted": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
+                "dash dot dot": "{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
+                "densely dash dot dot": "{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
+                "loosely dash dot dot": "{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}"
+            }.get(dash).format(pt=pt, sw=strokewidth)
             svg_style["stroke-dasharray"] = dasharray
         """ -------
             draw
@@ -187,17 +167,11 @@ class SvgLayer(Layer):
             markers = self.arrows[style['arrow']].format(_id=_id)
             svg_style['marker-end'] = f'url(#marker_{_id})'
 
-        if "clip" in style:
-            r = style['clip']
-            tf = self.svgtransform * self.transform
-            clip = f'<clipPath id="clip-{_id}"> <rect x="{tf(r.northwest).x}" y="{tf(r.northwest).y}" width="{(tf(r.northeast)-tf(r.northwest)).x}" height="{(tf(r.southwest)-tf(r.northwest)).y}" /></clipPath>'
-            svg_style["clip-path"] = f'url(#clip-{_id})'
-            del style["clip"]
-        else:
-            clip = ""
-
         self.edgelayer += [
-            f'{clip} <g  {dic_to_svglist(svg_style)} >  <path id="{_id}" d="{path}" /> {markers} </g>'
+            f'<g {dic_to_svglist(svg_style)} >'
+            f'<path id="{_id}" d="{path}" />'
+            f'{markers}'
+            '</g>'
         ]
 
         if reverse_start or reverse_end:
@@ -215,6 +189,7 @@ class SvgLayer(Layer):
                 if "above" in position:
                     label_style["dy"] = -5
                 else:
+                    # below
                     label_style["dy"] = 5
                     label_style["dominant-baseline"] = "hanging"
 
@@ -226,53 +201,29 @@ class SvgLayer(Layer):
                 elif "end" in position:
                     label_style[
                         "text-anchor"] = "end" if not reverse_end else "start"
+                    startOffset = 100 if not reverse_end else 0
+                    mainpath = f"#{_id}" if not reverse_end else f"#r-{_id}"
                 else:
                     label_style["text-anchor"] = "middle"
+                    mainpath = f"#{_id}" if not reverse_start else f"#r-{_id}"
+                    mainpath_end = f"#{_id}" if not reverse_end else f"#r-{_id}"
 
-                if "above start" == position:
+                if position in ["above start", "below start"]:
                     self.edgelayer += [
                         f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>'
                     ]
                 elif "above" == position:
-                    if not reverse_start:
-                        self.edgelayer += [
-                            f'<text   {dic_to_svglist(label_style)} ><textPath href="#{_id}" startOffset="50%"> {text} </textPath></text>'
-                        ]
-                    else:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)} ><textPath href="#r-{_id}" startOffset="50%"> {text} </textPath></text>'
-                        ]
-                elif "above end" == position:
-                    if not reverse_end:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)} ><textPath href="#{_id}"  startOffset="100%"> {text} </textPath></text>'
-                        ]
-                    else:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)} ><textPath href="#r-{_id}"> {text} </textPath></text>'
-                        ]
-                elif "below start" == position:
                     self.edgelayer += [
-                        f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>'
+                        f'<text   {dic_to_svglist(label_style)} ><textPath href="{mainpath}" startOffset="50%"> {text} </textPath></text>'
                     ]
-                elif "below end" == position:
-                    if not reverse_end:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)}><textPath href="#{_id}"  startOffset="100%"> {text} </textPath></text>'
-                        ]
-                    else:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)}><textPath href="#r-{_id}"> {text} </textPath></text>'
-                        ]
+                elif position in ["above end", "below end"]:
+                    self.edgelayer += [
+                        f'<text  {dic_to_svglist(label_style)} ><textPath href="{mainpath}"  startOffset="{startOffset}%"> {text} </textPath></text>'
+                    ]
                 elif "below" == position:
-                    if not reverse_end:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)}><textPath href="#{_id}"  startOffset="50%"> {text} </textPath></text>'
-                        ]
-                    else:
-                        self.edgelayer += [
-                            f'<text  {dic_to_svglist(label_style)}><textPath href="#r-{_id}" startOffset="50%"> {text} </textPath></text>'
-                        ]
+                    self.edgelayer += [
+                        f'<text  {dic_to_svglist(label_style)}><textPath href="{mainpath_end}"  startOffset="50%"> {text} </textPath></text>'
+                    ]
 
     def line(self, p1, p2, labels=None, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
@@ -287,11 +238,8 @@ class SvgLayer(Layer):
     def circle(self, p1, radius, labels=None, **style):
         tf = self.svgtransform * self.transform
 
-        pointx = tf(Point(radius, 0) + p1)
-        pointy = tf(Point(0, radius) + p1)
-
-        rx = tf(p1).distance(pointx)
-        ry = tf(p1).distance(pointy)
+        rx = tf(p1).distance(tf(Point(radius, 0) + p1))
+        ry = tf(p1).distance(tf(Point(0, radius) + p1))
 
         x1 = tf(p1 + Point(radius, 0))
         x2 = tf(p1 - Point(radius, 0))
@@ -457,7 +405,7 @@ class SvgLayer(Layer):
         self.__path(path, reverse_path, reverse_start, reverse_end, labels,
                     style)
 
-    def draw(self, rect, f=None, commands="", preamble=False):
+    def draw(self, rect, fs=None, commands="", preamble=False):
         tf = self.svgtransform * self.transform
         rect = Rectangle.bounding_box([
             *map(tf, [
@@ -467,10 +415,10 @@ class SvgLayer(Layer):
 
         print(
             fr'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{rect.width}" height="{rect.height}" viewBox="{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}">',
-            file=f)
-        print("\n".join(self.edgelayer), file=f)
-        print("\n".join(self.nodelayer), file=f)
-        print(r'</svg>', file=f)
+            file=fs)
+        print("\n".join(self.edgelayer), file=fs)
+        print("\n".join(self.nodelayer), file=fs)
+        print(r'</svg>', file=fs)
 
 
 register_layer('svg', SvgLayer)
