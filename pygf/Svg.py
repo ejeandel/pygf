@@ -31,7 +31,7 @@ class SvgLayer(Layer):
         self.nodelayer = []
         self.edgelayer = []
         self.defs = {}
-        self.svgtransform = Transform(50, -50)
+        self.svgtransform = Transform(a=50, d=-50)
 
         self.arrows = {
             "->":
