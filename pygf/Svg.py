@@ -1,9 +1,155 @@
 # pylint: disable=invalid-name
 import math
 import base64
+from dataclasses import dataclass
 from .Layer import Layer
 from .Geometry import Point, Rectangle, Transform
 from .Options import register_layer
+
+
+@dataclass
+class PathElement:
+    first_point: Point
+    next_point: Point
+
+
+@dataclass
+class SVGLine(PathElement):
+    pass
+
+
+@dataclass
+class SVGEllipse(PathElement):
+    rx: float
+    ry: float
+    x_axis_rotation: float
+    large_flag: int
+    sweep_flag: int
+
+
+@dataclass
+class SVGBezier(PathElement):
+    first_control_point: Point
+    second_control_point: Point
+
+
+@dataclass
+class SVGQuadratic(PathElement):
+    control_point: Point
+
+
+class SvgPath:
+    """ A path in SVG. Not all features are supported.
+
+    Not implemented
+      - relative commands
+      - V/H (not worth it)
+      - Z (cycle)
+      - S (Reflected Bezier)
+      - T (Reflected Quadratic Bezier)
+
+    """
+    def __init__(self, start_point, path_list=None):
+        self.current_point = start_point
+        if path_list is None:
+            self.path_list = []
+        else:
+            self.path_list = path_list
+
+    def line_to(self, next_point):
+        """ Adds a line from the current_point to the next point """
+        self.path_list += [SVGLine(self.current_point, next_point)]
+        self.current_point = next_point
+
+    def ellipse_to(self, next_point, rx, ry, x_axis_rotation, large_flag, sweep_flag):
+        """ Adds an ellipse """
+        self.path_list += [SVGEllipse(self.current_point, next_point,
+                                      rx, ry, x_axis_rotation, large_flag,
+                                      sweep_flag)]
+        self.current_point = next_point
+
+    def curve_to(self, next_point, first_control_point, second_control_point):
+        """ Adds a Bezier Curve """
+        self.path_list += [SVGBezier(self.current_point, next_point,
+                                     first_control_point,
+                                     second_control_point)]
+        self.current_point = next_point
+
+    def quadratic_to(self, next_point, control_point):
+        """ Adds a Quadratic Curve """
+        self.path_list += [SVGQuadratic(self.current_point, next_point,
+                                        control_point)]
+        self.current_point = next_point
+
+    def __str__(self):
+        first_point = self.path_list[0].first_point
+        s = f"M {first_point}"
+        current_point = first_point
+        for element in self.path_list:
+            match element:
+                case SVGLine(first_point, next_point):
+                    s += f" L {next_point}"
+                    current_point = next_point
+                case SVGEllipse(first_point, next_point, rx, ry,
+                                x_axis_rotation, large_flag, sweep_flag):
+                    s += f" A {rx} {ry} {x_axis_rotation} {large_flag} {sweep_flag} {next_point}"
+                    current_point = next_point
+                case SVGBezier(first_point, next_point, first_control_point, second_control_point):
+                    s += f" C {first_control_point} {second_control_point} {next_point}"
+                    current_point = next_point
+                case SVGQuadratic(first_point, next_point, control_point):
+                    s += f" Q {control_point} {next_point}"
+                    current_point = next_point
+
+        return s
+
+    def reverse(self):
+        if len(self.path_list) == 0:
+            return SvgPath(self.current_point)
+
+        reverse_list = []
+        for element in self.path_list[::-1]:
+            match element:
+                case SVGLine(first_point, next_point):
+                    # pylint: disable=arguments-out-of-order
+                    reverse_list += [SVGLine(next_point, first_point)]
+                    current_point = first_point
+                case SVGEllipse(first_point, next_point, rx, ry,
+                                x_axis_rotation, large_flag, sweep_flag):
+                    # pylint: disable=arguments-out-of-order
+                    reverse_list += [SVGEllipse(next_point, first_point, rx,
+                                                ry, x_axis_rotation,
+                                                large_flag, 1 - sweep_flag)]
+                    current_point = first_point
+                case SVGBezier(first_point, next_point, first_control_point, second_control_point):
+                    # pylint: disable=arguments-out-of-order
+                    reverse_list += [SVGBezier(next_point, first_point,
+                                               second_control_point,
+                                               first_control_point)]
+                    current_point = first_point
+                case SVGQuadratic(first_point, next_point, control_point):
+                    # pylint: disable=arguments-out-of-order
+                    reverse_list += [SVGQuadratic(next_point, first_point,
+                                               control_point)]
+                    current_point = first_point
+
+        return SvgPath(current_point, reverse_list)
+
+    def is_up(self):
+        if len(self.path_list) == 0:
+            raise NotImplementedError
+
+        match self.path_list[0]:
+            case SVGLine(first_point, next_point):
+                return abs((next_point - first_point).angle) > math.pi / 2
+            case SVGEllipse(first_point, next_point, _, _, _, _, sweep_flag):
+                # TODO
+                return sweep_flag > 0
+            case SVGBezier(first_point, next_point):
+                return abs((next_point - first_point).angle) > math.pi / 2
+            case SVGQuadratic(first_point, next_point):
+                return abs((next_point - first_point).angle) > math.pi / 2
+
 
 
 def dic_to_svglist(d):
@@ -144,16 +290,12 @@ class SvgLayer(Layer):
         else:
             text_style["font-family"] = "sans-serif"
 
-    def __path(self,
-               path,
-               reverse_path,
-               reverse_start,
-               reverse_end,
-               labels=None,
-               style=None):
+    def __path(self, svg_path, labels=None, style=None):
         if style is None:
             style = {}  # todo wire.wire_style
-        # partie qui par les styles: pas vraiment bien faite
+
+        reverse_start = svg_path.is_up()
+        reverse_end = not svg_path.reverse().is_up()
 
         svg_style = {}
         self.parse_style(style, svg_style)
@@ -170,14 +312,14 @@ class SvgLayer(Layer):
 
         self.edgelayer += [
             f'<g {dic_to_svglist(svg_style)} >'
-            f'<path id="{_id}" d="{path}" />'
+            f'<path id="{_id}" d="{svg_path}" />'
             f'{markers}'
             '</g>'
         ]
 
         if reverse_start or reverse_end:
             self.edgelayer += [
-                f'<path id="r-{_id}" d="{reverse_path}" display="none"/>'
+                f'<path id="r-{_id}" d="{svg_path.reverse()}" display="none"/>'
             ]
 
         if labels is not None:
@@ -228,13 +370,10 @@ class SvgLayer(Layer):
 
     def line(self, p1, p2, labels=None, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
-        path = f"M {p1} L {p2}"
-        reverse_path = f"M {p2} L {p1}"
+        svg_path = SvgPath(p1)
+        svg_path.line_to(p2)
 
-        reverse_start = abs((p2 - p1).angle) > math.pi / 2
-        reverse_end = reverse_start
-        self.__path(path, reverse_path, reverse_start, reverse_end, labels,
-                    style)
+        self.__path(svg_path, labels, style)
 
     def circle(self, p1, radius, labels=None, **style):
         tf = self.svgtransform * self.transform
@@ -247,13 +386,11 @@ class SvgLayer(Layer):
 
         x_axis_rotation = tf(Point(radius, 0)).angle * 180 / math.pi
 
-        path = f"M {x1} A {rx} {ry} {x_axis_rotation:f} 1 1 {x2} A {rx} {ry} {x_axis_rotation:f} 1 1 {x1}"
-        reverse_path = f"M {x1} A {rx} {ry} {x_axis_rotation:f} 1 0 {x2} A {rx} {ry} {x_axis_rotation:f} 1 0 {x1}"
+        svg_path = SvgPath(x1)
+        svg_path.ellipse_to(x2, rx, ry, x_axis_rotation, 1, 1)
+        svg_path.ellipse_to(x1, rx, ry, x_axis_rotation, 1, 1)
 
-        reverse_start = False
-        reverse_end = False
-        self.__path(path, reverse_path, reverse_start, reverse_end, labels,
-                    style)
+        self.__path(svg_path, labels, style)
 
     def rectangle(self, p1, p2, **style):
         r = Rectangle(p1, p2)
@@ -304,7 +441,7 @@ class SvgLayer(Layer):
         self.parse_text_style(style, text_style)
 
         self.nodelayer += [
-            f'<text x="{x}" y="{y}"   {dic_to_svglist(text_style)} text-anchor="{align}"  dominant-baseline="{valign}" transform="translate({self.svgtransform(self.transform(point))})">{text}</text>'
+            f'<text x="{x}" y="{y}" {dic_to_svglist(text_style)} text-anchor="{align}"  dominant-baseline="{valign}" transform="translate({self.svgtransform(self.transform(point))})">{text}</text>'
         ]
 
     def edge(self, points, labels=None, **style):
@@ -312,7 +449,6 @@ class SvgLayer(Layer):
         tf = self.svgtransform * self.transform
         angles = list(
             map(lambda x: x * math.pi / 180, self.find_angles(points)))
-        current_node = points[0]
 
         if "looseness" in style:
             looseness = style["looseness"]
@@ -320,91 +456,70 @@ class SvgLayer(Layer):
         else:
             looseness = 1
 
-        curve = []
-        point = current_node
+        point = points[0]
+        svg_path = SvgPath(tf(point))
         for i in range(len(points) - 1):
-            current_node = points[i + 1]
-            newpoint = current_node
+            newpoint = points[i + 1]
             dst = looseness * 0.3902 * newpoint.distance(point)
             fstcontrol = point + Point(dst, angles[i], polar=True)
             sndcontrol = newpoint - Point(dst, angles[i + 1], polar=True)
-            curve += [(point, fstcontrol, sndcontrol, newpoint)]
+            svg_path.curve_to(tf(newpoint), tf(fstcontrol), tf(sndcontrol))
             point = newpoint
 
-        path = f"M {tf(curve[0][0])}"
-        for (a, b, c, d) in curve:
-            path += f"C {tf(b)} {tf(c)} {tf(d)}"
-
-        curve.reverse()
-        reverse_path = f"M {tf(curve[0][3])}"
-        for (a, b, c, d) in curve:
-            reverse_path += f"C {tf(c)} {tf(b)} {tf(a)}"
-
-        # todo: on peut faire mieux je pense
-        reverse_start = abs((points[1] - points[0]).angle) > math.pi / 2
-        reverse_end = abs((points[-1] - points[-2]).angle) > math.pi / 2
-        self.__path(path, reverse_path, reverse_start, reverse_end, labels,
-                    style)
+        self.__path(svg_path, labels, style)
 
     def polyline(self, points, labels=None, closed=False, **style):
         tf = self.svgtransform * self.transform
+
+        def corners(p0,p1,p2):
+            """ returns points nears p1 to round the corners """
+            if p1.distance(p2) > p0.distance(p1):
+                ratio = min(12, p1.distance(p2) / p0.distance(p1))
+                t1 = 0.04 * ratio
+                t2 = 0.04
+            else:
+                ratio = min(12, p0.distance(p1) / p1.distance(p2))
+                t1 = 0.04
+                t2 = 0.04 * ratio
+            beforep1 = p0 * t1 + p1 * (1 - t1)
+            afterp1 = p1 * (1 - t2) + p2 * t2
+            return (beforep1, afterp1)
 
         if closed:
             points += [points[0]]
 
         if "rounded" in style and style["rounded"] and len(points) != 2:
-            path = ""
-            reverse_path = ""
+            p1 = points[0]
+            if closed:
+                p0 = points[-2]
+                p2 = points[1]
+                (_, afterp1) = corners(p0, p1, p2)
+                svg_path = SvgPath(tf(afterp1))
+            else:
+                svg_path = SvgPath(tf(p1))
             for i in range(len(points) - 2):
                 p0 = points[i]
                 p1 = points[i + 1]
                 p2 = points[i + 2]
-                if p1.distance(p2) > p0.distance(p1):
-                    ratio = min(12, p1.distance(p2) / p0.distance(p1))
-                    t1 = 0.04 * ratio
-                    t2 = 0.04
-                else:
-                    ratio = min(12, p0.distance(p1) / p1.distance(p2))
-                    t1 = 0.04
-                    t2 = 0.04 * ratio
-                beforep1 = p0 * t1 + p1 * (1 - t1)
-                afterp1 = p1 * (1 - t2) + p2 * t2
-                path += f" L {tf(beforep1)}"
-                path += f" Q {tf(p1)} {tf(afterp1)}"
-                # reverse_path starts from p2, goes to afterp1
-                reverse_path = f" Q {tf(p1)} {tf(beforep1)}" + reverse_path
-                reverse_path = f" L {tf(afterp1)}" + reverse_path
+                (beforep1, afterp1) = corners(p0, p1, p2)
+                svg_path.line_to(tf(beforep1))
+                svg_path.quadratic_to(tf(afterp1), tf(p1))
             if not closed:
-                path = f"M {tf(points[0])}" + path + f" L {tf(p2)}"
-                reverse_path = f"M {tf(p2)}" + reverse_path + f"L {tf(points[0])}"
+                svg_path.line_to(tf(p2))
             else:
                 p0 = points[-2]
                 p1 = points[0]
                 p2 = points[1]
-                if p1.distance(p2) > p0.distance(p1):
-                    ratio = min(12, p1.distance(p2) / p0.distance(p1))
-                    t1 = 0.04 * ratio
-                    t2 = 0.04
-                else:
-                    ratio = min(12, p0.distance(p1) / p1.distance(p2))
-                    t1 = 0.04
-                    t2 = 0.04 * ratio
-                beforep1 = p0 * t1 + p1 * (1 - t1)
-                afterp1 = p1 * (1 - t2) + p2 * t2
-                path = f"M {tf(afterp1)}" + path + f" L {tf(beforep1)} Q {tf(p1)} {tf(afterp1)}"
-                reverse_path = f"M {tf(afterp1)} Q {tf(p1)} {tf(beforep1)}" + reverse_path + f" L {tf(afterp1)}"
+                (beforep1, afterp1) = corners(p0, p1, p2)
+                svg_path.line_to(tf(beforep1))
+                svg_path.quadratic_to(tf(afterp1), tf(p1))
         else:
             # not rounded
-            path = f"M {tf(points[0])} L " + " ".join(
-                str(tf(p)) for p in points[1:])
-            reverse_path = f"M {tf(points[-1])} L " + " ".join(
-                str(tf(p)) for p in points[-2::-1])
+            svg_path = SvgPath(tf(points[0]))
+            for point in points[1:]:
+                svg_path.line_to(tf(point))
 
-        # todo: on peut faire mieux je pense
-        reverse_start = abs((points[1] - points[0]).angle) > math.pi / 2
-        reverse_end = abs((points[-1] - points[-2]).angle) > math.pi / 2
-        self.__path(path, reverse_path, reverse_start, reverse_end, labels,
-                    style)
+        self.__path(svg_path, labels, style)
 
     def draw(self, rect, fs=None, commands="", preamble=False):
         tf = self.svgtransform * self.transform
