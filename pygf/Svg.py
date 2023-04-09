@@ -1,3 +1,4 @@
+""" Module that provides the SVG Layer """
 # pylint: disable=invalid-name
 import math
 import base64
@@ -7,35 +8,100 @@ from .Geometry import Point, Rectangle, Transform
 from .Options import register_layer
 
 
+
 @dataclass
 class PathElement:
+    """
+    represents one part of a SVG Path
+    """
     first_point: Point
     next_point: Point
 
+    def is_up(self):
+        """
+        determines if the path element is drawn from left to right
+        or from right to left
+        important to know how to draw the text
+        """
+        return abs((self.next_point - self.first_point).angle) > math.pi / 2
+
+    def reverse(self):
+        """
+        return the reverse of the path element 
+        """
 
 @dataclass
 class SVGLine(PathElement):
-    pass
+    """ A line element in a SVG Path """
+    def __str__(self, first = False):
+        s = ""
+        if first:
+            s = "M {self.first_point}"
+        s += f" L {self.next_point}"
+        return s
+
+    def reverse(self):
+        return SVGLine(self.next_point, self.first_point)
 
 
 @dataclass
 class SVGEllipse(PathElement):
+    """ An ellipse element in a SVG Path """
     rx: float
     ry: float
     x_axis_rotation: float
     large_flag: int
     sweep_flag: int
 
+    def __str__(self, first = False):
+        s = ""
+        if first:
+            s = "M {self.first_point}"
+        s += (f" A {self.rx} {self.ry} {self.x_axis_rotation}"
+              f" {self.large_flag} {self.sweep_flag} {self.next_point}")
+        return s
+
+    def reverse(self):
+        return SVGEllipse(self.next_point, self.first_point,
+                          self.rx, self.ry,
+                          self.x_axis_rotation,
+                          self.large_flag, 1 - self.sweep_flag)
+
+
+    def is_up(self):
+        return self.sweep_flag > 0
 
 @dataclass
 class SVGBezier(PathElement):
+    """ A Bezier curve element in a SVG Path """
     first_control_point: Point
     second_control_point: Point
+    def __str__(self, first = False):
+        s = ""
+        if first:
+            s = "M {self.first_point}"
+        s += f" C {self.first_control_point} {self.second_control_point} {self.next_point}"
+        return s
 
+    def reverse(self):
+        return SVGBezier(self.next_point, self.first_point,
+                         self.second_control_point,
+                         self.first_control_point)
 
 @dataclass
 class SVGQuadratic(PathElement):
+    """ A Quadratic Bezier curve element in a SVG Path """    
     control_point: Point
+    def __str__(self, first = False):
+        s = ""
+        if first:
+            s = "M {self.first_point}"
+        s += f" Q {self.control_point} {self.next_point}"
+        return s
+
+    def reverse(self):
+        return SVGQuadratic(self.next_point, self.first_point,
+                            self.control_point)
 
 
 class SvgPath:
@@ -84,93 +150,40 @@ class SvgPath:
     def __str__(self):
         first_point = self.path_list[0].first_point
         s = f"M {first_point}"
-        current_point = first_point
-        for element in self.path_list:
-            match element:
-                case SVGLine(first_point, next_point):
-                    s += f" L {next_point}"
-                    current_point = next_point
-                case SVGEllipse(first_point, next_point, rx, ry,
-                                x_axis_rotation, large_flag, sweep_flag):
-                    s += f" A {rx} {ry} {x_axis_rotation} {large_flag} {sweep_flag} {next_point}"
-                    current_point = next_point
-                case SVGBezier(first_point, next_point, first_control_point, second_control_point):
-                    s += f" C {first_control_point} {second_control_point} {next_point}"
-                    current_point = next_point
-                case SVGQuadratic(first_point, next_point, control_point):
-                    s += f" Q {control_point} {next_point}"
-                    current_point = next_point
-
-        return s
+        return s + "".join(str(i) for i in self.path_list)
 
     def reverse(self):
+        """ return the reverse of the SVG path"""
         if len(self.path_list) == 0:
             return SvgPath(self.current_point)
 
-        reverse_list = []
-        for element in self.path_list[::-1]:
-            match element:
-                case SVGLine(first_point, next_point):
-                    # pylint: disable=arguments-out-of-order
-                    reverse_list += [SVGLine(next_point, first_point)]
-                    current_point = first_point
-                case SVGEllipse(first_point, next_point, rx, ry,
-                                x_axis_rotation, large_flag, sweep_flag):
-                    # pylint: disable=arguments-out-of-order
-                    reverse_list += [SVGEllipse(next_point, first_point, rx,
-                                                ry, x_axis_rotation,
-                                                large_flag, 1 - sweep_flag)]
-                    current_point = first_point
-                case SVGBezier(first_point, next_point, first_control_point, second_control_point):
-                    # pylint: disable=arguments-out-of-order
-                    reverse_list += [SVGBezier(next_point, first_point,
-                                               second_control_point,
-                                               first_control_point)]
-                    current_point = first_point
-                case SVGQuadratic(first_point, next_point, control_point):
-                    # pylint: disable=arguments-out-of-order
-                    reverse_list += [SVGQuadratic(next_point, first_point,
-                                               control_point)]
-                    current_point = first_point
-
-        return SvgPath(current_point, reverse_list)
+        reverse_list = [x.reverse() for x in self.path_list[::-1]]
+        last_point = reverse_list[-1].next_point
+        return SvgPath(last_point, reverse_list)
 
     def is_up(self):
+        """ return whether the path is drawn from left to right
+        or in the other direction """
         if len(self.path_list) == 0:
             raise NotImplementedError
 
-        match self.path_list[0]:
-            case SVGLine(first_point, next_point):
-                return abs((next_point - first_point).angle) > math.pi / 2
-            case SVGEllipse(first_point, next_point, _, _, _, _, sweep_flag):
-                # TODO
-                return sweep_flag > 0
-            case SVGBezier(first_point, next_point):
-                return abs((next_point - first_point).angle) > math.pi / 2
-            case SVGQuadratic(first_point, next_point):
-                return abs((next_point - first_point).angle) > math.pi / 2
-
+        return self.path_list[0].is_up()
 
 
 def dic_to_svglist(d):
+    """ converts a dictionary to a svg list """
     return ' '.join(f'{x}="{y}"' for (x, y) in d.items())
 
 
-""" TeX to SVG
-
-The common unit between TeX and SVG are centimeters.
-
-1cm is represented here by 50 pixels via the svgtransform that takes care automatically of the conversion
-
-"""
 
 
 def pt_to_cm(x):
+    """ converts pt to cm """
     return x * 2.54 / 72.27
 
 
 class SvgLayer(Layer):
-
+    """ the SVG Layer """
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
         self.names = 0
@@ -187,6 +200,7 @@ class SvgLayer(Layer):
         }
 
     def new_name(self):
+        """ return a new name for an id """
         self.names += 1
         return f"{self.names}"
 
@@ -215,9 +229,9 @@ class SvgLayer(Layer):
         # in thickness 1, the strokewidth should be 0.4pt
         strokewidth = 0.4 * pt * thickness
         svg_style["stroke-width"] = f"{strokewidth:.2g}"
-        """ ---------
-            dash
-            --------- """
+        ### ---------
+        ###    dash
+        ### ---------
         if "dash" in style:
             dash = style["dash"]
             del style["dash"]
@@ -244,9 +258,9 @@ class SvgLayer(Layer):
                 "loosely dash dot dot": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}"
             }.get(dash)
             svg_style["stroke-dasharray"] = dasharray
-        """ -------
-            draw
-            -------- """
+        ###  -------
+        ### draw
+        ### --------
         if "draw" in style:
             color = style["draw"]
             del style["draw"]
@@ -255,9 +269,9 @@ class SvgLayer(Layer):
         else:
             color = "black"
         svg_style["stroke"] = color
-        """ --------
-            fill
-            -------- """
+        ### --------
+        ###    fill
+        ### --------
         if "fill" in style:
             fill = style["fill"]
             del style["fill"]
@@ -277,6 +291,9 @@ class SvgLayer(Layer):
         # self.parse_arrows(style, svg_style) TODO
 
     def parse_text_style(self, style, text_style):
+        """ internal function
+        computes the text attributes
+        """
         if "text_size" in style:
             if style["text_size"] == "small":
                 text_style["font-size"] = "x-small"
@@ -292,7 +309,7 @@ class SvgLayer(Layer):
 
     def __path(self, svg_path, labels=None, style=None):
         if style is None:
-            style = {}  # todo wire.wire_style
+            style = {}
 
         reverse_start = svg_path.is_up()
         reverse_end = not svg_path.reverse().is_up()
@@ -538,14 +555,3 @@ class SvgLayer(Layer):
 
 
 register_layer('svg', SvgLayer)
-"""
-from io import StringIO
-from Diagrams.Core import Diagram
-def repr_jupyter(d):
-        f = StringIO()
-        d.draw(f, output='svg')
-        return f.getvalue()
-
-
-Diagram._repr_html_ = repr_jupyter
-"""
