@@ -3,6 +3,7 @@
 import math
 import base64
 from dataclasses import dataclass
+import xml.etree.ElementTree as ET
 from .Layer import Layer
 from .Geometry import Point, Rectangle, Transform
 from .Options import register_layer
@@ -170,13 +171,6 @@ class SvgPath:
         return self.path_list[0].is_up()
 
 
-def dic_to_svglist(d):
-    """ converts a dictionary to a svg list """
-    return ' '.join(f'{x}="{y}"' for (x, y) in d.items())
-
-
-
-
 def pt_to_cm(x):
     """ converts pt to cm """
     return x * 2.54 / 72.27
@@ -192,13 +186,6 @@ class SvgLayer(Layer):
         self.defs = {}
         self.svgtransform = Transform(a=50, d=-50)
 
-        self.arrows = {
-            "->":
-            '<marker id="marker_{_id}"  markerUnits = "userSpaceOnUse" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polyline points="0 0, 10 3.5, 0 7" /></marker>',
-            "-x":
-            '<marker id="marker_{_id}"  markerUnits = "userSpaceOnUse" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><polyline points="0 0, 7 7" /><line x1="0" y1="7" x2="7" y2="0"  /></marker>'
-        }
-
     def new_name(self):
         """ return a new name for an id """
         self.names += 1
@@ -209,11 +196,13 @@ class SvgLayer(Layer):
         r = Rectangle(Point(0, 0), self.svgtransform(Point(width, -height)))
         with open(img_name, 'rb') as f:
             data = f.read()
-            self.nodelayer += [
-                f'<image xlink:href="data:image/png;base64,{str(base64.b64encode(data),"utf-8")}" transform="translate({tf(point)-r.center})" width="{r.width}" height="{r.height}" preserveAspectRatio="none"/>'
-            ]
+            image_node = ET.Element('image', width=str(r.width), height=str(r.height))
+            image_node.set("xlink:href",
+                           f'data:image/png;base64,{str(base64.b64encode(data),"utf-8")}')
+            image_node.set("transform", f"translate({tf(point)-r.center})")
+            image_node.set("preserveAspectRatio", "none")
 
-        # TODO: none ou xMidYMid
+            self.nodelayer += [ image_node ]
 
     def parse_style(self, style, svg_style):
         """ ---------
@@ -307,6 +296,28 @@ class SvgLayer(Layer):
         else:
             text_style["font-family"] = "sans-serif"
 
+
+    def parse_arrows(self, style, svg, _id):
+        """ internal function for arrows """
+        if 'arrow' not in style:
+            return
+        if style['arrow'] == "->":
+            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
+                               markerWidth="10", markerHeight="7",
+                               refX="10", refY="3.5", orient="auto")
+            arrow.append(ET.Element("polyline",points="0 0, 10 3.5, 0 7"))
+        elif style['arrow'] == "-x":
+            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
+                            markerWidth="7", markerHeight="7",
+                            refX="3.5", refY="3.5", orient="auto")
+            arrow.append(ET.Element("polyline",points="0 0, 7 7"))
+            arrow.append(ET.Element("line",x1="0", y1="7", x2="7",y2="0"))
+        else:
+            raise NotImplementedError
+        svg.set('marker-end',f'url(#marker_{_id})')
+        arrow.set('id',f'marker_{_id}')
+        svg.append(arrow)
+
     def __path(self, svg_path, labels=None, style=None):
         if style is None:
             style = {}
@@ -322,68 +333,55 @@ class SvgLayer(Layer):
 
         _id = self.new_name()
 
-        markers = ""
-        if "arrow" in style:
-            markers = self.arrows[style['arrow']].format(_id=_id)
-            svg_style['marker-end'] = f'url(#marker_{_id})'
+        svg = ET.Element('g', svg_style)
+        svg.append(ET.Element('path', id=_id, d=str(svg_path)))
 
-        self.edgelayer += [
-            f'<g {dic_to_svglist(svg_style)} >'
-            f'<path id="{_id}" d="{svg_path}" />'
-            f'{markers}'
-            '</g>'
-        ]
+        self.parse_arrows(style, svg, _id)
+
+        self.edgelayer += [ svg ]
 
         if reverse_start or reverse_end:
             self.edgelayer += [
-                f'<path id="r-{_id}" d="{svg_path.reverse()}" display="none"/>'
+                ET.Element('path', id=f"r-{_id}",
+                           d=str(svg_path.reverse()),
+                           display="none")
             ]
 
         if labels is not None:
             for position in labels:
-
-                label_style = {}
-                label_style.update(text_style)
-
+                text_svg = ET.Element('text', text_style)
                 text = labels[position]
                 if "above" in position:
-                    label_style["dy"] = -5
+                    text_svg.set("dy", "-5")
                 else:
                     # below
-                    label_style["dy"] = 5
-                    label_style["dominant-baseline"] = "hanging"
+                    text_svg.set("dy", "5")
+                    text_svg.set("dominant-baseline", "hanging")
+
+                text_path = ET.Element("textPath")
 
                 if "start" in position:
-                    label_style[
-                        "text-anchor"] = "start" if not reverse_start else "end"
-                    startOffset = 0 if not reverse_start else 100
-                    mainpath = f"#{_id}" if not reverse_start else f"#r-{_id}"
+                    text_svg.set("text-anchor",
+                                 "start" if not reverse_start else "end")                    
+                    text_path.set("startOffset", "0%"  if not reverse_start else "100%")
+                    text_path.set("href", f"#{_id}" if not reverse_start else f"#r-{_id}")
                 elif "end" in position:
-                    label_style[
-                        "text-anchor"] = "end" if not reverse_end else "start"
-                    startOffset = 100 if not reverse_end else 0
-                    mainpath = f"#{_id}" if not reverse_end else f"#r-{_id}"
+                    text_svg.set("text-anchor",
+                                 "end" if not reverse_end else "start")                    
+                    text_path.set("startOffset", "100%"  if not reverse_end else "0%")
+                    text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
                 else:
-                    label_style["text-anchor"] = "middle"
-                    mainpath = f"#{_id}" if not reverse_start else f"#r-{_id}"
-                    mainpath_end = f"#{_id}" if not reverse_end else f"#r-{_id}"
+                    text_svg.set("text-anchor", "middle")
+                    text_path.set("startOffset", "50%")
+                    if position == "above":
+                        text_path.set("href", f"#{_id}" if not reverse_start else f"#r-{_id}")
+                    else:
+                        text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
 
-                if position in ["above start", "below start"]:
-                    self.edgelayer += [
-                        f'<text  {dic_to_svglist(label_style)}  ><textPath href="{mainpath}" startOffset="{startOffset}%"> {text} </textPath></text>'
-                    ]
-                elif "above" == position:
-                    self.edgelayer += [
-                        f'<text   {dic_to_svglist(label_style)} ><textPath href="{mainpath}" startOffset="50%"> {text} </textPath></text>'
-                    ]
-                elif position in ["above end", "below end"]:
-                    self.edgelayer += [
-                        f'<text  {dic_to_svglist(label_style)} ><textPath href="{mainpath}"  startOffset="{startOffset}%"> {text} </textPath></text>'
-                    ]
-                elif "below" == position:
-                    self.edgelayer += [
-                        f'<text  {dic_to_svglist(label_style)}><textPath href="{mainpath_end}"  startOffset="50%"> {text} </textPath></text>'
-                    ]
+                text_path.text = str(text)
+                text_svg.append(text_path)
+                self.edgelayer += [ text_svg ]
+
 
     def line(self, p1, p2, labels=None, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
@@ -457,9 +455,13 @@ class SvgLayer(Layer):
         text_style = {}
         self.parse_text_style(style, text_style)
 
-        self.nodelayer += [
-            f'<text x="{x}" y="{y}" {dic_to_svglist(text_style)} text-anchor="{align}"  dominant-baseline="{valign}" transform="translate({self.svgtransform(self.transform(point))})">{text}</text>'
-        ]
+        text_node = ET.Element("text", x=str(x), y=str(y), **text_style)
+        text_node.set("text-anchor", align)
+        text_node.set("dominant-baseline", valign)
+        text_node.set("transform", f"translate({self.svgtransform(self.transform(point))})")
+        text_node.text = str(text)
+
+        self.nodelayer += [ text_node ]
 
     def edge(self, points, labels=None, **style):
 
@@ -546,12 +548,15 @@ class SvgLayer(Layer):
             ])
         ])
 
-        print(
-            fr'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{rect.width}" height="{rect.height}" viewBox="{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}">',
-            file=fs)
-        print("\n".join(self.edgelayer), file=fs)
-        print("\n".join(self.nodelayer), file=fs)
-        print(r'</svg>', file=fs)
+        svg = ET.Element('svg', xmlns="http://www.w3.org/2000/svg",
+                         width=str(rect.width), height=str(rect.height),
+                         viewBox = f"{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}")
+        svg.set("xmlns:xlink", "http://www.w3.org/1999/xlink")
+
+        svg.extend(self.edgelayer)
+        svg.extend(self.nodelayer)
+
+        print(ET.tostring(svg, encoding="unicode"), file=fs)
 
 
 register_layer('svg', SvgLayer)
