@@ -204,7 +204,9 @@ class SvgLayer(Layer):
 
             self.nodelayer += [ image_node ]
 
-    def parse_style(self, style, svg_style):
+
+
+    def parse_stroke_width(self, style):
         """ ---------
             thickness
             --------- """
@@ -215,16 +217,19 @@ class SvgLayer(Layer):
         else:
             thickness = 1
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
-        # in thickness 1, the strokewidth should be 0.4pt
-        strokewidth = 0.4 * pt * thickness
-        svg_style["stroke-width"] = f"{strokewidth:.2g}"
-        ### ---------
-        ###    dash
-        ### ---------
+        stroke_width = 0.4 * pt * thickness
+        return stroke_width
+
+
+    def parse_style(self, stroke_width, style, svg_style):
+        """ ---------
+            dash
+         ---------"""
+        pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
         if "dash" in style:
             dash = style["dash"]
             del style["dash"]
-            sw = strokewidth
+            sw = stroke_width
             dasharray = {
                 "solid": "none",
                 "dotted": f"{sw:.2g} {2*pt:.2g}",
@@ -277,7 +282,6 @@ class SvgLayer(Layer):
             del style["rounded"]
             svg_style["stroke-linejoin"] = "round"
 
-        # self.parse_arrows(style, svg_style) TODO
 
     def parse_text_style(self, style, text_style):
         """ internal function
@@ -297,24 +301,69 @@ class SvgLayer(Layer):
             text_style["font-family"] = "sans-serif"
 
 
-    def parse_arrows(self, style, svg, _id):
+    def parse_arrows(self, stroke_width, style, svg, sub_path):
         """ internal function for arrows """
         if 'arrow' not in style:
             return
+
+        pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
+
         if style['arrow'] == "->":
+            x = 0.28*pt + .3 * stroke_width
+            width = 5*x
+            height = 10*x
             arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
-                               markerWidth="10", markerHeight="7",
-                               refX="10", refY="3.5", orient="auto")
-            arrow.append(ET.Element("polyline",points="0 0, 10 3.5, 0 7"))
+                               markerWidth=str(width), markerHeight=str(height),
+                               refX= str(width-0.4*stroke_width), refY=str(height/2), orient="auto")
+            arrow.set("stroke-width", str(0.8 * stroke_width))
+            relative = Point(-width,-height/2)
+            arrow_path = SvgPath(Point(-3.75*x, 4*x) - relative)
+            arrow_path.curve_to(Point(0, 0) - relative,
+                                Point(-3.5*x, 2.5*x) - relative,
+                                Point(-0.75*x, 0.25*x) - relative)
+            arrow_path.curve_to(Point(-3.75*x,-4*x) - relative,
+                                Point(-0.75*x, -0.25*x) - relative,
+                                Point(-3.5*x, -2.5*x) - relative)
+            arrow_svg_path = ET.Element('path', d=str(arrow_path))
+            arrow_svg_path.set("stroke-linecap", "round")
+            arrow_svg_path.set("stroke-linejoin", "round")
+            arrow_svg_path.set("stroke-dasharray", "none")
+            arrow.append(arrow_svg_path)
+        elif style['arrow'] == "latex":
+            x = 0.28*pt + .3 * stroke_width
+
+            width = 11*x
+            height = 10*x
+            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
+                               markerWidth=str(width), markerHeight=str(height),
+                               refX= str(width-0.5*stroke_width), refY=str(height/2), orient="auto")
+            arrow.set("stroke-width", str(stroke_width))
+
+            relative = Point(-width,-height/2)
+            arrow_path = SvgPath(Point(0, 0) - relative)
+            arrow_path.curve_to(Point(-10*x, 3.75*x) - relative,
+                                Point(-8*x/3, .5*x) - relative,
+                                Point(-7*x, 2*x) - relative)
+            arrow_path.line_to(Point(-10*x, -3.75*x) - relative)
+            arrow_path.curve_to(Point(0, 0) - relative,
+                                Point(-7*x, -2*x) - relative,
+                                Point(-8*x/3, -.5*x) - relative)
+            arrow_svg_path = ET.Element('path', d=str(arrow_path), fill=svg.get("stroke"))
+            arrow.append(arrow_svg_path)
         elif style['arrow'] == "-x":
+            width = 3*pt+4*stroke_width
+
             arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
-                            markerWidth="7", markerHeight="7",
-                            refX="3.5", refY="3.5", orient="auto")
-            arrow.append(ET.Element("polyline",points="0 0, 7 7"))
-            arrow.append(ET.Element("line",x1="0", y1="7", x2="7",y2="0"))
+                            markerWidth=str(width), markerHeight=str(width),
+                               refX=str(width/2), refY=str(width/2), orient="auto")
+
+            arrow.append(ET.Element("polyline",points=f"{Point(0,0)} {Point(width, width)}"))
+            arrow.append(ET.Element("polyline",points=f"{Point(width,0)} {Point(0, width)}"))
         else:
             raise NotImplementedError
-        svg.set('marker-end',f'url(#marker_{_id})')
+
+        _id = self.new_name()
+        sub_path.set('marker-end',f'url(#marker_{_id})')
         arrow.set('id',f'marker_{_id}')
         svg.append(arrow)
 
@@ -325,8 +374,10 @@ class SvgLayer(Layer):
         reverse_start = svg_path.is_up()
         reverse_end = not svg_path.reverse().is_up()
 
-        svg_style = {}
-        self.parse_style(style, svg_style)
+        stroke_width = self.parse_stroke_width(style)
+
+        svg_style = {'stroke-width': f'{stroke_width:2g}'}
+        self.parse_style(stroke_width, style, svg_style)
 
         text_style = {}
         self.parse_text_style(style, text_style)
@@ -334,9 +385,10 @@ class SvgLayer(Layer):
         _id = self.new_name()
 
         svg = ET.Element('g', svg_style)
-        svg.append(ET.Element('path', id=_id, d=str(svg_path)))
+        sub_path = ET.Element('path', id=_id, d=str(svg_path))
+        svg.append(sub_path)
 
-        self.parse_arrows(style, svg, _id)
+        self.parse_arrows(stroke_width, style, svg, sub_path)
 
         self.edgelayer += [ svg ]
 
@@ -350,7 +402,6 @@ class SvgLayer(Layer):
         if labels is not None:
             for position in labels:
                 text_svg = ET.Element('text', text_style)
-                text = labels[position]
                 if "above" in position:
                     text_svg.set("dy", "-5")
                 else:
@@ -378,7 +429,7 @@ class SvgLayer(Layer):
                     else:
                         text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
 
-                text_path.text = str(text)
+                text_path.text = str(labels[position])
                 text_svg.append(text_path)
                 self.edgelayer += [ text_svg ]
 
@@ -540,7 +591,7 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style)
 
-    def draw(self, rect, fs=None, commands="", preamble=False):
+    def draw(self, rect, fs=None, options=None , preamble=False):
         tf = self.svgtransform * self.transform
         rect = Rectangle.bounding_box([
             *map(tf, [
@@ -556,7 +607,7 @@ class SvgLayer(Layer):
         svg.extend(self.edgelayer)
         svg.extend(self.nodelayer)
 
-        print(ET.tostring(svg, encoding="unicode"), file=fs)
+        print("\n".join(ET.tostringlist(svg, encoding="unicode")), file=fs)
 
 
 register_layer('svg', SvgLayer)

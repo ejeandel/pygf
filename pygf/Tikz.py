@@ -1,9 +1,10 @@
+""" Module that provides the SVG Layer """
 # pylint: disable=invalid-name
 import math
 from .Layer import Layer
 from .Options import register_layer
 from .Geometry import Point, Rectangle
-""" code pour gérer tikz """
+
 
 
 def dic_to_list(d):
@@ -21,6 +22,7 @@ def _escape(x):
 
 
 class TikzLayer(Layer):
+    """ The Tikz Layer """
 
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
@@ -30,8 +32,9 @@ class TikzLayer(Layer):
 
     def picture(self, point, img_name, width, height):
         # pictures are NOT subject to the transform (only the position is)
-        self.nodelayer += "\\node at ({position}) {{\\includegraphics[width={w:f}cm, height={h:f}cm]{{{name}}}}};\n".format(
-            position=self.transform(point), name=img_name, h=height, w=width)
+        self.nodelayer += rf"\node at ({self.transform(point)}) "\
+            rf"{{\includegraphics[width={width:f}cm, height={height:f}cm]"\
+            f"{{{img_name}}}}};\n"
 
     def text(self, point, text, **hints):
         #  text is NOT subject to the transform (only the position is)
@@ -46,7 +49,8 @@ class TikzLayer(Layer):
             else:
                 opts.update({x: None})
         opts.update(hints)
-        self.nodelayer += f"\\node[{dic_to_list(opts)}] at ({self.transform(point)}) {{{_escape(text)}}};\n"
+        self.nodelayer += f"\\node[{dic_to_list(opts)}] at ({self.transform(point)})"\
+            f"{{{_escape(text)}}};\n"
 
     def circle(self, p1, radius, labels=None, **style):
         tf = self.transform
@@ -65,9 +69,11 @@ class TikzLayer(Layer):
         self._parse_style(style, tikz_style)
         tikz_style.update(style)
         if rx != ry:
-            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) circle[x radius={rx:2f}, y radius={ry:2f}, rotate={x_axis_rotation:2f}];\n"
+            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) "\
+                f"circle[x radius={rx:2f}, y radius={ry:2f}, rotate={x_axis_rotation:2f}];\n"
         else:
-            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) circle[radius={rx:2f}];\n"
+            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) "\
+                f"circle[radius={rx:2f}];\n"
 
     def rectangle(self, p1, p2, **style):
         r = Rectangle(p1, p2)
@@ -77,7 +83,8 @@ class TikzLayer(Layer):
         (sw, se, nw,
          ne) = map(self.transform,
                    (r.southwest, r.southeast, r.northwest, r.northeast))
-        self.nodelayer += f"\\path[{dic_to_list(tikz_style)}] ({sw}) -- ({se}) -- ({ne}) -- ({nw}) -- cycle;\n"
+        self.nodelayer += f"\\path[{dic_to_list(tikz_style)}]"\
+            f"({sw}) -- ({se}) -- ({ne}) -- ({nw}) -- cycle;\n"
 
     def _parse_thickness(self, gen_style, tikz_style):
         if "thickness" not in gen_style:
@@ -95,8 +102,7 @@ class TikzLayer(Layer):
         if thick in dic:
             tikz_style.update({dic[thick]: None})
         else:
-            tikz_style.update(
-                {"line width": "{thick:.3g}pt".format(thick=0.4 * thick)})
+            tikz_style.update({"line width": f"{0.4*thick:.3g}pt"})
         del gen_style["thickness"]
 
     def _parse_dashness(self, gen_style, tikz_style):
@@ -105,7 +111,7 @@ class TikzLayer(Layer):
         dash = gen_style["dash"]
         if dash == "solid":
             return
-        elif dash == "dotted":
+        if dash == "dotted":
             tikz_style.update({"dotted": None})
         elif dash == "dashed":
             tikz_style.update({"dashed": None})
@@ -131,7 +137,7 @@ class TikzLayer(Layer):
         del gen_style["draw"]
 
     def _parse_arrows(self, gen_style, tikz_style):
-        arrows = {'->': '->', '-x': '-Rays'}
+        arrows = {'->': '->', '-x': '-Rays', 'latex' : '-latex'}
         if "arrow" not in gen_style:
             return
         arrow = arrows[gen_style["arrow"]]
@@ -167,6 +173,7 @@ class TikzLayer(Layer):
             tikz_style.update({"rounded corners": None})
 
     def convert_angle(self, angle):
+        """ convert the angle according to the transform and round """
         p = Point(1, angle * math.pi / 180, polar=True)
         p = self.transform(p)
         a = p.angle * 180 / math.pi
@@ -180,7 +187,7 @@ class TikzLayer(Layer):
         tikz_style = {}
         self._parse_style(style, tikz_style)
         tikz_style.update(style)
-        s += "\\path[%s] (%s) -- (%s)" % (dic_to_list(tikz_style), p1, p2)
+        s += f"\\path[{dic_to_list(tikz_style)}] ({p1}) -- ({p2})"
 
         if (abs((p2 - p1).angle) - math.pi / 2) < 0.01:
             # hack
@@ -190,28 +197,29 @@ class TikzLayer(Layer):
         reverse_end = reverse_start
 
         if labels is not None:
-            if "above" in labels:
-                s += f"node [sloped,pos=0.5,above ] {{{labels['above']}}} "
-            if "below" in labels:
-                s += f"node [sloped,pos=0.5,below ] {{{labels['below']}}} "
-            if "above start" in labels:
-                s += f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'} ] {{{labels['above start']}}} "
-            if "below start" in labels:
-                s += f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}] {{{labels['below start']}}} "
-            if "above end" in labels:
-                s += f"node [sloped,pos=1,above {'left' if not reverse_end else 'right'}] {{{labels['above end']}}} "
-            if "below end" in labels:
-                s += f"node [sloped,pos=1,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} "
+            for label in labels:
+                text = _escape(labels[label])
+
+                if label == "above":
+                    s += " node [sloped,pos=0.5,above]"
+                elif label == "below":
+                    s += " node [sloped,pos=0.5,below]"
+                elif label == "above start":
+                    s += f" node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                elif label == "below start":
+                    s += f" node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                elif label == "above end":
+                    s += f" node [sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
+                elif label == "below end":
+                    s += f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
+                s += f"{{{text}}}"
         self.edgelayer += s + ";\n"
 
     def edge(self, points, labels=None, **style):
         l = self.find_angles(points)
         points = [*map(self.transform, points)]
 
-        current_node = points[0]
         s = ""
-        if style is None:
-            style = {}
 
         if "looseness" in style:
             looseness = style["looseness"]
@@ -221,31 +229,35 @@ class TikzLayer(Layer):
         tikz_style = {}
         self._parse_style(style, tikz_style)
         tikz_style.update(style)
-        s += "\\path[%s] (%s)" % (dic_to_list(tikz_style), points[0])
+        s += f"\\path[{dic_to_list(tikz_style)}] ({points[0]})"
 
         for i in range(len(points) - 1):
-            current_node = points[i + 1]
+            out_angle = self.convert_angle(l[i])
+            in_angle = self.convert_angle(180 + l[i + 1])
+            s += f" to[out={out_angle:3.3g}, in={in_angle:3.3g}"
             if looseness != 1:
-                s += " to[out=%3.3g, in=%3.3g, looseness=%3.3g] (%s) " % (
-                    self.convert_angle(
-                        l[i]), self.convert_angle(180 + l[i + 1]), looseness,
-                    current_node)
-            else:
-                s += " to[out=%3.3g, in=%3.3g] (%s) " % (self.convert_angle(
-                    l[i]), self.convert_angle(180 + l[i + 1]), current_node)
+                s += f', looseness={looseness:3.3g}'
+            s += f'] ({points[i+1]}) '
 
         reverse_start = abs((points[1] - points[0]).angle) > math.pi / 2
         reverse_end = abs((points[-1] - points[-2]).angle) > math.pi / 2
 
         if labels is not None:
-            if "above start" in labels:
-                s += f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'} ] {{{labels['above start']}}} "
-            if "below start" in labels:
-                s += f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}] {{{labels['below start']}}} "
-            if "above end" in labels:
-                s += f"node [sloped,pos=100,above {'left' if not reverse_end else 'right'}] {{{labels['above end']}}} "
-            if "below end" in labels:
-                s += f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} "
+            for label in labels:
+                text = _escape(labels[label])
+                if label ==  "above start" :
+                    s += f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                if label ==  "above" :
+                    s += f"node [sloped,pos=50,above {'right' if not reverse_start else 'left'}]"
+                elif label ==  "below start" :
+                    s += f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                elif label ==  "below" :
+                    s += f"node [sloped,pos=50,below {'right' if not reverse_start else 'left'}]"
+                elif label ==  "above end" :
+                    s += f"node [sloped,pos=100,above {'left' if not reverse_end else 'right'}]"
+                elif label ==  "below end" :
+                    s += f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}]"
+                s += f"{{{text}}}"
         self.edgelayer += s + ";\n"
 
     def polyline(self, points, labels=None, closed=False, **style):
@@ -269,24 +281,38 @@ class TikzLayer(Layer):
             listpoints += ["cycle"]
 
         if labels is not None:
-            if "above start" in labels:
-                listpoints[1] = listpoints[
-                    1] + f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'} ] {{{labels['above start']}}} "
-            if "below start" in labels:
-                listpoints[1] = listpoints[
-                    1] + f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}] {{{labels['below start']}}} "
-            if "above end" in labels:
-                listpoints[-1] = listpoints[
-                    -1] + f"node [sloped,pos=100,above {'left' if not reverse_end else 'right'}] {{{labels['above end']}}} "
-            if "below end" in labels:
-                listpoints[-1] = listpoints[
-                    -1] + f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}] {{{labels['below end']}}} "
+            for label in labels:
+                text = _escape(labels[label])
+                if label == "above start":
+                    code = f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                    code += f"{{{text}}} "
+                    listpoints[1] = code + listpoints[1]
+                elif label == "below start":
+                    code = f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                    code += f"{{{text}}} "
+                    listpoints[1] = code + listpoints[1]
+                elif label == "above":
+                    code = f"node [sloped,pos=0.5,above {'right' if not reverse_start else 'left'}]"
+                    code += f"{{{text}}} "
+                    listpoints[1] = code + listpoints[1]
+                elif label == "below":
+                    code = f"node [sloped,pos=0.5,below {'right' if not reverse_start else 'left'}]"
+                    code += f"{{{text}}} "
+                    listpoints[1] = code + listpoints[1]
+                elif label == "above end":
+                    code = f" node [sloped,pos=100,above {'left' if not reverse_end else 'right'}]"
+                    code += f"{{{text}}}"
+                    listpoints[-1] = listpoints[-1] + code
+                elif label == "below end":
+                    code = f" node [sloped,pos=0,below {'left' if not reverse_end else 'right'}]"
+                    code += f"{{{text}}}"
+                    listpoints[-1] = listpoints[-1] + code
 
         s = rf"\path[{dic_to_list(tikz_style)}] " + "--".join(listpoints)
 
         self.edgelayer += s + ";\n"
 
-    def draw(self, rect, fs, options=None, preamble=False):
+    def draw(self, rect, fs = None, options=None, preamble=False):
         if options is None:
             options = {}
 
@@ -308,7 +334,7 @@ class TikzLayer(Layer):
                 if options["center"] is True:
                     options["baseline"] = "(current bounding box.center)"
                 del options["center"]
-            print(r"\begin{tikzpicture}[%s]" % dic_to_list(options), file=fs)
+            print(rf"\begin{{tikzpicture}}[{dic_to_list(options)}]" , file=fs)
 
         tf = self.transform
 

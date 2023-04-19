@@ -1,3 +1,4 @@
+""" The Layer module """
 # pylint: disable=invalid-name
 import math
 from abc import ABC, abstractmethod
@@ -131,7 +132,7 @@ class Layer(ABC):
         pass
 
     @abstractmethod
-    def draw(self, rect, fs=None, commands=None, preamble=False):
+    def draw(self, rect, fs=None, options=None, preamble=False):
         pass
 
     def find_angles(self, points):
@@ -174,7 +175,7 @@ class Layer(ABC):
 
 
 class NoLayer(Layer):
-
+    """ Dummy Layer that does nothing """
     def __init__(self, transform = None):
         Layer.__init__(self, transform)
 
@@ -193,7 +194,7 @@ class NoLayer(Layer):
     def picture(self, point, img_name, width, height):
         pass
 
-    def draw(self, rect, fs=None, commands=None, preamble=False):
+    def draw(self, rect, fs=None, options=None, preamble=False):
         pass
 
     def polyline(self, points, labels=None, closed=False, **style):
@@ -204,7 +205,7 @@ class NoLayer(Layer):
 
 
 class MultiLayer(Layer):
-
+    """ represents multiple layers """
     def __init__(self, layers):
         Layer.__init__(self, None)
         self.layers = layers
@@ -237,10 +238,10 @@ class MultiLayer(Layer):
         for layer in self.layers:
             layer.picture(point, img_name, width, height)
 
-    def draw(self, rect, files=None, commands=None, preamble=False):
+    def draw(self, rect, files=None, options=None, preamble=False):
         if files is not None:
             for (layer, fs) in zip(self.layers, files):
-                layer.draw(rect, fs, commands, preamble)
+                layer.draw(rect, fs, options, preamble)
         else:
             for layer in self.layers:
-                layer.draw(rect, None, commands, preamble)
+                layer.draw(rect, None, options, preamble)
