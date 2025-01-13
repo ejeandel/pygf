@@ -2,7 +2,6 @@
 # pylint: disable=invalid-name
 import math
 from .Layer import Layer
-from .Options import register_layer
 from .Geometry import Point, Rectangle
 
 
@@ -145,7 +144,12 @@ class TikzLayer(Layer):
         del gen_style["arrow"]
 
     def _parse_text(self, gen_style, tikz_style):
-        if not ("text_size" in gen_style or "font_family" in gen_style):
+        if "text_color" in gen_style:
+            text_color = gen_style["text_color"]
+            tikz_style.update({"color": text_color})
+            del gen_style["text_color"]
+        
+        if not ("font_family" in gen_style or "text_color" in gen_style):
             return
         font = ""
         if "text_size" in gen_style:
@@ -161,6 +165,8 @@ class TikzLayer(Layer):
 
         tikz_style.update({"font": font})
 
+
+        
     def _parse_style(self, style, tikz_style):
         self._parse_thickness(style, tikz_style)
         self._parse_dashness(style, tikz_style)
@@ -353,4 +359,3 @@ class TikzLayer(Layer):
             print(r"\end{document}", file=fs)
 
 
-register_layer('tikz', TikzLayer)

@@ -7,6 +7,8 @@ Welcome to PYGF's documentation!
 	     
    Layers <layer>
 
+   Geometry <geometry>
+   
       
 Indices and tables
 ==================
