@@ -149,7 +149,7 @@ class TikzLayer(Layer):
             tikz_style.update({"color": text_color})
             del gen_style["text_color"]
         
-        if not ("font_family" in gen_style or "text_color" in gen_style):
+        if not ("font_family" in gen_style or "text_size" in gen_style):
             return
         font = ""
         if "text_size" in gen_style:
