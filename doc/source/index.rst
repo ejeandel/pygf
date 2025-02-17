@@ -7,6 +7,10 @@ Welcome to PYGF's documentation!
 	     
    Layers <layer>
 
+.. automodule:: pygf.Geometry
+   :members:
+   :show-inheritance:
+
       
 Indices and tables
 ==================
