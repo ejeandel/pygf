@@ -6,7 +6,6 @@ from dataclasses import dataclass
 import xml.etree.ElementTree as ET
 from .Layer import Layer
 from .Geometry import Point, Rectangle, Transform
-from .Options import register_layer
 
 
 
@@ -300,6 +299,13 @@ class SvgLayer(Layer):
         else:
             text_style["font-family"] = "sans-serif"
 
+        if "text_color" in style:
+            text_style["stroke"] = style['text_color']
+            del style['text_color']
+            
+            
+
+            
 
     def parse_arrows(self, stroke_width, style, svg, sub_path):
         """ internal function for arrows """
@@ -559,7 +565,7 @@ class SvgLayer(Layer):
             points += [points[0]]
 
         if "rounded" in style and style["rounded"] and len(points) != 2:
-            p1 = points[0]
+            p2 = p1 = points[0]
             if closed:
                 p0 = points[-2]
                 p2 = points[1]
@@ -608,6 +614,3 @@ class SvgLayer(Layer):
         svg.extend(self.nodelayer)
 
         print("\n".join(ET.tostringlist(svg, encoding="unicode")), file=fs)
-
-
-register_layer('svg', SvgLayer)
