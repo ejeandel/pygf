@@ -128,7 +128,7 @@ class Layer(ABC):
         """
 
     @abstractmethod
-    def edge(self, points, labels=None, **style):
+    def edge(self, points, labels=None, closed = False, **style):
         """Draw a curve passing through the points (edge command)
 
         :param points: list of points
@@ -137,11 +137,29 @@ class Layer(ABC):
         :type labels: dict
         :param style: additional styling elements
         :type style: dict
+        :param closed: If true, draws a last line segment from the last point to the first point.
+        :type closed: bool
 
+        
         The points might be decorated to specify at which angle the curve
         should pass through the point.
         """
 
+    @abstractmethod
+    def shape(self, points,  **style):
+        """Draw a shape passing through the points (shape command)
+
+        :param points: list of points
+        :type points: List[Point]
+        :param style: additional styling elements
+        :type style: dict
+
+        The points might be decorated to specify at which angle the curve
+        should pass through the point.
+        """
+        
+
+        
     @abstractmethod
     def picture(self, point, img_name, width, height):
         """Draw an image (shape command)
@@ -173,7 +191,7 @@ class Layer(ABC):
         
         pass
 
-    def find_angles(self, points):
+    def find_angles(self, points, closed = False):
         """ Helper function: find the angles for the wires """
 
         def in_angle(node1, node2):
@@ -191,7 +209,10 @@ class Layer(ABC):
         next_node = todraw[1]
         angle = current_hint
         if angle is None:
-            angle = in_angle(current_node, next_node)
+            if not closed:            
+                angle = in_angle(current_node, next_node)
+            else:
+                angle = in_angle(todraw[-1], next_node)
         the_list += [angle]
         for i in range(len(points) - 1):
             prev_node = todraw[i]
@@ -200,7 +221,10 @@ class Layer(ABC):
             if i != len(points) - 2:
                 next_node = todraw[i + 2]
             else:
-                next_node = None
+                if not closed:
+                    next_node = None
+                else:
+                    next_node = todraw[0]
             if current_hint is None:
                 new_angle = in_angle(
                     prev_node,
@@ -238,9 +262,15 @@ class NoLayer(Layer):
     def polyline(self, points, labels=None, closed=False, **style):
         pass
 
+    def polygon(self, points,  **style):
+        pass
+    
     def edge(self, points, labels=None, **style):
         pass
 
+    def shape(self, points, **style):
+        pass
+    
 
 class MultiLayer(Layer):
     """represents multiple layers at once
@@ -276,10 +306,18 @@ class MultiLayer(Layer):
         for layer in self.layers:
             layer.edge(points, labels, **style)
 
+    def shape(self, points,  **style):
+        for layer in self.layers:
+            layer.shape(points,  **style)
+            
     def polyline(self, points, labels=None, closed=False, **style):
         for layer in self.layers:
             layer.polyline(points, labels, closed, **style)
 
+    def polygon(self, points,  **style):
+        for layer in self.layers:
+            layer.polygon(points, **style)
+            
     def picture(self, point, img_name, width, height):
         for layer in self.layers:
             layer.picture(point, img_name, width, height)

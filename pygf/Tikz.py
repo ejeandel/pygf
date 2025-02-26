@@ -221,8 +221,39 @@ class TikzLayer(Layer):
                 s += f"{{{text}}}"
         self.edgelayer += s + ";\n"
 
-    def edge(self, points, labels=None, **style):
-        l = self.find_angles(points)
+
+    def shape(self, points, **style):
+        l = self.find_angles(points, closed = True)
+        points.append(points[0])
+        l.append(l[0])
+        points = [*map(self.transform, points)]
+
+        s = ""
+
+        if "looseness" in style:
+            looseness = style["looseness"]
+            del style["looseness"]
+        else:
+            looseness = 1
+        tikz_style = {}
+        self._parse_style(style, tikz_style)
+        tikz_style.update(style)
+        s += f"\\path[{dic_to_list(tikz_style)}] ({points[0]})"
+
+        for i in range(len(points) - 1):
+            out_angle = self.convert_angle(l[i])
+            in_angle = self.convert_angle(180 + l[i + 1])
+            s += f" to[out={out_angle:3.3g}, in={in_angle:3.3g}"
+            if looseness != 1:
+                s += f', looseness={looseness:3.3g}'
+            s += f'] ({points[i+1]}) '
+
+        self.nodelayer += s + ";\n"
+        
+    def edge(self, points, labels=None, closed = False, **style):
+        if closed:
+            l.append(l[0])
+        l = self.find_angles(points, closed)
         points = [*map(self.transform, points)]
 
         s = ""

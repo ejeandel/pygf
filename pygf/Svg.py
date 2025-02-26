@@ -562,6 +562,30 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style)
 
+    def shape(self, points, **style):
+
+        tf = self.svgtransform * self.transform
+        angles = list(
+            map(lambda x: x * math.pi / 180, self.find_angles(points)))
+
+        if "looseness" in style:
+            looseness = style["looseness"]
+            del style["looseness"]
+        else:
+            looseness = 1
+
+        point = points[0]
+        svg_path = SvgPath(tf(point))
+        for i in range(len(points) - 1):
+            newpoint = points[i + 1]
+            dst = looseness * 0.3902 * newpoint.distance(point)
+            fstcontrol = point + Point(dst, angles[i], polar=True)
+            sndcontrol = newpoint - Point(dst, angles[i + 1], polar=True)
+            svg_path.curve_to(tf(newpoint), tf(fstcontrol), tf(sndcontrol))
+            point = newpoint
+
+        self.__shape(svg_path, style)
+        
     def polyline(self, points, labels=None, closed=False, **style):
         tf = self.svgtransform * self.transform
 
