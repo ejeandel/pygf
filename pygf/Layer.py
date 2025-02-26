@@ -7,6 +7,10 @@ from .Geometry import Transform
 class Layer(ABC):
     """Layer is the abstract class that represents a graphics system.
     All relevant classes are subclasses of this one.
+
+    :param transform: the general transform to apply to the layer
+    :type transform: Transform
+    
     """
 
     def __init__(self, transform = None):
@@ -16,7 +20,7 @@ class Layer(ABC):
 
     @abstractmethod
     def line(self, p1, p2, labels=None, **style):
-        """ Draw a line from one point to the other
+        """ Draw a line from one point to the other (edge command)
 
         :param p1: the first point
         :type p1: Point
@@ -32,7 +36,7 @@ class Layer(ABC):
 
     @abstractmethod
     def text(self, point, text, **style):
-        """Place a text at a given point
+        """Place a text at a given point (shape command)
 
         :param point: the point where the text will be placed
         :type point: Point
@@ -48,7 +52,7 @@ class Layer(ABC):
 
     @abstractmethod
     def rectangle(self, p1, p2, **style):
-        """Draws a rectangle whose corners are the two given points
+        """Draws a rectangle whose corners are the two given points (shape command)
 
         :param p1: one of the corner of the rectangle
         :type p1: Point
@@ -64,18 +68,16 @@ class Layer(ABC):
 
     @abstractmethod
     def polyline(self, points, labels=None, closed=False, **style):
-        """Draw line segments from one point to the next
+        """Draw line segments from one point to the next (edge command)
 
         :param points: list of points
         :type points: List[Point]
         :param labels: possible labels to put on the lines
         :type labels: dict
-        :param closed: If true, draws a last line segment from the
-        last point to the first point.
+        :param closed: If true, draws a last line segment from the last point to the first point.
         :type closed: bool
         :param style: additional styling elements
         :type style: dict
-
 
         ``closed = True`` is slightly different from adding the
         first point as the last point.
@@ -94,8 +96,21 @@ class Layer(ABC):
         """
 
     @abstractmethod
+    def polygon(self, points,  **style):
+        """Draw a polygon (shape command)
+
+        :param points: list of points
+        :type points: List[Point]
+        :param style: additional styling elements
+        :type style: dict
+
+        Internally, there is not a lot of difference between a polygon and a polyline, except polylines are lines (and therefore drawn first) while polygons are considered shaped (and therefore drawn last)        
+
+        """
+        
+    @abstractmethod
     def circle(self, p1, radius, labels=None, **style):
-        """Draws a circle given a point and a radius
+        """Draws a circle given a point and a radius (shape command)
 
         :param p1: center of the circle
         :type point: Point
@@ -114,7 +129,7 @@ class Layer(ABC):
 
     @abstractmethod
     def edge(self, points, labels=None, **style):
-        """Draw a curve passing through the points
+        """Draw a curve passing through the points (edge command)
 
         :param points: list of points
         :type points: List[Point]
@@ -129,10 +144,33 @@ class Layer(ABC):
 
     @abstractmethod
     def picture(self, point, img_name, width, height):
+        """Draw an image (shape command)
+
+        :param point: where the image should be put
+        :type point: Point
+        :param img_name: path to the image
+        :type img_name: str
+        :param width: width of the image
+        :type width: int
+        :param height: height of the image
+        :type height: int
+        """
+        
         pass
 
     @abstractmethod
     def draw(self, rect, fs=None, options=None, preamble=False):
+        """Write the result in a file
+
+        :param rect: The bounding box for the picture
+        :type rect: Rectangle
+        :param fs: A file I/O where to write the result
+        :type fs: IO
+        :param preamble: whether to produce a standalone document, or a document to be included in another
+        :type preamble: bool
+
+        """
+        
         pass
 
     def find_angles(self, points):
@@ -141,8 +179,8 @@ class Layer(ABC):
         def in_angle(node1, node2):
             c1 = node1
             c2 = node2
-            x = c2[0] - c1[0]
-            y = c2[1] - c1[1]
+            x = c2.x - c1.x
+            y = c2.y - c1.y
             angle = math.atan2(y, x) * 180 / math.pi
             return round(angle)
 
@@ -205,7 +243,15 @@ class NoLayer(Layer):
 
 
 class MultiLayer(Layer):
-    """ represents multiple layers """
+    """represents multiple layers at once
+
+    :param layers: the list of layers 
+    :type layers: List[Layer]
+
+
+    The draw function has a different prototype, to take into account the different layers.
+    
+    """
     def __init__(self, layers):
         Layer.__init__(self, None)
         self.layers = layers
@@ -239,6 +285,17 @@ class MultiLayer(Layer):
             layer.picture(point, img_name, width, height)
 
     def draw(self, rect, files=None, options=None, preamble=False):
+        """Write the result to a list of files
+
+        :param rect: The bounding box for the picture
+        :type rect: Rectangle
+        :param fs: A list of file I/O where to write the result
+        :type fs: List[IO]
+        :param preamble: whether to produce standalone documents, or documents to be included in another
+        :type preamble: bool
+
+        """
+        
         if files is not None:
             for (layer, fs) in zip(self.layers, files):
                 layer.draw(rect, fs, options, preamble)

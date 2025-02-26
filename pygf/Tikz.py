@@ -266,6 +266,24 @@ class TikzLayer(Layer):
                 s += f"{{{text}}}"
         self.edgelayer += s + ";\n"
 
+    def polygon(self, points, **style):
+        points = [*map(self.transform, points)]
+
+        if style is None:
+            style = {}
+
+        tikz_style = {}
+        self._parse_style(style, tikz_style)
+        tikz_style.update(style)
+
+        listpoints = list(map(lambda x: f"({x})", points))
+        listpoints += ["cycle"]
+
+        s = rf"\path[{dic_to_list(tikz_style)}] " + "--".join(listpoints)
+
+        self.nodelayer += s + ";\n"
+
+
     def polyline(self, points, labels=None, closed=False, **style):
         points = [*map(self.transform, points)]
 

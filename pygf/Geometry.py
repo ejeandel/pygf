@@ -236,6 +236,74 @@ class Rectangle:
                 y1 = p.y
         return cls(Point(x0, y0), Point(x1, y1))
 
+    def vertical_split(self, weight_list: List[int]) -> List[Rectangle]:
+        """ 
+        given a list of weights, splits the rectangle into n rectangles 
+        in such a way that the width of each rectangle is proportional to its weight 
+
+        :param weight_list: list of coefficients
+        :type weight_list: List[int]
+        
+        """
+        total_weight = sum(weight_list)
+        x1 = self.fst.x
+        x2 = self.snd.x        
+        height = self.snd.y - self.fst.y
+        output = []
+        cumulative_weight = 0
+        for i in weight_list:
+            y1 = self.fst.y + cumulative_weight*height/total_weight
+            cumulative_weight += i
+            y2 = self.fst.y + cumulative_weight*height/total_weight
+            output += [Rectangle(Point(x1, y1), Point(x2, y2))]
+        return output
+
+    def horizontal_split(self, weight_list: List[int]) -> List[Rectangle]:
+        """ 
+        given a list of weights, splits the rectangle into n rectangles 
+        in such a way that the height of each rectangle is proportional to its weight 
+
+        :param weight_list: list of coefficients
+        :type weight_list: List[int]
+        
+        """
+        total_weight = sum(weight_list)
+        y1 = self.fst.y
+        y2 = self.snd.y        
+        width = self.snd.x - self.fst.x
+        output = []
+        cumulative_weight = 0
+        for i in weight_list:
+            x1 = self.fst.x + cumulative_weight*width/total_weight
+            cumulative_weight += i
+            x2 = self.fst.x + cumulative_weight*width/total_weight
+            output += [Rectangle(Point(x1, y1), Point(x2, y2))]
+        return output
+
+    def fit(self, width: int, height: int) -> Rectangle:
+        """
+        returns a subrectangle of size (width, height) centered in the rectangle
+
+        :param width: width of the sub-rectangle
+        :type width: int
+
+        :param height: height of the sub-rectangle
+        :type height: int
+        
+        """
+        if self.width > width:
+            x1,x2 = (self.fst.x + self.snd.x - width)/2, (self.fst.x + self.snd.x + width)/2
+        else:
+            x1,x2 = self.fst.x, self.snd.x
+        if self.height > height:
+            y1,y2 = (self.fst.y + self.snd.y - height)/2,(self.fst.y + self.snd.y + height)/2
+        else:
+            y1,y2 = self.fst.y, self.snd.y
+        return Rectangle(Point(x1,y1), Point(x2,y2))
+        
+    
+
+    
 class Transform:
     r""" Codes a transformation matrix
 

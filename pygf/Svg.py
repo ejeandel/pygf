@@ -439,6 +439,24 @@ class SvgLayer(Layer):
                 text_svg.append(text_path)
                 self.edgelayer += [ text_svg ]
 
+    def __shape(self, svg_path, style=None):
+        if style is None:
+            style = {}
+
+        stroke_width = self.parse_stroke_width(style)
+
+        svg_style = {'stroke-width': f'{stroke_width:2g}'}
+        self.parse_style(stroke_width, style, svg_style)
+
+        _id = self.new_name()
+
+        svg = ET.Element('g', svg_style)
+        sub_path = ET.Element('path', id=_id, d=str(svg_path))
+        svg.append(sub_path)
+
+        self.parse_arrows(stroke_width, style, svg, sub_path)
+
+        self.nodelayer += [ svg ]
 
     def line(self, p1, p2, labels=None, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
@@ -597,6 +615,59 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style)
 
+    def polygon(self, points,  **style):
+        tf = self.svgtransform * self.transform
+
+        def corners(p0,p1,p2):
+            """ returns points nears p1 to round the corners """
+            if p1.distance(p2) > p0.distance(p1):
+                ratio = min(12, p1.distance(p2) / p0.distance(p1))
+                t1 = 0.04 * ratio
+                t2 = 0.04
+            else:
+                ratio = min(12, p0.distance(p1) / p1.distance(p2))
+                t1 = 0.04
+                t2 = 0.04 * ratio
+            beforep1 = p0 * t1 + p1 * (1 - t1)
+            afterp1 = p1 * (1 - t2) + p2 * t2
+            return (beforep1, afterp1)
+
+        points += [points[0]]
+
+        if "rounded" in style and style["rounded"] and len(points) != 2:
+            p2 = p1 = points[0]
+            if closed:
+                p0 = points[-2]
+                p2 = points[1]
+                (_, afterp1) = corners(p0, p1, p2)
+                svg_path = SvgPath(tf(afterp1))
+            else:
+                svg_path = SvgPath(tf(p1))
+            for i in range(len(points) - 2):
+                p0 = points[i]
+                p1 = points[i + 1]
+                p2 = points[i + 2]
+                (beforep1, afterp1) = corners(p0, p1, p2)
+                svg_path.line_to(tf(beforep1))
+                svg_path.quadratic_to(tf(afterp1), tf(p1))
+            if not closed:
+                svg_path.line_to(tf(p2))
+            else:
+                p0 = points[-2]
+                p1 = points[0]
+                p2 = points[1]
+                (beforep1, afterp1) = corners(p0, p1, p2)
+                svg_path.line_to(tf(beforep1))
+                svg_path.quadratic_to(tf(afterp1), tf(p1))
+        else:
+            # not rounded
+            svg_path = SvgPath(tf(points[0]))
+            for point in points[1:]:
+                svg_path.line_to(tf(point))
+
+        self.__shape(svg_path, labels, style)
+
+        
     def draw(self, rect, fs=None, options=None , preamble=False):
         tf = self.svgtransform * self.transform
         rect = Rectangle.bounding_box([
