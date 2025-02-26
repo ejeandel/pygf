@@ -107,14 +107,13 @@ class TikzLayer(Layer):
     def _parse_dashness(self, gen_style, tikz_style):
         if "dash" not in gen_style:
             return
+        
         dash = gen_style["dash"]
-        if dash == "solid":
-            return
-        if dash == "dotted":
-            tikz_style.update({"dotted": None})
-        elif dash == "dashed":
-            tikz_style.update({"dashed": None})
-        del gen_style["dash"]
+        if dash not in ["solid","dotted","densely dotted","loosely dotted","dashed","densely dashed","loosely dashed","dashdotted","dash dot","densely dashdotted","densely dash dot","loosely dashdotted","loosely dash dot","dashdotdotted","densely dashdotdotted", "loosely dashdotdotted","dash dot dot","densely dash dot dot","loosely dash dot dot"]:
+            raise ValueError
+        
+        tikz_style.update({gen_style["dash"]: None})
+        del gen_style["dash"]            
 
     def _parse_fillness(self, gen_style, tikz_style):
         if "fill" not in gen_style:

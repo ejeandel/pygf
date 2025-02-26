@@ -1,21 +1,12 @@
 import sys
+from pygf.Layer import MultiLayer
 from pygf.Tikz import TikzLayer
 from pygf.Svg import SvgLayer
 from pygf.Geometry import Transform,Point, Rectangle
 import math
 
-import argparse    
-parser = argparse.ArgumentParser(description='')
-parser.add_argument('--tex', dest='tex', action="store_true", help='tex or svg output')
-
-args = parser.parse_args()
-
-if args.tex:
-    layer = TikzLayer()
-    fn = "code5.tex"
-else:
-    layer = SvgLayer()
-    fn = "code5.svg"
+layer1,layer2 = TikzLayer(), SvgLayer()
+layer = MultiLayer([layer1, layer2])
 
 x00000= Point(5.2,0*math.pi/180,polar=True) , "00000"
 x00001= Point(4.2,0*math.pi/180,polar=True) , "00001"
@@ -155,6 +146,6 @@ for (a,b) in [x00000,x01000,x10000,x11000,x00100,x01100,x10100,x11100,x00010,x01
         layer.circle(a,0.33, fill="White")        
     layer.text(a, b, text_size="small")
 
-layer.draw(Rectangle(Point(-6,-6), Point(6,6)), open(fn, "w"), preamble=True)
+layer.draw(Rectangle(Point(-6,-6), Point(6,6)), [open("code5.tex", "w"), open("code5.svg", "w")], preamble=True)
 
 
