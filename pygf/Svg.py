@@ -538,11 +538,15 @@ class SvgLayer(Layer):
 
         self.nodelayer += [ text_node ]
 
-    def edge(self, points, labels=None, **style):
+    def edge(self, points, labels=None, closed = False, **style):
 
         tf = self.svgtransform * self.transform
-        angles = list(
-            map(lambda x: x * math.pi / 180, self.find_angles(points)))
+        l = self.find_angles(points, closed)
+        if closed:
+            points.append(points[0])
+            l.append(l[0])
+
+        angles = list(map(lambda x: x * math.pi / 180, l))
 
         if "looseness" in style:
             looseness = style["looseness"]
@@ -563,10 +567,13 @@ class SvgLayer(Layer):
         self.__path(svg_path, labels, style)
 
     def shape(self, points, **style):
-
+        l = self.find_angles(points, closed = True)
+        points.append(points[0])
+        l.append(l[0])
+        points = [*map(self.transform, points)]
+        
         tf = self.svgtransform * self.transform
-        angles = list(
-            map(lambda x: x * math.pi / 180, self.find_angles(points)))
+        angles = list(map(lambda x: x * math.pi / 180, l))
 
         if "looseness" in style:
             looseness = style["looseness"]

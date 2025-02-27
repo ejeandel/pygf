@@ -251,9 +251,11 @@ class TikzLayer(Layer):
         self.nodelayer += s + ";\n"
         
     def edge(self, points, labels=None, closed = False, **style):
-        if closed:
-            l.append(l[0])
         l = self.find_angles(points, closed)
+        if closed:
+            points.append(points[0])
+            l.append(l[0])
+        
         points = [*map(self.transform, points)]
 
         s = ""
