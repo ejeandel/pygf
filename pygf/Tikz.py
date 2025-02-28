@@ -388,6 +388,13 @@ class TikzLayer(Layer):
 
             print(r"\begin{document}", file=fs)
 
+        if "clip" in options:
+            clip = options["clip"]
+            del options["clip"]
+        else:
+            clip = True
+            
+            
         if options == {}:
             print(r"\begin{tikzpicture}", file=fs)
         else:
@@ -405,8 +412,8 @@ class TikzLayer(Layer):
             ])
         ])
 
-        print(rf"\clip ({rect.northwest}) rectangle ({rect.southeast});",
-              file=fs)
+        if clip:
+            print(rf"\clip ({rect.northwest}) rectangle ({rect.southeast});", file=fs)
         print(self.edgelayer, file=fs, end="")
         print(self.nodelayer, file=fs, end="")
         print(r"\end{tikzpicture}", file=fs)
