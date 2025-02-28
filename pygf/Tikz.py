@@ -272,15 +272,17 @@ class TikzLayer(Layer):
         tikz_style = {}
         self._parse_style(style, tikz_style)
         tikz_style.update(style)
-        s += f"\\path[{dic_to_list(tikz_style)}] ({points[0]})"
 
+        list_edges = [f"({points[0]})"]
         for i in range(len(points) - 1):
             out_angle = self.convert_angle(l[i])
             in_angle = self.convert_angle(180 + l[i + 1])
-            s += f" to[out={out_angle:3.3g}, in={in_angle:3.3g}"
+            s = f" to[out={out_angle:3.3g}, in={in_angle:3.3g}"
             if looseness != 1:
                 s += f', looseness={looseness:3.3g}'
-            s += f'] ({points[i+1]}) '
+            s += ']'
+            list_edges.append(s)
+            list_edges.append(f'({points[i+1]})')
 
         reverse_start = abs((points[1] - points[0]).angle) > math.pi / 2
         reverse_end = abs((points[-1] - points[-2]).angle) > math.pi / 2
@@ -288,19 +290,37 @@ class TikzLayer(Layer):
         if labels is not None:
             for label in labels:
                 text = _escape(labels[label])
-                if label ==  "above start" :
-                    s += f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
-                if label ==  "above" :
-                    s += f"node [sloped,pos=50,above {'right' if not reverse_start else 'left'}]"
-                elif label ==  "below start" :
-                    s += f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
-                elif label ==  "below" :
-                    s += f"node [sloped,pos=50,below {'right' if not reverse_start else 'left'}]"
-                elif label ==  "above end" :
-                    s += f"node [sloped,pos=100,above {'left' if not reverse_end else 'right'}]"
-                elif label ==  "below end" :
-                    s += f"node [sloped,pos=0,below {'left' if not reverse_end else 'right'}]"
-                s += f"{{{text}}}"
+                if label == "above start":
+                    code = f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                    code += f"{{{text}}} "
+                    list_edges[1] = list_edges[1] + code
+                elif label == "below start":
+                    code = f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                    code += f"{{{text}}} "
+                    list_edges[1] = list_edges[1] + code
+                elif label == "above":
+                    code = f"node [sloped,pos=0.5,above]"
+                    code += f"{{{text}}} "
+                    n = (len(list_edges)-1)//2
+                    n = 2*(n //2 ) + 1
+                    list_edges[n] = list_edges[n] + code
+                elif label == "below":
+                    code = f"node [sloped,pos=0.5,below]"
+                    code += f"{{{text}}} "
+                    n = (len(list_edges)-1)//2                                                            
+                    n = 2*(n //2 ) + 1
+                    list_edges[n] = list_edges[n] + code 
+                elif label == "above end":
+                    code = f" node [sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
+                    code += f"{{{text}}}"
+                    list_edges[-2] = list_edges[-2] + code
+                elif label == "below end":
+                    code = f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
+                    code += f"{{{text}}}"
+                    list_edges[-2] = list_edges[-2] + code
+
+        s = rf"\path[{dic_to_list(tikz_style)}] " + " ".join(list_edges)
+                
         self.edgelayer += s + ";\n"
 
     def polygon(self, points, **style):
@@ -337,9 +357,14 @@ class TikzLayer(Layer):
         else:
             reverse_end = abs((points[-1] - points[-2]).angle) > math.pi / 2
 
-        listpoints = list(map(lambda x: f"({x})", points))
+        list_edges = [f"({points[0]})"]
+        for i in range(len(points) - 1):
+            list_edges.append("--")
+            list_edges.append(f'({points[i+1]})')            
+
         if closed:
-            listpoints += ["cycle"]
+            list_edges.append("--")
+            list_edges.append("cycle")
 
         if labels is not None:
             for label in labels:
@@ -347,30 +372,34 @@ class TikzLayer(Layer):
                 if label == "above start":
                     code = f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
                     code += f"{{{text}}} "
-                    listpoints[1] = code + listpoints[1]
+                    list_edges[1] = list_edges[1] + code
                 elif label == "below start":
                     code = f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
                     code += f"{{{text}}} "
-                    listpoints[1] = code + listpoints[1]
+                    list_edges[1] = list_edges[1] + code
                 elif label == "above":
-                    code = f"node [sloped,pos=0.5,above {'right' if not reverse_start else 'left'}]"
+                    code = f"node [centered, sloped,pos=0.5,above]"
                     code += f"{{{text}}} "
-                    listpoints[1] = code + listpoints[1]
+                    n = (len(list_edges)-1)//2
+                    n = 2*(n //2 ) + 1
+                    list_edges[n] = list_edges[n] + code
                 elif label == "below":
-                    code = f"node [sloped,pos=0.5,below {'right' if not reverse_start else 'left'}]"
+                    code = f"node [centered, sloped,pos=0.5,below]"
                     code += f"{{{text}}} "
-                    listpoints[1] = code + listpoints[1]
+                    n = (len(list_edges)-1)//2                                                            
+                    n = 2*(n //2 ) + 1
+                    list_edges[n] = list_edges[n] + code 
                 elif label == "above end":
-                    code = f" node [sloped,pos=100,above {'left' if not reverse_end else 'right'}]"
+                    code = f" node [sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
                     code += f"{{{text}}}"
-                    listpoints[-1] = listpoints[-1] + code
+                    list_edges[-2] = list_edges[-2] + code
                 elif label == "below end":
-                    code = f" node [sloped,pos=0,below {'left' if not reverse_end else 'right'}]"
+                    code = f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
                     code += f"{{{text}}}"
-                    listpoints[-1] = listpoints[-1] + code
+                    list_edges[-2] = list_edges[-2] + code
 
-        s = rf"\path[{dic_to_list(tikz_style)}] " + "--".join(listpoints)
-
+        s = rf"\path[{dic_to_list(tikz_style)}] " + " ".join(list_edges)
+            
         self.edgelayer += s + ";\n"
 
     def draw(self, rect, fs = None, options=None, preamble=False):
