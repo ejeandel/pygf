@@ -314,49 +314,68 @@ class SvgLayer(Layer):
 
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
 
-        if style['arrow'] == "->":
+        arrows  = style['arrow'].split("-")
+
+
+        def latex_arrow(reverse = False, first = False):
+            x = 0.28*pt + .3 * stroke_width
+
+            width = 11*x
+            height = 10*x
+
+            X = -x if not reverse else x
+            if not first:
+                refX = width-0.5*stroke_width
+            else:
+                refX = 0.5*stroke_width
+                
+            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
+                               markerWidth=str(width), markerHeight=str(height),
+                               refX= str(refX), refY=str(height/2), orient="auto")
+            arrow.set("stroke-width", str(stroke_width))
+
+            relative = Point(-width if not reverse else 0,-height/2)
+            arrow_path = SvgPath(Point(0, 0) - relative)
+            arrow_path.curve_to(Point(10*X, 3.75*x) - relative,
+                                Point(8*X/3, .5*x) - relative,
+                                Point(7*X, 2*x) - relative)
+            arrow_path.line_to(Point(10*X, -3.75*x) - relative)
+            arrow_path.curve_to(Point(0, 0) - relative,
+                                Point(7*X, -2*x) - relative,
+                                Point(8*X/3, -.5*x) - relative)
+            arrow_svg_path = ET.Element('path', d=str(arrow_path), fill=svg.get("stroke"))
+            arrow.append(arrow_svg_path)
+            return arrow
+
+        def default_arrow(reverse = False, first = False):
             x = 0.28*pt + .3 * stroke_width
             width = 5*x
             height = 10*x
+            X = -x if not reverse else x
+            if not reverse:
+                refX = width-0.4*stroke_width
+            else:
+                refX = 0.4*stroke_width
             arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
                                markerWidth=str(width), markerHeight=str(height),
-                               refX= str(width-0.4*stroke_width), refY=str(height/2), orient="auto")
+                               refX= str(refX), refY=str(height/2), orient="auto")
             arrow.set("stroke-width", str(0.8 * stroke_width))
-            relative = Point(-width,-height/2)
-            arrow_path = SvgPath(Point(-3.75*x, 4*x) - relative)
+            relative = Point(-width if not reverse else 0,-height/2)
+            arrow_path = SvgPath(Point(3.75*X, 4*x) - relative)
             arrow_path.curve_to(Point(0, 0) - relative,
-                                Point(-3.5*x, 2.5*x) - relative,
-                                Point(-0.75*x, 0.25*x) - relative)
-            arrow_path.curve_to(Point(-3.75*x,-4*x) - relative,
-                                Point(-0.75*x, -0.25*x) - relative,
-                                Point(-3.5*x, -2.5*x) - relative)
+                                Point(3.5*X, 2.5*x) - relative,
+                                Point(0.75*X, 0.25*x) - relative)
+            arrow_path.curve_to(Point(3.75*X,-4*x) - relative,
+                                Point(0.75*X, -0.25*x) - relative,
+                                Point(3.5*X, -2.5*x) - relative)
             arrow_svg_path = ET.Element('path', d=str(arrow_path))
             arrow_svg_path.set("stroke-linecap", "round")
             arrow_svg_path.set("stroke-linejoin", "round")
             arrow_svg_path.set("stroke-dasharray", "none")
             arrow.append(arrow_svg_path)
-        elif style['arrow'] == "latex":
-            x = 0.28*pt + .3 * stroke_width
+            return arrow
 
-            width = 11*x
-            height = 10*x
-            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
-                               markerWidth=str(width), markerHeight=str(height),
-                               refX= str(width-0.5*stroke_width), refY=str(height/2), orient="auto")
-            arrow.set("stroke-width", str(stroke_width))
-
-            relative = Point(-width,-height/2)
-            arrow_path = SvgPath(Point(0, 0) - relative)
-            arrow_path.curve_to(Point(-10*x, 3.75*x) - relative,
-                                Point(-8*x/3, .5*x) - relative,
-                                Point(-7*x, 2*x) - relative)
-            arrow_path.line_to(Point(-10*x, -3.75*x) - relative)
-            arrow_path.curve_to(Point(0, 0) - relative,
-                                Point(-7*x, -2*x) - relative,
-                                Point(-8*x/3, -.5*x) - relative)
-            arrow_svg_path = ET.Element('path', d=str(arrow_path), fill=svg.get("stroke"))
-            arrow.append(arrow_svg_path)
-        elif style['arrow'] == "-x":
+        def x_arrow(reverse = False, first = False):
             width = 3*pt+4*stroke_width
 
             arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
@@ -365,13 +384,27 @@ class SvgLayer(Layer):
 
             arrow.append(ET.Element("polyline",points=f"{Point(0,0)} {Point(width, width)}"))
             arrow.append(ET.Element("polyline",points=f"{Point(width,0)} {Point(0, width)}"))
-        else:
-            raise NotImplementedError
+            return arrow
+            
+        for i in range(2):
+            if arrows[i] == ">":
+                arrow = default_arrow(False, i == 0)
+            elif arrows[i] == "<":
+                arrow = default_arrow(True, i == 0)
+            elif arrows[i] == "latex":
+                arrow = latex_arrow(False, i == 0)
+            elif arrows[i] == "xetal":
+                arrow = latex_arrow(True, i == 0)
+            elif arrows[i] == "x":
+                arrow = x_arrow(False, False)
 
-        _id = self.new_name()
-        sub_path.set('marker-end',f'url(#marker_{_id})')
-        arrow.set('id',f'marker_{_id}')
-        svg.append(arrow)
+            if len(arrows[i]) > 0:
+
+                _id = self.new_name()
+                sub_path.set('marker-start' if i == 0 else 'marker-end',f'url(#marker_{_id})')
+                arrow.set('id',f'marker_{_id}')
+                svg.append(arrow)
+                
 
     def __path(self, svg_path, labels=None, style=None):
         if style is None:

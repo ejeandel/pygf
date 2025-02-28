@@ -1,4 +1,4 @@
-""" Module that provides the SVG Layer """
+""" Module that provides the TIKZ Layer """
 # pylint: disable=invalid-name
 import math
 from .Layer import Layer
@@ -135,10 +135,15 @@ class TikzLayer(Layer):
         del gen_style["draw"]
 
     def _parse_arrows(self, gen_style, tikz_style):
-        arrows = {'->': '->', '-x': '-Rays', 'latex' : '-latex'}
+        
+        leftarrows = {'': '', '>': '>', '<': '<', 'x': 'Rays', 'xetal' : 'latex', 'latex': 'latex reversed'}
+        rightarrows = {'':'', '>': '>', '<': '<', 'x': 'Rays', 'xetal' : 'latex reversed', 'latex': 'latex'}
         if "arrow" not in gen_style:
             return
-        arrow = arrows[gen_style["arrow"]]
+        [first,last]  = gen_style['arrow'].split("-")
+        
+        
+        arrow = f"{leftarrows[first]}-{rightarrows[last]}"
         tikz_style.update({arrow: None})
         del gen_style["arrow"]
 
