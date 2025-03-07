@@ -433,14 +433,23 @@ class SvgLayer(Layer):
 
         self.add_to_layer(z_index, svg)
 
-        if reverse_start or reverse_end:
-            self.add_to_layer(z_index, 
-                              ET.Element('path', id=f"r-{_id}",
-                                         d=str(svg_path.reverse()),
-                                         display="none")
-                              )
-
         if labels is not None:
+            need_reverse = False
+
+            for position in labels:
+                if "start" in position and reverse_start:
+                    need_reverse = True
+                if "end" in position and reverse_end:
+                    need_reverse = True
+                if (position == "above" and reverse_start) or (position =="below" and reverse_end):
+                    need_reverse = True
+            if need_reverse:
+                self.add_to_layer(z_index,
+                                  ET.Element('path', id=f"r-{_id}",
+                                             d=str(svg_path.reverse()),
+                                             display="none")
+                                  )
+
             for position in labels:
                 text_svg = ET.Element('text', text_style)
                 if "above" in position:
@@ -474,10 +483,6 @@ class SvgLayer(Layer):
                 text_svg.append(text_path)
                 self.add_to_layer(z_index, text_svg)
 
-    def __shape(self, svg_path, labels=None, style=None):
-        self.__path(svg_path, labels, style, z_index = 1)
-        
-        
     def line(self, p1, p2, labels=None, z_index = 0, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
         svg_path = SvgPath(p1)
@@ -583,8 +588,6 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
-    def shape(self, points, labels=None, z_index=1, **style):
-        self.edge(points, labels, z_index=z_index, closed=True, **style)
         
     def polyline(self, points, labels=None, closed=False, z_index=0, **style):
         tf = self.svgtransform * self.transform
@@ -639,8 +642,6 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
-    def polygon(self, points, labels=None, z_index=1, **style):
-        self.polyline(points, labels, closed=True, z_index=z_index, **style)
         
     def draw(self, rect, fs=None, options=None , preamble=False):
         tf = self.svgtransform * self.transform

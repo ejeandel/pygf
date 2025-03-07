@@ -20,7 +20,29 @@ layer.polyline([Point(0,0), Point(2,3) , Point(4,3), Point(6,0)],
                )
 
 
-layer.edge([Point(-6,0), Point(-4,3) , Point(-2,3), Point(0,0)],
+layer.polyline([Point(0,4), Point(2,7) , Point(4,7), Point(6,4)][::-1],
+                labels= {
+                    "above start": "above start" ,
+                    "above": "above",
+                    "above end": "above end" ,
+                    "below start": "below start" ,
+                    "below": "below",
+                    "below end": "below end" }
+               )
+
+
+layer.edge([Point(-7,0), Point(-5,3) , Point(-3,3), Point(-1,0)],
+                labels= {
+                    "above start": "above start" ,
+                    "above": "above",
+                    "above end": "above end" ,
+                    "below start": "below start" ,
+                    "below": "below",
+                    "below end": "below end" }
+               )
+
+
+layer.edge([Point(-7,4), Point(-5,7) , Point(-3,7), Point(-1,4)][::-1],
                 labels= {
                     "above start": "above start" ,
                     "above": "above", 
@@ -31,6 +53,6 @@ layer.edge([Point(-6,0), Point(-4,3) , Point(-2,3), Point(0,0)],
                )
 
 
-layer.draw(Rectangle(Point(-7,-1), Point(7,5)), [open("poly.tex", "w"), open("poly.svg", "w")], preamble=True)
+layer.draw(Rectangle(Point(-8,-1), Point(7,8)), [open("poly.tex", "w"), open("poly.svg", "w")], preamble=True)
 
 

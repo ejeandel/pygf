@@ -19,7 +19,7 @@ class Layer(ABC):
         self.transform = transform
 
     @abstractmethod
-    def line(self, p1, p2, labels=None, **style):
+    def line(self, p1, p2, labels=None, z_index = 0, **style):
         """ Draw a line from one point to the other (edge command)
 
         :param p1: the first point
@@ -28,6 +28,8 @@ class Layer(ABC):
         :type p2: Point
         :param labels: dictionary of possible labels to put on the line
         :type labels: dict
+        :param z_index: z-index of the path (0 by default)
+        :type z_index: int
         :param style: additional styling elements
         :type style: dict
 
@@ -35,13 +37,15 @@ class Layer(ABC):
 
 
     @abstractmethod
-    def text(self, point, text, **style):
+    def text(self, point, text, z_index = 1, **style):
         """Place a text at a given point (shape command)
 
         :param point: the point where the text will be placed
         :type point: Point
         :param text: The text
         :type text: str
+        :param z_index: z-index of the path (1 by default)
+        :type z_index: int
         :param style: additional styling elements for the text
         :type style: dict
 
@@ -51,13 +55,15 @@ class Layer(ABC):
         """
 
     @abstractmethod
-    def rectangle(self, p1, p2, **style):
+    def rectangle(self, p1, p2, z_index=1, **style):
         """Draws a rectangle whose corners are the two given points (shape command)
 
         :param p1: one of the corner of the rectangle
         :type p1: Point
         :param p2: the other corner of the rectangle
         :type point: Point
+        :param z_index: z-index of the path (1 by default)
+        :type z_index: int
         :param style: additional styling elements for the rectangle
         :type style: dict
 
@@ -67,13 +73,15 @@ class Layer(ABC):
         """
 
     @abstractmethod
-    def polyline(self, points, labels=None, closed=False, **style):
+    def polyline(self, points, labels=None, z_index = 0, closed = False, **style):
         """Draw line segments from one point to the next (edge command)
 
         :param points: list of points
         :type points: List[Point]
         :param labels: possible labels to put on the lines
         :type labels: dict
+        :param z_index: z-index of the path (0 by default)
+        :type z_index: int
         :param closed: If true, draws a last line segment from the last point to the first point.
         :type closed: bool
         :param style: additional styling elements
@@ -95,21 +103,16 @@ class Layer(ABC):
         closed polylines.
         """
 
-    @abstractmethod
-    def polygon(self, points,  **style):
+    def polygon(self, points, labels=None, z_index = 1, **style):
         """Draw a polygon (shape command)
 
-        :param points: list of points
-        :type points: List[Point]
-        :param style: additional styling elements
-        :type style: dict
-
-        Internally, there is not a lot of difference between a polygon and a polyline, except polylines are lines (and therefore drawn first) while polygons are considered shaped (and therefore drawn last)        
-
+        Alias for ``polyline(..., closed = True)`` with default ``z_index`` of 1
         """
+        self.polyline(points, labels, closed=True, z_index=z_index, **style)
+
         
     @abstractmethod
-    def circle(self, p1, radius, labels=None, **style):
+    def circle(self, p1, radius, labels=None, z_index = 1, **style):
         """Draws a circle given a point and a radius (shape command)
 
         :param p1: center of the circle
@@ -118,6 +121,8 @@ class Layer(ABC):
         :type radius: float
         :param labels: possible labels to put on the circle
         :type labels: dict
+        :param z_index: z-index of the path (1 by default)
+        :type z_index: int
         :param style: additional styling elements
         :type style: dict
 
@@ -128,13 +133,15 @@ class Layer(ABC):
         """
 
     @abstractmethod
-    def edge(self, points, labels=None, closed = False, **style):
+    def edge(self, points, labels=None, closed = False, z_index=0, **style):
         """Draw a curve passing through the points (edge command)
 
         :param points: list of points
         :type points: List[Point]
         :param labels: possible labels to put on the lines
         :type labels: dict
+        :param z_index: z-index of the path (0 by default)
+        :type z_index: int
         :param style: additional styling elements
         :type style: dict
         :param closed: If true, draws a last line segment from the last point to the first point.
@@ -145,23 +152,16 @@ class Layer(ABC):
         should pass through the point.
         """
 
-    @abstractmethod
-    def shape(self, points,  **style):
+    def shape(self, points, labels=None, z_index=1, **style):
         """Draw a shape passing through the points (shape command)
 
-        :param points: list of points
-        :type points: List[Point]
-        :param style: additional styling elements
-        :type style: dict
-
-        The points might be decorated to specify at which angle the curve
-        should pass through the point.
+        Alias for ``edge(..., closed = True)`` with ``z_index`` of 1 by default.
+        
         """
-        
+        self.edge(points, labels, z_index=z_index, closed=True, **style)
 
-        
     @abstractmethod
-    def picture(self, point, img_name, width, height):
+    def picture(self, point, img_name, width, height, z_index = 1):
         """Draw an image (shape command)
 
         :param point: where the image should be put
@@ -172,6 +172,8 @@ class Layer(ABC):
         :type width: int
         :param height: height of the image
         :type height: int
+        :param z_index: z-index of the path (1 by default)
+        :type z_index: int
         """
         
         pass
@@ -241,35 +243,30 @@ class NoLayer(Layer):
     def __init__(self, transform = None):
         Layer.__init__(self, transform)
 
-    def line(self, p1, p2, labels=None, **style):
+    def line(self, p1, p2, labels=None, z_index = 0, **style):
         pass
 
-    def text(self, point, text, **style):
+    def text(self, point, text, z_index = 1, **style):
         pass
 
-    def rectangle(self, p1, p2, **style):
+    def rectangle(self, p1, p2, z_index=1, **style):
         pass
 
-    def circle(self, p1, radius, labels=None, **style):
+    def circle(self, p1, radius, labels=None, z_index = 1, **style):
         pass
 
-    def picture(self, point, img_name, width, height):
+    def picture(self, point, img_name, width, height, z_index = 1):
         pass
 
     def draw(self, rect, fs=None, options=None, preamble=False):
         pass
 
-    def polyline(self, points, labels=None, closed=False, **style):
-        pass
-
-    def polygon(self, points,  **style):
+    def polyline(self, points, labels=None, z_index = 0, closed = False, **style):
         pass
     
-    def edge(self, points, labels=None, **style):
+    def edge(self, points, labels=None, closed = False, z_index=0, **style):
         pass
 
-    def shape(self, points, **style):
-        pass
     
 
 class MultiLayer(Layer):
@@ -286,41 +283,33 @@ class MultiLayer(Layer):
         Layer.__init__(self, None)
         self.layers = layers
 
-    def line(self, p1, p2, labels=None, **style):
+    def line(self, p1, p2, labels=None, z_index = 0, **style):
         for layer in self.layers:
-            layer.line(p1, p2, labels, **style)
+            layer.line(p1, p2, labels, z_index, **style)
 
-    def text(self, point, text, **style):
+    def text(self, point, text, z_index = 1, **style):
         for layer in self.layers:
-            layer.text(point, text, **style)
+            layer.text(point, text, z_index, **style)
 
-    def rectangle(self, p1, p2, **style):
+    def rectangle(self, p1, p2, z_index=1, **style):
         for layer in self.layers:
-            layer.rectangle(p1, p2, **style)
+            layer.rectangle(p1, p2, z_index, **style)
 
-    def circle(self, p1, radius, labels=None, **style):
+    def circle(self, p1, radius, labels=None, z_index = 1, **style):
         for layer in self.layers:
-            layer.circle(p1, radius, labels, **style)
+            layer.circle(p1, radius, labels, z_index, **style)
 
-    def edge(self, points, labels=None, **style):
+    def edge(self, points, labels=None, closed = False, z_index=0, **style):
         for layer in self.layers:
-            layer.edge(points, labels, **style)
+            layer.edge(points, labels, closed, z_index, **style)
 
-    def shape(self, points,  **style):
+    def polyline(self, points, labels=None, z_index = 0, closed = False, **style):
         for layer in self.layers:
-            layer.shape(points,  **style)
+            layer.polyline(points, labels, z_index = z_index, closed = closed, **style)
             
-    def polyline(self, points, labels=None, closed=False, **style):
+    def picture(self, point, img_name, width, height, z_index = 1):
         for layer in self.layers:
-            layer.polyline(points, labels, closed, **style)
-
-    def polygon(self, points,  **style):
-        for layer in self.layers:
-            layer.polygon(points, **style)
-            
-    def picture(self, point, img_name, width, height):
-        for layer in self.layers:
-            layer.picture(point, img_name, width, height)
+            layer.picture(point, img_name, width, height, z_index)
 
     def draw(self, rect, files=None, options=None, preamble=False):
         """Write the result to a list of files

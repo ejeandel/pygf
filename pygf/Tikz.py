@@ -230,10 +230,6 @@ class TikzLayer(Layer):
                 s += f"{{{text}}}"
         self.add_to_layer(z_index, s+";")
 
-    def shape(self, points, labels=None, z_index=1, **style):
-        self.edge(points, labels, z_index=z_index, closed=True, **style)
-        
-        
     def edge(self, points, labels=None, closed = False, z_index=0, **style):
         l = self.find_angles(points, closed)
         if closed:
@@ -303,10 +299,10 @@ class TikzLayer(Layer):
                 
         self.add_to_layer(z_index, s + ";")
 
-    def polygon(self, points, labels=None, z_index=1, **style):
-        self.polyline(points, labels, closed=True, z_index=z_index, **style)
 
-    def polyline(self, points, labels=None, z_index=0, closed=False, **style):
+    def polyline(self, points, labels=None, z_index = 0, closed = False, **style):
+        print(points, labels, z_index, closed, style)
+        print(closed)
         points = [*map(self.transform, points)]
 
         if style is None:
@@ -330,6 +326,7 @@ class TikzLayer(Layer):
         if closed:
             list_edges.append("--")
             list_edges.append("cycle")
+
 
         if labels is not None:
             for label in labels:
@@ -409,7 +406,7 @@ class TikzLayer(Layer):
         if clip:
             print(rf"\clip ({rect.northwest}) rectangle ({rect.southeast});", file=fs)
         for i in sorted(self.layers.keys()):            
-            print("\n".join(self.layers[i]), file=fs, end="")
+            print("\n".join(self.layers[i]), file=fs, end="\n")
         print(r"\end{tikzpicture}", file=fs)
         if preamble:
             print(r"\end{document}", file=fs)
