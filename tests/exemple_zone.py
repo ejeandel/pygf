@@ -18,10 +18,10 @@ else:
     fn = "exemple_zone.svg"
 
 
-layer.circle(Point(-3,0),4, fill="Pink")
-layer.circle(Point(3,3),2.5, fill="Thistle")
-layer.circle(Point(3,-3),2.5, fill="GreenYellow")
-layer.circle(Point(9,0),4, fill="LightGray")
+layer.circle(Point(-3,0),4, fill="Pink", z_index=-1)
+layer.circle(Point(3,3),2.5, fill="Thistle", z_index=-1)
+layer.circle(Point(3,-3),2.5, fill="GreenYellow", z_index=-1)
+layer.circle(Point(9,0),4, fill="LightGray", z_index=-1)
     
 A = Point(0,0)
 B = Point(2,1)

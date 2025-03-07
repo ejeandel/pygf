@@ -25,17 +25,22 @@ class TikzLayer(Layer):
 
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
-        self.nodelayer = ""
-        self.edgelayer = ""
+        self.layers = { 0: [], 1: [] }
         self.names = 0
 
-    def picture(self, point, img_name, width, height):
+    def add_to_layer(self, z_index, x):
+        """ helper function """
+        if z_index not in self.layers:
+            self.layers[z_index] = []
+        self.layers[z_index].append(x)
+        
+    def picture(self, point, img_name, width, height, z_index = 1):
         # pictures are NOT subject to the transform (only the position is)
-        self.nodelayer += rf"\node at ({self.transform(point)}) "\
-            rf"{{\includegraphics[width={width:f}cm, height={height:f}cm]"\
-            f"{{{img_name}}}}};\n"
+        self.add_to_layer(z_index, rf"\node at ({self.transform(point)}) "\
+                          rf"{{\includegraphics[width={width:f}cm, height={height:f}cm]"\
+                          f"{{{img_name}}}}};")
 
-    def text(self, point, text, **hints):
+    def text(self, point, text, z_index=1, **hints):
         #  text is NOT subject to the transform (only the position is)
         text = str(text)
         opts = {}
@@ -48,10 +53,10 @@ class TikzLayer(Layer):
             else:
                 opts.update({x: None})
         opts.update(hints)
-        self.nodelayer += f"\\node[{dic_to_list(opts)}] at ({self.transform(point)})"\
-            f"{{{_escape(text)}}};\n"
+        self.add_to_layer(z_index,  f"\\node[{dic_to_list(opts)}] at ({self.transform(point)})"\
+            f"{{{_escape(text)}}};")
 
-    def circle(self, p1, radius, labels=None, **style):
+    def circle(self, p1, radius, labels=None, z_index = 1, **style):
         tf = self.transform
 
         pointx = tf(Point(radius, 0) + p1)
@@ -68,13 +73,13 @@ class TikzLayer(Layer):
         self._parse_style(style, tikz_style)
         tikz_style.update(style)
         if rx != ry:
-            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) "\
-                f"circle[x radius={rx:2f}, y radius={ry:2f}, rotate={x_axis_rotation:2f}];\n"
+            self.add_to_layer(z_index, f"\\path[{dic_to_list(tikz_style)}] ({x}) "\
+                f"circle[x radius={rx:2f}, y radius={ry:2f}, rotate={x_axis_rotation:2f}];")
         else:
-            self.edgelayer += f"\\path[{dic_to_list(tikz_style)}] ({x}) "\
-                f"circle[radius={rx:2f}];\n"
+            self.add_to_layer(z_index, f"\\path[{dic_to_list(tikz_style)}] ({x}) "\
+                f"circle[radius={rx:2f}];")
 
-    def rectangle(self, p1, p2, **style):
+    def rectangle(self, p1, p2, z_index=1, **style):
         r = Rectangle(p1, p2)
         tikz_style = {}
         self._parse_style(style, tikz_style)
@@ -82,8 +87,8 @@ class TikzLayer(Layer):
         (sw, se, nw,
          ne) = map(self.transform,
                    (r.southwest, r.southeast, r.northwest, r.northeast))
-        self.nodelayer += f"\\path[{dic_to_list(tikz_style)}]"\
-            f"({sw}) -- ({se}) -- ({ne}) -- ({nw}) -- cycle;\n"
+        self.add_to_layer(z_index, f"\\path[{dic_to_list(tikz_style)}]"\
+            f"({sw}) -- ({se}) -- ({ne}) -- ({nw}) -- cycle;")
 
     def _parse_thickness(self, gen_style, tikz_style):
         if "thickness" not in gen_style:
@@ -189,7 +194,7 @@ class TikzLayer(Layer):
         a = p.angle * 180 / math.pi
         return int(a * 10 + 0.5) / 10
 
-    def line(self, p1, p2, labels=None, **style):
+    def line(self, p1, p2, labels=None, z_index = 0, **style):
         (p1, p2) = map(self.transform, (p1, p2))
         s = ""
         if style is None:
@@ -223,38 +228,13 @@ class TikzLayer(Layer):
                 elif label == "below end":
                     s += f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
                 s += f"{{{text}}}"
-        self.edgelayer += s + ";\n"
+        self.add_to_layer(z_index, s+";")
 
-
-    def shape(self, points, **style):
-        l = self.find_angles(points, closed = True)
-        points.append(points[0])
-        l.append(l[0])
-        points = [*map(self.transform, points)]
-
-        s = ""
-
-        if "looseness" in style:
-            looseness = style["looseness"]
-            del style["looseness"]
-        else:
-            looseness = 1
-        tikz_style = {}
-        self._parse_style(style, tikz_style)
-        tikz_style.update(style)
-        s += f"\\path[{dic_to_list(tikz_style)}] ({points[0]})"
-
-        for i in range(len(points) - 1):
-            out_angle = self.convert_angle(l[i])
-            in_angle = self.convert_angle(180 + l[i + 1])
-            s += f" to[out={out_angle:3.3g}, in={in_angle:3.3g}"
-            if looseness != 1:
-                s += f', looseness={looseness:3.3g}'
-            s += f'] ({points[i+1]}) '
-
-        self.nodelayer += s + ";\n"
+    def shape(self, points, labels=None, z_index=1, **style):
+        self.edge(points, labels, z_index=z_index, closed=True, **style)
         
-    def edge(self, points, labels=None, closed = False, **style):
+        
+    def edge(self, points, labels=None, closed = False, z_index=0, **style):
         l = self.find_angles(points, closed)
         if closed:
             points.append(points[0])
@@ -321,27 +301,12 @@ class TikzLayer(Layer):
 
         s = rf"\path[{dic_to_list(tikz_style)}] " + " ".join(list_edges)
                 
-        self.edgelayer += s + ";\n"
+        self.add_to_layer(z_index, s + ";")
 
-    def polygon(self, points, **style):
-        points = [*map(self.transform, points)]
+    def polygon(self, points, labels=None, z_index=1, **style):
+        self.polyline(points, labels, closed=True, z_index=z_index, **style)
 
-        if style is None:
-            style = {}
-
-        tikz_style = {}
-        self._parse_style(style, tikz_style)
-        tikz_style.update(style)
-
-        listpoints = list(map(lambda x: f"({x})", points))
-        listpoints += ["cycle"]
-
-        s = rf"\path[{dic_to_list(tikz_style)}] " + "--".join(listpoints)
-
-        self.nodelayer += s + ";\n"
-
-
-    def polyline(self, points, labels=None, closed=False, **style):
+    def polyline(self, points, labels=None, z_index=0, closed=False, **style):
         points = [*map(self.transform, points)]
 
         if style is None:
@@ -400,7 +365,7 @@ class TikzLayer(Layer):
 
         s = rf"\path[{dic_to_list(tikz_style)}] " + " ".join(list_edges)
             
-        self.edgelayer += s + ";\n"
+        self.add_to_layer(z_index, s + ";")
 
     def draw(self, rect, fs = None, options=None, preamble=False):
         if options is None:
@@ -443,8 +408,8 @@ class TikzLayer(Layer):
 
         if clip:
             print(rf"\clip ({rect.northwest}) rectangle ({rect.southeast});", file=fs)
-        print(self.edgelayer, file=fs, end="")
-        print(self.nodelayer, file=fs, end="")
+        for i in sorted(self.layers.keys()):            
+            print("\n".join(self.layers[i]), file=fs, end="")
         print(r"\end{tikzpicture}", file=fs)
         if preamble:
             print(r"\end{document}", file=fs)

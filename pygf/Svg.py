@@ -180,8 +180,9 @@ class SvgLayer(Layer):
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
         self.names = 0
-        self.nodelayer = []
-        self.edgelayer = []
+        # node = 1
+        # edge = 0
+        self.layers = { 0: [], 1: [] }
         self.defs = {}
         self.svgtransform = Transform(a=50, d=-50)
 
@@ -190,7 +191,13 @@ class SvgLayer(Layer):
         self.names += 1
         return f"{self.names}"
 
-    def picture(self, point, img_name, width, height):
+    def add_to_layer(self, z_index, x):
+        """ helper function """
+        if z_index not in self.layers:
+            self.layers[z_index] = []
+        self.layers[z_index].append(x)
+        
+    def picture(self, point, img_name, width, height, z_index = 1):
         tf = self.svgtransform * self.transform
         r = Rectangle(Point(0, 0), self.svgtransform(Point(width, -height)))
         with open(img_name, 'rb') as f:
@@ -201,9 +208,7 @@ class SvgLayer(Layer):
             image_node.set("transform", f"translate({tf(point)-r.center})")
             image_node.set("preserveAspectRatio", "none")
 
-            self.nodelayer += [ image_node ]
-
-
+            self.add_to_layer(z_index, image_node)
 
     def parse_stroke_width(self, style):
         """ ---------
@@ -304,9 +309,6 @@ class SvgLayer(Layer):
             del style['text_color']
             
             
-
-            
-
     def parse_arrows(self, stroke_width, style, svg, sub_path):
         """ internal function for arrows """
         if 'arrow' not in style:
@@ -406,7 +408,7 @@ class SvgLayer(Layer):
                 svg.append(arrow)
                 
 
-    def __path(self, svg_path, labels=None, style=None):
+    def __path(self, svg_path, labels=None, style=None, z_index = 0):
         if style is None:
             style = {}
 
@@ -429,14 +431,14 @@ class SvgLayer(Layer):
 
         self.parse_arrows(stroke_width, style, svg, sub_path)
 
-        self.edgelayer += [ svg ]
+        self.add_to_layer(z_index, svg)
 
         if reverse_start or reverse_end:
-            self.edgelayer += [
-                ET.Element('path', id=f"r-{_id}",
-                           d=str(svg_path.reverse()),
-                           display="none")
-            ]
+            self.add_to_layer(z_index, 
+                              ET.Element('path', id=f"r-{_id}",
+                                         d=str(svg_path.reverse()),
+                                         display="none")
+                              )
 
         if labels is not None:
             for position in labels:
@@ -470,35 +472,20 @@ class SvgLayer(Layer):
 
                 text_path.text = str(labels[position])
                 text_svg.append(text_path)
-                self.edgelayer += [ text_svg ]
+                self.add_to_layer(z_index, text_svg)
 
-    def __shape(self, svg_path, style=None):
-        if style is None:
-            style = {}
-
-        stroke_width = self.parse_stroke_width(style)
-
-        svg_style = {'stroke-width': f'{stroke_width:2g}'}
-        self.parse_style(stroke_width, style, svg_style)
-
-        _id = self.new_name()
-
-        svg = ET.Element('g', svg_style)
-        sub_path = ET.Element('path', id=_id, d=str(svg_path))
-        svg.append(sub_path)
-
-        self.parse_arrows(stroke_width, style, svg, sub_path)
-
-        self.nodelayer += [ svg ]
-
-    def line(self, p1, p2, labels=None, **style):
+    def __shape(self, svg_path, labels=None, style=None):
+        self.__path(svg_path, labels, style, z_index = 1)
+        
+        
+    def line(self, p1, p2, labels=None, z_index = 0, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
         svg_path = SvgPath(p1)
         svg_path.line_to(p2)
 
-        self.__path(svg_path, labels, style)
+        self.__path(svg_path, labels, style, z_index)
 
-    def circle(self, p1, radius, labels=None, **style):
+    def circle(self, p1, radius, labels=None, z_index = 1, **style):
         tf = self.svgtransform * self.transform
 
         rx = tf(p1).distance(tf(Point(radius, 0) + p1))
@@ -513,15 +500,13 @@ class SvgLayer(Layer):
         svg_path.ellipse_to(x2, rx, ry, x_axis_rotation, 1, 1)
         svg_path.ellipse_to(x1, rx, ry, x_axis_rotation, 1, 1)
 
-        self.__path(svg_path, labels, style)
+        self.__path(svg_path, labels, style, z_index)
 
-    def rectangle(self, p1, p2, **style):
+    def rectangle(self, p1, p2, z_index=1, **style):
         r = Rectangle(p1, p2)
-        self.polyline([r.northwest, r.northeast, r.southeast, r.southwest],
-                      closed=True,
-                      **style)
+        self.polygon([r.northwest, r.northeast, r.southeast, r.southwest], z_index=1, **style)
 
-    def text(self, point, text, **style):
+    def text(self, point, text, z_index = 1, **style):
 
         def compute_anchors(position):
             if position == "center":
@@ -568,10 +553,9 @@ class SvgLayer(Layer):
         text_node.set("dominant-baseline", valign)
         text_node.set("transform", f"translate({self.svgtransform(self.transform(point))})")
         text_node.text = str(text)
+        self.add_to_layer(z_index, text_node)
 
-        self.nodelayer += [ text_node ]
-
-    def edge(self, points, labels=None, closed = False, **style):
+    def edge(self, points, labels=None, closed = False, z_index=0, **style):
 
         tf = self.svgtransform * self.transform
         l = self.find_angles(points, closed)
@@ -597,36 +581,12 @@ class SvgLayer(Layer):
             svg_path.curve_to(tf(newpoint), tf(fstcontrol), tf(sndcontrol))
             point = newpoint
 
-        self.__path(svg_path, labels, style)
+        self.__path(svg_path, labels, style, z_index)
 
-    def shape(self, points, **style):
-        l = self.find_angles(points, closed = True)
-        points.append(points[0])
-        l.append(l[0])
-        points = [*map(self.transform, points)]
+    def shape(self, points, labels=None, z_index=1, **style):
+        self.edge(points, labels, z_index=z_index, closed=True, **style)
         
-        tf = self.svgtransform * self.transform
-        angles = list(map(lambda x: x * math.pi / 180, l))
-
-        if "looseness" in style:
-            looseness = style["looseness"]
-            del style["looseness"]
-        else:
-            looseness = 1
-
-        point = points[0]
-        svg_path = SvgPath(tf(point))
-        for i in range(len(points) - 1):
-            newpoint = points[i + 1]
-            dst = looseness * 0.3902 * newpoint.distance(point)
-            fstcontrol = point + Point(dst, angles[i], polar=True)
-            sndcontrol = newpoint - Point(dst, angles[i + 1], polar=True)
-            svg_path.curve_to(tf(newpoint), tf(fstcontrol), tf(sndcontrol))
-            point = newpoint
-
-        self.__shape(svg_path, style)
-        
-    def polyline(self, points, labels=None, closed=False, **style):
+    def polyline(self, points, labels=None, closed=False, z_index=0, **style):
         tf = self.svgtransform * self.transform
 
         def corners(p0,p1,p2):
@@ -677,60 +637,10 @@ class SvgLayer(Layer):
             for point in points[1:]:
                 svg_path.line_to(tf(point))
 
-        self.__path(svg_path, labels, style)
+        self.__path(svg_path, labels, style, z_index)
 
-    def polygon(self, points,  **style):
-        tf = self.svgtransform * self.transform
-
-        def corners(p0,p1,p2):
-            """ returns points nears p1 to round the corners """
-            if p1.distance(p2) > p0.distance(p1):
-                ratio = min(12, p1.distance(p2) / p0.distance(p1))
-                t1 = 0.04 * ratio
-                t2 = 0.04
-            else:
-                ratio = min(12, p0.distance(p1) / p1.distance(p2))
-                t1 = 0.04
-                t2 = 0.04 * ratio
-            beforep1 = p0 * t1 + p1 * (1 - t1)
-            afterp1 = p1 * (1 - t2) + p2 * t2
-            return (beforep1, afterp1)
-
-        points += [points[0]]
-
-        if "rounded" in style and style["rounded"] and len(points) != 2:
-            p2 = p1 = points[0]
-            if closed:
-                p0 = points[-2]
-                p2 = points[1]
-                (_, afterp1) = corners(p0, p1, p2)
-                svg_path = SvgPath(tf(afterp1))
-            else:
-                svg_path = SvgPath(tf(p1))
-            for i in range(len(points) - 2):
-                p0 = points[i]
-                p1 = points[i + 1]
-                p2 = points[i + 2]
-                (beforep1, afterp1) = corners(p0, p1, p2)
-                svg_path.line_to(tf(beforep1))
-                svg_path.quadratic_to(tf(afterp1), tf(p1))
-            if not closed:
-                svg_path.line_to(tf(p2))
-            else:
-                p0 = points[-2]
-                p1 = points[0]
-                p2 = points[1]
-                (beforep1, afterp1) = corners(p0, p1, p2)
-                svg_path.line_to(tf(beforep1))
-                svg_path.quadratic_to(tf(afterp1), tf(p1))
-        else:
-            # not rounded
-            svg_path = SvgPath(tf(points[0]))
-            for point in points[1:]:
-                svg_path.line_to(tf(point))
-
-        self.__shape(svg_path, labels, style)
-
+    def polygon(self, points, labels=None, z_index=1, **style):
+        self.polyline(points, labels, closed=True, z_index=z_index, **style)
         
     def draw(self, rect, fs=None, options=None , preamble=False):
         tf = self.svgtransform * self.transform
@@ -745,7 +655,8 @@ class SvgLayer(Layer):
                          viewBox = f"{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}")
         svg.set("xmlns:xlink", "http://www.w3.org/1999/xlink")
 
-        svg.extend(self.edgelayer)
-        svg.extend(self.nodelayer)
+
+        for i in sorted(self.layers.keys()):            
+            svg.extend(self.layers[i])
 
         print("\n".join(ET.tostringlist(svg, encoding="unicode")), file=fs)
