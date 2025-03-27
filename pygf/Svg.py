@@ -1,4 +1,5 @@
-""" Module that provides the SVG Layer """
+"""Module that provides the SVG Layer"""
+
 # pylint: disable=invalid-name
 import math
 import base64
@@ -8,12 +9,12 @@ from .Layer import Layer
 from .Geometry import Point, Rectangle, Transform
 
 
-
 @dataclass
 class PathElement:
     """
     represents one part of a SVG Path
     """
+
     first_point: Point
     next_point: Point
 
@@ -27,13 +28,16 @@ class PathElement:
 
     def reverse(self):
         """
-        return the reverse of the path element 
+        return the reverse of the path element
         """
+        return self
+
 
 @dataclass
 class SVGLine(PathElement):
-    """ A line element in a SVG Path """
-    def __str__(self, first = False):
+    """A line element in a SVG Path"""
+
+    def __str__(self, first=False):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -46,37 +50,47 @@ class SVGLine(PathElement):
 
 @dataclass
 class SVGEllipse(PathElement):
-    """ An ellipse element in a SVG Path """
+    """An ellipse element in a SVG Path"""
+
     rx: float
     ry: float
     x_axis_rotation: float
     large_flag: int
     sweep_flag: int
 
-    def __str__(self, first = False):
+    def __str__(self, first=False):
         s = ""
         if first:
             s = "M {self.first_point}"
-        s += (f" A {self.rx} {self.ry} {self.x_axis_rotation}"
-              f" {self.large_flag} {self.sweep_flag} {self.next_point}")
+        s += (
+            f" A {self.rx} {self.ry} {self.x_axis_rotation}"
+            f" {self.large_flag} {self.sweep_flag} {self.next_point}"
+        )
         return s
 
     def reverse(self):
-        return SVGEllipse(self.next_point, self.first_point,
-                          self.rx, self.ry,
-                          self.x_axis_rotation,
-                          self.large_flag, 1 - self.sweep_flag)
-
+        return SVGEllipse(
+            self.next_point,
+            self.first_point,
+            self.rx,
+            self.ry,
+            self.x_axis_rotation,
+            self.large_flag,
+            1 - self.sweep_flag,
+        )
 
     def is_up(self):
         return self.sweep_flag > 0
 
+
 @dataclass
 class SVGBezier(PathElement):
-    """ A Bezier curve element in a SVG Path """
+    """A Bezier curve element in a SVG Path"""
+
     first_control_point: Point
     second_control_point: Point
-    def __str__(self, first = False):
+
+    def __str__(self, first=False):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -84,15 +98,21 @@ class SVGBezier(PathElement):
         return s
 
     def reverse(self):
-        return SVGBezier(self.next_point, self.first_point,
-                         self.second_control_point,
-                         self.first_control_point)
+        return SVGBezier(
+            self.next_point,
+            self.first_point,
+            self.second_control_point,
+            self.first_control_point,
+        )
+
 
 @dataclass
 class SVGQuadratic(PathElement):
-    """ A Quadratic Bezier curve element in a SVG Path """    
+    """A Quadratic Bezier curve element in a SVG Path"""
+
     control_point: Point
-    def __str__(self, first = False):
+
+    def __str__(self, first=False):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -100,12 +120,11 @@ class SVGQuadratic(PathElement):
         return s
 
     def reverse(self):
-        return SVGQuadratic(self.next_point, self.first_point,
-                            self.control_point)
+        return SVGQuadratic(self.next_point, self.first_point, self.control_point)
 
 
 class SvgPath:
-    """ A path in SVG. Not all features are supported.
+    """A path in SVG. Not all features are supported.
 
     Not implemented
       - relative commands
@@ -115,6 +134,7 @@ class SvgPath:
       - T (Reflected Quadratic Bezier)
 
     """
+
     def __init__(self, start_point, path_list=None):
         self.current_point = start_point
         if path_list is None:
@@ -123,28 +143,40 @@ class SvgPath:
             self.path_list = path_list
 
     def line_to(self, next_point):
-        """ Adds a line from the current_point to the next point """
+        """Adds a line from the current_point to the next point"""
         self.path_list += [SVGLine(self.current_point, next_point)]
         self.current_point = next_point
 
     def ellipse_to(self, next_point, rx, ry, x_axis_rotation, large_flag, sweep_flag):
-        """ Adds an ellipse """
-        self.path_list += [SVGEllipse(self.current_point, next_point,
-                                      rx, ry, x_axis_rotation, large_flag,
-                                      sweep_flag)]
+        """Adds an ellipse"""
+        self.path_list += [
+            SVGEllipse(
+                self.current_point,
+                next_point,
+                rx,
+                ry,
+                x_axis_rotation,
+                large_flag,
+                sweep_flag,
+            )
+        ]
         self.current_point = next_point
 
     def curve_to(self, next_point, first_control_point, second_control_point):
-        """ Adds a Bezier Curve """
-        self.path_list += [SVGBezier(self.current_point, next_point,
-                                     first_control_point,
-                                     second_control_point)]
+        """Adds a Bezier Curve"""
+        self.path_list += [
+            SVGBezier(
+                self.current_point,
+                next_point,
+                first_control_point,
+                second_control_point,
+            )
+        ]
         self.current_point = next_point
 
     def quadratic_to(self, next_point, control_point):
-        """ Adds a Quadratic Curve """
-        self.path_list += [SVGQuadratic(self.current_point, next_point,
-                                        control_point)]
+        """Adds a Quadratic Curve"""
+        self.path_list += [SVGQuadratic(self.current_point, next_point, control_point)]
         self.current_point = next_point
 
     def __str__(self):
@@ -153,7 +185,7 @@ class SvgPath:
         return s + "".join(str(i) for i in self.path_list)
 
     def reverse(self):
-        """ return the reverse of the SVG path"""
+        """return the reverse of the SVG path"""
         if len(self.path_list) == 0:
             return SvgPath(self.current_point)
 
@@ -162,8 +194,8 @@ class SvgPath:
         return SvgPath(last_point, reverse_list)
 
     def is_up(self):
-        """ return whether the path is drawn from left to right
-        or in the other direction """
+        """return whether the path is drawn from left to right
+        or in the other direction"""
         if len(self.path_list) == 0:
             raise NotImplementedError
 
@@ -171,49 +203,52 @@ class SvgPath:
 
 
 def pt_to_cm(x):
-    """ converts pt to cm """
+    """converts pt to cm"""
     return x * 2.54 / 72.27
 
 
 class SvgLayer(Layer):
-    """ the SVG Layer """
+    """the SVG Layer"""
+
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
         self.names = 0
         # node = 1
         # edge = 0
-        self.layers = { 0: [], 1: [] }
+        self.layers = {0: [], 1: []}
         self.defs = {}
         self.svgtransform = Transform(a=50, d=-50)
 
     def new_name(self):
-        """ return a new name for an id """
+        """return a new name for an id"""
         self.names += 1
         return f"{self.names}"
 
     def add_to_layer(self, z_index, x):
-        """ helper function """
+        """helper function"""
         if z_index not in self.layers:
             self.layers[z_index] = []
         self.layers[z_index].append(x)
-        
-    def picture(self, point, img_name, width, height, z_index = 1):
+
+    def picture(self, point, img_name, width, height, z_index=1):
         tf = self.svgtransform * self.transform
         r = Rectangle(Point(0, 0), self.svgtransform(Point(width, -height)))
-        with open(img_name, 'rb') as f:
+        with open(img_name, "rb") as f:
             data = f.read()
-            image_node = ET.Element('image', width=str(r.width), height=str(r.height))
-            image_node.set("xlink:href",
-                           f'data:image/png;base64,{str(base64.b64encode(data),"utf-8")}')
+            image_node = ET.Element("image", width=str(r.width), height=str(r.height))
+            image_node.set(
+                "xlink:href",
+                f'data:image/png;base64,{str(base64.b64encode(data),"utf-8")}',
+            )
             image_node.set("transform", f"translate({tf(point)-r.center})")
             image_node.set("preserveAspectRatio", "none")
 
             self.add_to_layer(z_index, image_node)
 
     def parse_stroke_width(self, style):
-        """ ---------
-            thickness
-            --------- """
+        """---------
+        thickness
+        ---------"""
 
         if "thickness" in style:
             thickness = style["thickness"]
@@ -224,11 +259,10 @@ class SvgLayer(Layer):
         stroke_width = 0.4 * pt * thickness
         return stroke_width
 
-
     def parse_style(self, stroke_width, style, svg_style):
-        """ ---------
-            dash
-         ---------"""
+        """---------
+           dash
+        ---------"""
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
         if "dash" in style:
             dash = style["dash"]
@@ -253,7 +287,7 @@ class SvgLayer(Layer):
                 "loosely dashdotdotted": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
                 "dash dot dot": f"{3*pt:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g} {sw:.2g} {2*pt:.2g}",
                 "densely dash dot dot": f"{3*pt:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g} {sw:.2g} {1*pt:.2g}",
-                "loosely dash dot dot": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}"
+                "loosely dash dot dot": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
             }.get(dash)
             svg_style["stroke-dasharray"] = dasharray
         ###  -------
@@ -286,9 +320,8 @@ class SvgLayer(Layer):
             del style["rounded"]
             svg_style["stroke-linejoin"] = "round"
 
-
     def parse_text_style(self, style, text_style):
-        """ internal function
+        """internal function
         computes the text attributes
         """
         if "text_size" in style:
@@ -305,89 +338,113 @@ class SvgLayer(Layer):
             text_style["font-family"] = "sans-serif"
 
         if "text_color" in style:
-            text_style["stroke"] = style['text_color']
-            del style['text_color']
-            
-            
+            text_style["stroke"] = style["text_color"]
+            del style["text_color"]
+
     def parse_arrows(self, stroke_width, style, svg, sub_path):
-        """ internal function for arrows """
-        if 'arrow' not in style:
+        """internal function for arrows"""
+        if "arrow" not in style:
             return
 
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
 
-        arrows  = style['arrow'].split("-")
+        arrows = style["arrow"].split("-")
 
+        def latex_arrow(reverse=False, first=False):
+            x = 0.28 * pt + 0.3 * stroke_width
 
-        def latex_arrow(reverse = False, first = False):
-            x = 0.28*pt + .3 * stroke_width
-
-            width = 11*x
-            height = 10*x
+            width = 11 * x
+            height = 10 * x
 
             X = -x if not reverse else x
             if not first:
-                refX = width-0.5*stroke_width
+                refX = width - 0.5 * stroke_width
             else:
-                refX = 0.5*stroke_width
-                
-            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
-                               markerWidth=str(width), markerHeight=str(height),
-                               refX= str(refX), refY=str(height/2), orient="auto")
+                refX = 0.5 * stroke_width
+
+            arrow = ET.Element(
+                "marker",
+                markerUnits="userSpaceOnUse",
+                markerWidth=str(width),
+                markerHeight=str(height),
+                refX=str(refX),
+                refY=str(height / 2),
+                orient="auto",
+            )
             arrow.set("stroke-width", str(stroke_width))
 
-            relative = Point(-width if not reverse else 0,-height/2)
+            relative = Point(-width if not reverse else 0, -height / 2)
             arrow_path = SvgPath(Point(0, 0) - relative)
-            arrow_path.curve_to(Point(10*X, 3.75*x) - relative,
-                                Point(8*X/3, .5*x) - relative,
-                                Point(7*X, 2*x) - relative)
-            arrow_path.line_to(Point(10*X, -3.75*x) - relative)
-            arrow_path.curve_to(Point(0, 0) - relative,
-                                Point(7*X, -2*x) - relative,
-                                Point(8*X/3, -.5*x) - relative)
-            arrow_svg_path = ET.Element('path', d=str(arrow_path), fill=svg.get("stroke"))
+            arrow_path.curve_to(
+                Point(10 * X, 3.75 * x) - relative,
+                Point(8 * X / 3, 0.5 * x) - relative,
+                Point(7 * X, 2 * x) - relative,
+            )
+            arrow_path.line_to(Point(10 * X, -3.75 * x) - relative)
+            arrow_path.curve_to(
+                Point(0, 0) - relative,
+                Point(7 * X, -2 * x) - relative,
+                Point(8 * X / 3, -0.5 * x) - relative,
+            )
+            arrow_svg_path = ET.Element("path", d=str(arrow_path), fill=svg.get("stroke"))
             arrow.append(arrow_svg_path)
             return arrow
 
-        def default_arrow(reverse = False, first = False):
-            x = 0.28*pt + .3 * stroke_width
-            width = 5*x
-            height = 10*x
+        def default_arrow(reverse=False, first=False):
+            x = 0.28 * pt + 0.3 * stroke_width
+            width = 5 * x
+            height = 10 * x
             X = -x if not reverse else x
             if not reverse:
-                refX = width-0.4*stroke_width
+                refX = width - 0.4 * stroke_width
             else:
-                refX = 0.4*stroke_width
-            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
-                               markerWidth=str(width), markerHeight=str(height),
-                               refX= str(refX), refY=str(height/2), orient="auto")
+                refX = 0.4 * stroke_width
+            arrow = ET.Element(
+                "marker",
+                markerUnits="userSpaceOnUse",
+                markerWidth=str(width),
+                markerHeight=str(height),
+                refX=str(refX),
+                refY=str(height / 2),
+                orient="auto",
+            )
             arrow.set("stroke-width", str(0.8 * stroke_width))
-            relative = Point(-width if not reverse else 0,-height/2)
-            arrow_path = SvgPath(Point(3.75*X, 4*x) - relative)
-            arrow_path.curve_to(Point(0, 0) - relative,
-                                Point(3.5*X, 2.5*x) - relative,
-                                Point(0.75*X, 0.25*x) - relative)
-            arrow_path.curve_to(Point(3.75*X,-4*x) - relative,
-                                Point(0.75*X, -0.25*x) - relative,
-                                Point(3.5*X, -2.5*x) - relative)
-            arrow_svg_path = ET.Element('path', d=str(arrow_path))
+            relative = Point(-width if not reverse else 0, -height / 2)
+            arrow_path = SvgPath(Point(3.75 * X, 4 * x) - relative)
+            arrow_path.curve_to(
+                Point(0, 0) - relative,
+                Point(3.5 * X, 2.5 * x) - relative,
+                Point(0.75 * X, 0.25 * x) - relative,
+            )
+            arrow_path.curve_to(
+                Point(3.75 * X, -4 * x) - relative,
+                Point(0.75 * X, -0.25 * x) - relative,
+                Point(3.5 * X, -2.5 * x) - relative,
+            )
+            arrow_svg_path = ET.Element("path", d=str(arrow_path))
             arrow_svg_path.set("stroke-linecap", "round")
             arrow_svg_path.set("stroke-linejoin", "round")
             arrow_svg_path.set("stroke-dasharray", "none")
             arrow.append(arrow_svg_path)
             return arrow
 
-        def x_arrow(reverse = False, first = False):
-            width = 3*pt+4*stroke_width
+        def x_arrow(reverse=False, first=False):
+            width = 3 * pt + 4 * stroke_width
 
-            arrow = ET.Element("marker", markerUnits="userSpaceOnUse",
-                            markerWidth=str(width), markerHeight=str(width),
-                               refX=str(width/2), refY=str(width/2), orient="auto")
+            arrow = ET.Element(
+                "marker",
+                markerUnits="userSpaceOnUse",
+                markerWidth=str(width),
+                markerHeight=str(width),
+                refX=str(width / 2),
+                refY=str(width / 2),
+                orient="auto",
+            )
 
-            arrow.append(ET.Element("polyline",points=f"{Point(0,0)} {Point(width, width)}"))
-            arrow.append(ET.Element("polyline",points=f"{Point(width,0)} {Point(0, width)}"))
+            arrow.append(ET.Element("polyline", points=f"{Point(0,0)} {Point(width, width)}"))
+            arrow.append(ET.Element("polyline", points=f"{Point(width,0)} {Point(0, width)}"))
             return arrow
-            
+
         for i in range(2):
             if arrows[i] == ">":
                 arrow = default_arrow(False, i == 0)
@@ -399,16 +456,17 @@ class SvgLayer(Layer):
                 arrow = latex_arrow(True, i == 0)
             elif arrows[i] == "x":
                 arrow = x_arrow(False, False)
+            else:
+                raise NotImplementedError(arrows[i])
 
             if len(arrows[i]) > 0:
 
                 _id = self.new_name()
-                sub_path.set('marker-start' if i == 0 else 'marker-end',f'url(#marker_{_id})')
-                arrow.set('id',f'marker_{_id}')
+                sub_path.set("marker-start" if i == 0 else "marker-end", f"url(#marker_{_id})")
+                arrow.set("id", f"marker_{_id}")
                 svg.append(arrow)
-                
 
-    def __path(self, svg_path, labels=None, style=None, z_index = 0):
+    def __path(self, svg_path, labels=None, style=None, z_index=0):
         if style is None:
             style = {}
 
@@ -417,7 +475,7 @@ class SvgLayer(Layer):
 
         stroke_width = self.parse_stroke_width(style)
 
-        svg_style = {'stroke-width': f'{stroke_width:2g}'}
+        svg_style = {"stroke-width": f"{stroke_width:2g}"}
         self.parse_style(stroke_width, style, svg_style)
 
         text_style = {}
@@ -425,8 +483,8 @@ class SvgLayer(Layer):
 
         _id = self.new_name()
 
-        svg = ET.Element('g', svg_style)
-        sub_path = ET.Element('path', id=_id, d=str(svg_path))
+        svg = ET.Element("g", svg_style)
+        sub_path = ET.Element("path", id=_id, d=str(svg_path))
         svg.append(sub_path)
 
         self.parse_arrows(stroke_width, style, svg, sub_path)
@@ -441,17 +499,16 @@ class SvgLayer(Layer):
                     need_reverse = True
                 if "end" in position and reverse_end:
                     need_reverse = True
-                if (position == "above" and reverse_start) or (position =="below" and reverse_end):
+                if (position == "above" and reverse_start) or (position == "below" and reverse_end):
                     need_reverse = True
             if need_reverse:
-                self.add_to_layer(z_index,
-                                  ET.Element('path', id=f"r-{_id}",
-                                             d=str(svg_path.reverse()),
-                                             display="none")
-                                  )
+                self.add_to_layer(
+                    z_index,
+                    ET.Element("path", id=f"r-{_id}", d=str(svg_path.reverse()), display="none"),
+                )
 
             for position in labels:
-                text_svg = ET.Element('text', text_style)
+                text_svg = ET.Element("text", text_style)
                 if "above" in position:
                     text_svg.set("dy", "-5")
                 else:
@@ -462,14 +519,12 @@ class SvgLayer(Layer):
                 text_path = ET.Element("textPath")
 
                 if "start" in position:
-                    text_svg.set("text-anchor",
-                                 "start" if not reverse_start else "end")                    
-                    text_path.set("startOffset", "0%"  if not reverse_start else "100%")
+                    text_svg.set("text-anchor", "start" if not reverse_start else "end")
+                    text_path.set("startOffset", "0%" if not reverse_start else "100%")
                     text_path.set("href", f"#{_id}" if not reverse_start else f"#r-{_id}")
                 elif "end" in position:
-                    text_svg.set("text-anchor",
-                                 "end" if not reverse_end else "start")                    
-                    text_path.set("startOffset", "100%"  if not reverse_end else "0%")
+                    text_svg.set("text-anchor", "end" if not reverse_end else "start")
+                    text_path.set("startOffset", "100%" if not reverse_end else "0%")
                     text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
                 else:
                     text_svg.set("text-anchor", "middle")
@@ -483,14 +538,14 @@ class SvgLayer(Layer):
                 text_svg.append(text_path)
                 self.add_to_layer(z_index, text_svg)
 
-    def line(self, p1, p2, labels=None, z_index = 0, **style):
+    def line(self, p1, p2, labels=None, z_index=0, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
         svg_path = SvgPath(p1)
         svg_path.line_to(p2)
 
         self.__path(svg_path, labels, style, z_index)
 
-    def circle(self, p1, radius, labels=None, z_index = 1, **style):
+    def circle(self, p1, radius, labels=None, z_index=1, **style):
         tf = self.svgtransform * self.transform
 
         rx = tf(p1).distance(tf(Point(radius, 0) + p1))
@@ -511,14 +566,14 @@ class SvgLayer(Layer):
         r = Rectangle(p1, p2)
         self.polygon([r.northwest, r.northeast, r.southeast, r.southwest], z_index=1, **style)
 
-    def text(self, point, text, z_index = 1, **style):
+    def text(self, point, text, z_index=1, **style):
 
         def compute_anchors(position):
             if position == "center":
                 x = 0
                 y = 0
-                valign = 'central'
-                align = 'middle'
+                valign = "central"
+                align = "middle"
                 return (x, y, align, valign)
             x = 0
             y = 0
@@ -560,7 +615,7 @@ class SvgLayer(Layer):
         text_node.text = str(text)
         self.add_to_layer(z_index, text_node)
 
-    def edge(self, points, labels=None, closed = False, z_index=0, **style):
+    def edge(self, points, labels=None, closed=False, z_index=0, **style):
 
         tf = self.svgtransform * self.transform
         l = self.find_angles(points, closed)
@@ -588,12 +643,11 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
-        
     def polyline(self, points, labels=None, closed=False, z_index=0, **style):
         tf = self.svgtransform * self.transform
 
-        def corners(p0,p1,p2):
-            """ returns points nears p1 to round the corners """
+        def corners(p0, p1, p2):
+            """returns points nears p1 to round the corners"""
             if p1.distance(p2) > p0.distance(p1):
                 ratio = min(12, p1.distance(p2) / p0.distance(p1))
                 t1 = 0.04 * ratio
@@ -642,22 +696,22 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
-        
-    def draw(self, rect, fs=None, options=None , preamble=False):
+    def draw(self, rect, fs=None, options=None, preamble=False):
         tf = self.svgtransform * self.transform
-        rect = Rectangle.bounding_box([
-            *map(tf, [
-                rect.northwest, rect.northeast, rect.southeast, rect.southwest
-            ])
-        ])
+        rect = Rectangle.bounding_box(
+            [*map(tf, [rect.northwest, rect.northeast, rect.southeast, rect.southwest])]
+        )
 
-        svg = ET.Element('svg', xmlns="http://www.w3.org/2000/svg",
-                         width=str(rect.width), height=str(rect.height),
-                         viewBox = f"{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}")
+        svg = ET.Element(
+            "svg",
+            xmlns="http://www.w3.org/2000/svg",
+            width=str(rect.width),
+            height=str(rect.height),
+            viewBox=f"{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}",
+        )
         svg.set("xmlns:xlink", "http://www.w3.org/1999/xlink")
 
-
-        for i in sorted(self.layers.keys()):            
+        for i in sorted(self.layers.keys()):
             svg.extend(self.layers[i])
 
         print("\n".join(ET.tostringlist(svg, encoding="unicode")), file=fs)

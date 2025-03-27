@@ -1,12 +1,14 @@
-""" Geometry classes """
+"""Geometry classes"""
+
 # pylint: disable=invalid-name
 from __future__ import annotations
 import math
 import copy
-from typing import Dict,Any,List
+from typing import Dict, Any, List
+
 
 class Point:
-    """ The famous Point class. Represents a point in 2D.
+    """The famous Point class. Represents a point in 2D.
 
     Can be constructed either by giving the x-coordinate
     and the y-coordinate, or (if `polar=True`) by giving
@@ -35,33 +37,33 @@ class Point:
     :param fst: the x coordinate (if `polar=False`) or the radius (if `polar=True`).
     :param snd: the y coordinate (if `polar=False`) or the angle (if `polar=True`).
     :param polar: True if parameters are polar coordinates rather than xy-coordinates.
-    
+
     """
 
-    __slots__ = ('x', 'y', 'dico')
+    __slots__ = ("x", "y", "dico")
 
-    def __init__(self, fst: float, snd: float, polar: bool=False):
+    def __init__(self, fst: float, snd: float, polar: bool = False):
         if polar is False:
             self.x = fst
             self.y = snd
         else:
             self.x = fst * math.cos(snd)
             self.y = fst * math.sin(snd)
-        self.dico: Dict[str,Any] = {}
+        self.dico: Dict[str, Any] = {}
 
-    def __matmul__(self, dico: Dict[str,Any]) -> Point:
+    def __matmul__(self, dico: Dict[str, Any]) -> Point:
         x = copy.deepcopy(self)
         x.dico.update(dico)
         return x
 
-    def get(self, key:str , default:Any=None) -> Any:
-        """ returns the decoration corresponding to key, like in a
-        normal dictionary """
+    def get(self, key: str, default: Any = None) -> Any:
+        """returns the decoration corresponding to key, like in a
+        normal dictionary"""
 
         return self.dico.get(key, default)
 
     def distance(self, p: Point) -> float:
-        """ returns the distance between this point and another point
+        """returns the distance between this point and another point
 
         :param p: the other point
         """
@@ -69,8 +71,8 @@ class Point:
 
     @property
     def angle(self) -> float:
-        """ returns the angle (in radians) between the point (0,0)
-        and the point itself """
+        """returns the angle (in radians) between the point (0,0)
+        and the point itself"""
 
         return math.atan2(self.y, self.x)
 
@@ -89,7 +91,7 @@ class Point:
     def __or__(self, p: Point) -> Point:
         return Point(self.x, p.y)
 
-    def __format__(self, format_spec: str|None) -> str:
+    def __format__(self, format_spec: str | None) -> str:
         return f"{self.x:.3f},{self.y:.3f}"
 
     def __str__(self) -> str:
@@ -97,16 +99,17 @@ class Point:
 
 
 class Rectangle:
-    """ The famous Rectangle class. The rectangle is aligned with the
+    """The famous Rectangle class. The rectangle is aligned with the
     x-axis and the y-axis, and is given by two points.
 
     :param fst: one corner of the rectangle
     :param snd: opposite corner of the rectangle
 
     """
-    __slots__ = ('fst', 'snd')
 
-    def __init__(self, fst: Point, snd: Point):       
+    __slots__ = ("fst", "snd")
+
+    def __init__(self, fst: Point, snd: Point):
         if fst.x > snd.x:
             (x1, x2) = (snd.x, fst.x)
         else:
@@ -134,22 +137,20 @@ class Rectangle:
         raise IndexError
 
     def __contains__(self, p: Point) -> bool:
-        return self.fst.x <= p.x <= self.snd.x and \
-            self.fst.y <= p.y <= self.snd.y
+        return self.fst.x <= p.x <= self.snd.x and self.fst.y <= p.y <= self.snd.y
 
     @property
-    def center(self) -> Point :
-        """ returns the center of the rectangle
+    def center(self) -> Point:
+        """returns the center of the rectangle
 
         :rtype: Point
         """
 
-        return Point((self.fst.x + self.snd.x) / 2,
-                     (self.fst.y + self.snd.y) / 2)
+        return Point((self.fst.x + self.snd.x) / 2, (self.fst.y + self.snd.y) / 2)
 
     @property
     def width(self) -> float:
-        """ returns the width of the rectangle
+        """returns the width of the rectangle
 
         :rtype: float
         """
@@ -158,7 +159,7 @@ class Rectangle:
 
     @property
     def height(self) -> float:
-        """ returns the height of the rectangle
+        """returns the height of the rectangle
 
         :rtype: float
         """
@@ -167,7 +168,7 @@ class Rectangle:
 
     @property
     def southwest(self) -> Point:
-        """ returns the southwest corner of the rectangle
+        """returns the southwest corner of the rectangle
 
         :rtype: Point
         """
@@ -175,7 +176,7 @@ class Rectangle:
 
     @property
     def south(self) -> Point:
-        """ returns the point at the center of the south side of the rectangle
+        """returns the point at the center of the south side of the rectangle
 
         :rtype: Point
         """
@@ -183,7 +184,7 @@ class Rectangle:
 
     @property
     def north(self) -> Point:
-        """ returns the point at the center of the north side of the rectangle
+        """returns the point at the center of the north side of the rectangle
 
         :rtype: Point
         """
@@ -191,7 +192,7 @@ class Rectangle:
 
     @property
     def northwest(self) -> Point:
-        """ returns the northwest corner of the rectangle
+        """returns the northwest corner of the rectangle
 
         :rtype: Point
         """
@@ -199,7 +200,7 @@ class Rectangle:
 
     @property
     def northeast(self) -> Point:
-        """ returns the northeast corner of the rectangle
+        """returns the northeast corner of the rectangle
 
         :rtype: Point
         """
@@ -207,7 +208,7 @@ class Rectangle:
 
     @property
     def southeast(self) -> Point:
-        """ returns the southeast corner of the rectangle
+        """returns the southeast corner of the rectangle
 
         :rtype: Point
         """
@@ -215,7 +216,7 @@ class Rectangle:
 
     @classmethod
     def bounding_box(cls: type[Rectangle], point_list: List[Point]) -> Rectangle:
-        """ returns the smallest rectangle that contains all points
+        """returns the smallest rectangle that contains all points
         in the list.
 
         :param point_list: The list of points
@@ -223,60 +224,53 @@ class Rectangle:
 
         :rtype: Rectangle
         """
-        x0 = x1 = point_list[0].x
-        y0 = y1 = point_list[0].y
-        for p in point_list[1:]:
-            if p.x < x0:
-                x0 = p.x
-            if p.x > x1:
-                x1 = p.x
-            if p.y < y0:
-                y0 = p.y
-            if p.y > y1:
-                y1 = p.y
+        x0 = min(map(lambda p: p.x, point_list))
+        x1 = max(map(lambda p: p.x, point_list))
+        y0 = min(map(lambda p: p.y, point_list))
+        y1 = max(map(lambda p: p.y, point_list))
         return cls(Point(x0, y0), Point(x1, y1))
 
     def vertical_split(self, weight_list: List[int]) -> List[Rectangle]:
-        """ 
-        given a list of weights, splits the rectangle into n rectangles 
-        in such a way that the width of each rectangle is proportional to its weight 
+        """
+        given a list of weights, splits the rectangle into n rectangles
+        in such a way that the width of each rectangle is proportional to its weight
 
         :param weight_list: list of coefficients
         :type weight_list: List[int]
-        
+
         """
         total_weight = sum(weight_list)
         x1 = self.fst.x
-        x2 = self.snd.x        
+        x2 = self.snd.x
         height = self.snd.y - self.fst.y
         output = []
         cumulative_weight = 0
         for i in weight_list:
-            y1 = self.fst.y + cumulative_weight*height/total_weight
+            y1 = self.fst.y + cumulative_weight * height / total_weight
             cumulative_weight += i
-            y2 = self.fst.y + cumulative_weight*height/total_weight
+            y2 = self.fst.y + cumulative_weight * height / total_weight
             output += [Rectangle(Point(x1, y1), Point(x2, y2))]
         return output
 
     def horizontal_split(self, weight_list: List[int]) -> List[Rectangle]:
-        """ 
-        given a list of weights, splits the rectangle into n rectangles 
-        in such a way that the height of each rectangle is proportional to its weight 
+        """
+        given a list of weights, splits the rectangle into n rectangles
+        in such a way that the height of each rectangle is proportional to its weight
 
         :param weight_list: list of coefficients
         :type weight_list: List[int]
-        
+
         """
         total_weight = sum(weight_list)
         y1 = self.fst.y
-        y2 = self.snd.y        
+        y2 = self.snd.y
         width = self.snd.x - self.fst.x
         output = []
         cumulative_weight = 0
         for i in weight_list:
-            x1 = self.fst.x + cumulative_weight*width/total_weight
+            x1 = self.fst.x + cumulative_weight * width / total_weight
             cumulative_weight += i
-            x2 = self.fst.x + cumulative_weight*width/total_weight
+            x2 = self.fst.x + cumulative_weight * width / total_weight
             output += [Rectangle(Point(x1, y1), Point(x2, y2))]
         return output
 
@@ -289,21 +283,21 @@ class Rectangle:
 
         :param height: height of the sub-rectangle
         :type height: int
-        
+
         """
         if self.width > width:
-            x1,x2 = (self.fst.x + self.snd.x - width)/2, (self.fst.x + self.snd.x + width)/2
+            x1 = (self.fst.x + self.snd.x - width) / 2
+            x2 = (self.fst.x + self.snd.x + width) / 2
         else:
-            x1,x2 = self.fst.x, self.snd.x
+            x1, x2 = self.fst.x, self.snd.x
         if self.height > height:
-            y1,y2 = (self.fst.y + self.snd.y - height)/2,(self.fst.y + self.snd.y + height)/2
+            y1 = (self.fst.y + self.snd.y - height) / 2
+            y2 = (self.fst.y + self.snd.y + height) / 2
         else:
-            y1,y2 = self.fst.y, self.snd.y
-        return Rectangle(Point(x1,y1), Point(x2,y2))
-        
-    
+            y1, y2 = self.fst.y, self.snd.y
+        return Rectangle(Point(x1, y1), Point(x2, y2))
 
-    
+
 class Transform:
     r""" Codes a transformation matrix
 
@@ -322,16 +316,25 @@ class Transform:
     :param f: one coefficient (defaults to 0)
 
     The six parameters by default corresponds to the Identity matrix.
-    
+
     Three operators are defined on Transform objects:
       - one can multiply them together (using the * operator)
       - one can inverse a transform (using the inverse function)
       - one can apply the transform to a point
 
     """
-    __slots__ = ('a', 'b', 'c', 'd', 'e', 'f')
 
-    def __init__(self, a: float=1, b: float=0, c: float=0, d: float=1, e: float=0, f: float=0):
+    __slots__ = ("a", "b", "c", "d", "e", "f")
+
+    def __init__(
+        self,
+        a: float = 1,
+        b: float = 0,
+        c: float = 0,
+        d: float = 1,
+        e: float = 0,
+        f: float = 0,
+    ):
         # pylint: disable=too-many-arguments
 
         self.a = a
@@ -342,7 +345,7 @@ class Transform:
         self.f = f
 
     def __call__(self, point: Point) -> Point:
-        """ transforms a point """
+        """transforms a point"""
 
         x = self.a * point.x + self.b * point.y + self.e
         y = self.c * point.x + self.d * point.y + self.f
@@ -350,25 +353,31 @@ class Transform:
         return Point(x, y)
 
     def __mul__(self, other: Transform) -> Transform:
-        """ composes two transforms """
+        """composes two transforms"""
 
-        return Transform(self.a * other.a + self.b * other.c,
-                         self.a * other.b + self.b * other.d,
-                         self.c * other.a + self.d * other.c,
-                         self.c * other.b + self.d * other.d,
-                         self.a * other.e + self.b * other.f + self.e,
-                         self.c * other.e + self.d * other.f + self.f)
+        return Transform(
+            self.a * other.a + self.b * other.c,
+            self.a * other.b + self.b * other.d,
+            self.c * other.a + self.d * other.c,
+            self.c * other.b + self.d * other.d,
+            self.a * other.e + self.b * other.f + self.e,
+            self.c * other.e + self.d * other.f + self.f,
+        )
 
     @property
     def inverse(self) -> Transform:
-        """ returns the inverse of the transform """
+        """returns the inverse of the transform"""
 
         det = self.a * self.d - self.b * self.c
 
-        return Transform(self.d / det, -self.b / det, -self.c / det,
-                         self.a / det,
-                         (self.b * self.f - self.d * self.e) / det,
-                         (self.c * self.e - self.a * self.f) / det)
+        return Transform(
+            self.d / det,
+            -self.b / det,
+            -self.c / det,
+            self.a / det,
+            (self.b * self.f - self.d * self.e) / det,
+            (self.c * self.e - self.a * self.f) / det,
+        )
 
     @classmethod
     def Rotation(cls: type[Transform], angle: float) -> Transform:
@@ -390,11 +399,10 @@ class Transform:
 
         """
 
-        return cls(math.cos(angle), math.sin(angle), -math.sin(angle),
-                   math.cos(angle))
+        return cls(math.cos(angle), math.sin(angle), -math.sin(angle), math.cos(angle))
 
     @classmethod
-    def Scale(cls: type[Transform], x: float=1, y:float=1) -> Transform:
+    def Scale(cls: type[Transform], x: float = 1, y: float = 1) -> Transform:
         r""" returns the transform corresponding to a rescaling
 
         Corresponds to the matrix
