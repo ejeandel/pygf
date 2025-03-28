@@ -203,7 +203,7 @@ class Layer(ABC):
         :type rect: Rectangle
         :param fs: A file I/O where to write the result
         :type fs: IO
-        :param preamble: whether to produce a standalone document, or a document to be included in another
+        :param preamble: whether to produce a standalone file, or a file to be included in another
         :type preamble: bool
 
         """
@@ -336,7 +336,7 @@ class MultiLayer(Layer):
         :type rect: Rectangle
         :param fs: A list of file I/O where to write the result
         :type fs: List[IO]
-        :param preamble: whether to produce standalone documents, or documents to be included in another
+        :param preamble: whether to produce standalone files, or files to be included in another
         :type preamble: bool
 
         """

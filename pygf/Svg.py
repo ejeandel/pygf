@@ -238,7 +238,7 @@ class SvgLayer(Layer):
             image_node = ET.Element("image", width=str(r.width), height=str(r.height))
             image_node.set(
                 "xlink:href",
-                f'data:image/png;base64,{str(base64.b64encode(data),"utf-8")}',
+                f'data:image/png;base64,{str(base64.b64encode(data), "utf-8")}',
             )
             image_node.set("transform", f"translate({tf(point)-r.center})")
             image_node.set("preserveAspectRatio", "none")
@@ -260,9 +260,7 @@ class SvgLayer(Layer):
         return stroke_width
 
     def parse_style(self, stroke_width, style, svg_style):
-        """---------
-           dash
-        ---------"""
+        # dash
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
         if "dash" in style:
             dash = style["dash"]
@@ -290,9 +288,7 @@ class SvgLayer(Layer):
                 "loosely dash dot dot": f"{3*pt:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g} {sw:.2g} {4*pt:.2g}",
             }.get(dash)
             svg_style["stroke-dasharray"] = dasharray
-        ###  -------
-        ### draw
-        ### --------
+        # draw
         if "draw" in style:
             color = style["draw"]
             del style["draw"]
@@ -301,9 +297,7 @@ class SvgLayer(Layer):
         else:
             color = "black"
         svg_style["stroke"] = color
-        ### --------
-        ###    fill
-        ### --------
+        # fill
         if "fill" in style:
             fill = style["fill"]
             del style["fill"]
@@ -345,7 +339,6 @@ class SvgLayer(Layer):
         """internal function for arrows"""
         if "arrow" not in style:
             return
-
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
 
         arrows = style["arrow"].split("-")
@@ -441,11 +434,14 @@ class SvgLayer(Layer):
                 orient="auto",
             )
 
-            arrow.append(ET.Element("polyline", points=f"{Point(0,0)} {Point(width, width)}"))
-            arrow.append(ET.Element("polyline", points=f"{Point(width,0)} {Point(0, width)}"))
+            arrow.append(ET.Element("polyline", points=f"{Point(0, 0)} {Point(width, width)}"))
+            arrow.append(ET.Element("polyline", points=f"{Point(width, 0)} {Point(0, width)}"))
             return arrow
 
         for i in range(2):
+            if arrows[i] == "":
+                continue
+            
             if arrows[i] == ">":
                 arrow = default_arrow(False, i == 0)
             elif arrows[i] == "<":
@@ -459,12 +455,11 @@ class SvgLayer(Layer):
             else:
                 raise NotImplementedError(arrows[i])
 
-            if len(arrows[i]) > 0:
-
-                _id = self.new_name()
-                sub_path.set("marker-start" if i == 0 else "marker-end", f"url(#marker_{_id})")
-                arrow.set("id", f"marker_{_id}")
-                svg.append(arrow)
+            
+            _id = self.new_name()
+            sub_path.set("marker-start" if i == 0 else "marker-end", f"url(#marker_{_id})")
+            arrow.set("id", f"marker_{_id}")
+            svg.append(arrow)
 
     def __path(self, svg_path, labels=None, style=None, z_index=0):
         if style is None:
@@ -618,12 +613,12 @@ class SvgLayer(Layer):
     def edge(self, points, labels=None, closed=False, z_index=0, **style):
 
         tf = self.svgtransform * self.transform
-        l = self.find_angles(points, closed)
+        list_angles = self.find_angles(points, closed)
         if closed:
             points.append(points[0])
-            l.append(l[0])
+            list_angles.append(list_angles[0])
 
-        angles = list(map(lambda x: x * math.pi / 180, l))
+        angles = list(map(lambda x: x * math.pi / 180, list_angles))
 
         if "looseness" in style:
             looseness = style["looseness"]

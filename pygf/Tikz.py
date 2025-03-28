@@ -270,10 +270,10 @@ class TikzLayer(Layer):
         self.add_to_layer(z_index, s + ";")
 
     def edge(self, points, labels=None, closed=False, z_index=0, **style):
-        l = self.find_angles(points, closed)
+        list_angles = self.find_angles(points, closed)
         if closed:
             points.append(points[0])
-            l.append(l[0])
+            list_angles.append(list_angles[0])
 
         points = [*map(self.transform, points)]
 
@@ -290,8 +290,8 @@ class TikzLayer(Layer):
 
         list_edges = [f"({points[0]})"]
         for i in range(len(points) - 1):
-            out_angle = self.convert_angle(l[i])
-            in_angle = self.convert_angle(180 + l[i + 1])
+            out_angle = self.convert_angle(list_angles[i])
+            in_angle = self.convert_angle(180 + list_angles[i + 1])
             s = f" to[out={out_angle:3.3g}, in={in_angle:3.3g}"
             if looseness != 1:
                 s += f", looseness={looseness:3.3g}"
