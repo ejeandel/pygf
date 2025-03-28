@@ -441,7 +441,7 @@ class SvgLayer(Layer):
         for i in range(2):
             if arrows[i] == "":
                 continue
-            
+
             if arrows[i] == ">":
                 arrow = default_arrow(False, i == 0)
             elif arrows[i] == "<":
@@ -455,7 +455,6 @@ class SvgLayer(Layer):
             else:
                 raise NotImplementedError(arrows[i])
 
-            
             _id = self.new_name()
             sub_path.set("marker-start" if i == 0 else "marker-end", f"url(#marker_{_id})")
             arrow.set("id", f"marker_{_id}")

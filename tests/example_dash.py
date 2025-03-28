@@ -34,7 +34,7 @@ for i in range(len(dash)):
     layer.line(Point(0, i), Point(5, i), dash=dash[i])
     layer.text(Point(-3, i), f"dash = {dash[i]}")
 
-layer.draw(
+layer.draw_all(
     Rectangle(Point(-6, -1), Point(6, 20)),
     [open("dash.tex", "w"), open("dash.svg", "w")],
     preamble=True,

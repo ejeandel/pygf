@@ -9,6 +9,7 @@ setup(
     author_email="emmanuel.jeandel@loria.fr",
     license="BSD 2-clause",
     packages=["pygf"],
+    package_dir={'pygf': 'src/pygf'},
     install_requires=[],
     classifiers=[
         "Development Status :: 1 - Planning",

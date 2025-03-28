@@ -76,12 +76,7 @@ class Layer(ABC):
 
     @abstractmethod
     def polyline(
-        self,
-        points: List[Point],
-        labels: dict | None = None,
-        closed: bool = False,
-        z_index: int = 0,
-        **style
+        self, points: List[Point], labels: dict | None = None, closed: bool = False, z_index: int = 0, **style
     ):
         """Draw line segments from one point to the next (edge command)
 
@@ -120,9 +115,7 @@ class Layer(ABC):
         self.polyline(points, labels, closed=True, z_index=z_index, **style)
 
     @abstractmethod
-    def circle(
-        self, p1: Point, radius: float, labels: dict | None = None, z_index: int = 1, **style
-    ):
+    def circle(self, p1: Point, radius: float, labels: dict | None = None, z_index: int = 1, **style):
         """Draws a circle given a point and a radius (shape command)
 
         :param p1: center of the circle
@@ -144,12 +137,7 @@ class Layer(ABC):
 
     @abstractmethod
     def edge(
-        self,
-        points: List[Point],
-        labels: dict | None = None,
-        closed: bool = False,
-        z_index: int = 0,
-        **style
+        self, points: List[Point], labels: dict | None = None, closed: bool = False, z_index: int = 0, **style
     ):
         """Draw a curve passing through the points (edge command)
 
@@ -245,9 +233,7 @@ class Layer(ABC):
                 else:
                     next_node = todraw[0]
             if current_hint is None:
-                new_angle = in_angle(
-                    prev_node, next_node if next_node is not None else current_node
-                )
+                new_angle = in_angle(prev_node, next_node if next_node is not None else current_node)
             else:
                 new_angle = current_hint
             the_list += [new_angle]
@@ -330,6 +316,9 @@ class MultiLayer(Layer):
             layer.picture(point, img_name, width, height, z_index)
 
     def draw(self, rect, fs=None, options=None, preamble=False):
+        raise NotImplementedError
+
+    def draw_all(self, rect: Rectangle, fs: List[IO] | None = None, options=None, preamble=False):
         """Write the result to a list of files
 
         :param rect: The bounding box for the picture

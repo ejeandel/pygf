@@ -2,7 +2,7 @@ import sys
 from pygf.Layer import MultiLayer
 from pygf.Tikz import TikzLayer
 from pygf.Svg import SvgLayer
-from ..pygf.Geometry import Point as p, Rectangle
+from pygf.Geometry import Point as p, Rectangle
 import argparse
 
 parser = argparse.ArgumentParser(description="")
@@ -181,12 +181,8 @@ for i in range(0, 2):
         fill=color,
     )
 
-    layer.polyline(
-        [p(-0.2, 1.15 + x), p(0.6, 1.15 + x), p(0.6, 0.35 + x), p(-0.2, 0.35 + x)], closed=True
-    )
-    layer.polyline(
-        [p(0.6, 0.95 + x), p(1.4, 0.95 + x), p(1.4, 0.55 + x), p(0.6, 0.55 + x)], closed=True
-    )
+    layer.polyline([p(-0.2, 1.15 + x), p(0.6, 1.15 + x), p(0.6, 0.35 + x), p(-0.2, 0.35 + x)], closed=True)
+    layer.polyline([p(0.6, 0.95 + x), p(1.4, 0.95 + x), p(1.4, 0.55 + x), p(0.6, 0.55 + x)], closed=True)
 
 
 layer.edge(
@@ -272,4 +268,4 @@ for l in (layer1,):
     l.line(p(-1, 0.45 - 4), p(-0.5, 0.45 - 4), arrow="->")
 
 
-layer.draw(Rectangle(p(-5, 2), p(13.5, -4.5)), [open(fn, "w") for fn in fns], preamble=True)
+layer.draw_all(Rectangle(p(-5, 2), p(13.5, -4.5)), [open(fn, "w") for fn in fns], preamble=True)
