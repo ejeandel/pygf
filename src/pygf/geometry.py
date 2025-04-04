@@ -2,9 +2,10 @@
 
 # pylint: disable=invalid-name
 from __future__ import annotations
-import math
+
 import copy
-from typing import Dict, Any, List
+import math
+from typing import Any
 
 
 class Point:
@@ -42,16 +43,16 @@ class Point:
 
     __slots__ = ("x", "y", "dico")
 
-    def __init__(self, fst: float, snd: float, polar: bool = False):
+    def __init__(self, fst: float, snd: float, *, polar: bool = False):
         if polar is False:
             self.x = fst
             self.y = snd
         else:
             self.x = fst * math.cos(snd)
             self.y = fst * math.sin(snd)
-        self.dico: Dict[str, Any] = {}
+        self.dico: dict[str, Any] = {}
 
-    def __matmul__(self, dico: Dict[str, Any]) -> Point:
+    def __matmul__(self, dico: dict[str, Any]) -> Point:
         x = copy.deepcopy(self)
         x.dico.update(dico)
         return x
@@ -215,7 +216,7 @@ class Rectangle:
         return Point(self.snd.x, self.fst.y)
 
     @classmethod
-    def bounding_box(cls: type[Rectangle], point_list: List[Point]) -> Rectangle:
+    def bounding_box(cls: type[Rectangle], point_list: list[Point]) -> Rectangle:
         """returns the smallest rectangle that contains all points
         in the list.
 
@@ -224,13 +225,13 @@ class Rectangle:
 
         :rtype: Rectangle
         """
-        x0 = min(map(lambda p: p.x, point_list))
-        x1 = max(map(lambda p: p.x, point_list))
-        y0 = min(map(lambda p: p.y, point_list))
-        y1 = max(map(lambda p: p.y, point_list))
+        x0 = min(p.x for p in point_list)
+        x1 = max(p.x for p in point_list)
+        y0 = min(p.y for p in point_list)
+        y1 = max(p.y for p in point_list)
         return cls(Point(x0, y0), Point(x1, y1))
 
-    def vertical_split(self, weight_list: List[int]) -> List[Rectangle]:
+    def vertical_split(self, weight_list: list[int]) -> list[Rectangle]:
         """
         given a list of weights, splits the rectangle into n rectangles
         in such a way that the width of each rectangle is proportional to its weight
@@ -252,7 +253,7 @@ class Rectangle:
             output += [Rectangle(Point(x1, y1), Point(x2, y2))]
         return output
 
-    def horizontal_split(self, weight_list: List[int]) -> List[Rectangle]:
+    def horizontal_split(self, weight_list: list[int]) -> list[Rectangle]:
         """
         given a list of weights, splits the rectangle into n rectangles
         in such a way that the height of each rectangle is proportional to its weight

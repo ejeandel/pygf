@@ -1,12 +1,13 @@
 """Module that provides the SVG Layer"""
 
 # pylint: disable=invalid-name
-import math
 import base64
-from dataclasses import dataclass
+import math
 import xml.etree.ElementTree as ET
-from .Layer import Layer
-from .Geometry import Point, Rectangle, Transform
+from dataclasses import dataclass
+
+from pygf.geometry import Point, Rectangle, Transform
+from pygf.layer import Layer
 
 
 @dataclass
@@ -37,7 +38,7 @@ class PathElement:
 class SVGLine(PathElement):
     """A line element in a SVG Path"""
 
-    def __str__(self, first=False):
+    def __str__(self, first=None):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -58,7 +59,7 @@ class SVGEllipse(PathElement):
     large_flag: int
     sweep_flag: int
 
-    def __str__(self, first=False):
+    def __str__(self, first=None ):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -90,7 +91,7 @@ class SVGBezier(PathElement):
     first_control_point: Point
     second_control_point: Point
 
-    def __str__(self, first=False):
+    def __str__(self, first=None):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -112,7 +113,7 @@ class SVGQuadratic(PathElement):
 
     control_point: Point
 
-    def __str__(self, first=False):
+    def __str__(self, first=None):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -230,7 +231,7 @@ class SvgLayer(Layer):
             self.layers[z_index] = []
         self.layers[z_index].append(x)
 
-    def picture(self, point, img_name, width, height, z_index=1):
+    def picture(self, point, img_name, width, height, *, z_index=1):
         tf = self.svgtransform * self.transform
         r = Rectangle(Point(0, 0), self.svgtransform(Point(width, -height)))
         with open(img_name, "rb") as f:
@@ -256,8 +257,7 @@ class SvgLayer(Layer):
         else:
             thickness = 1
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
-        stroke_width = 0.4 * pt * thickness
-        return stroke_width
+        return 0.4 * pt * thickness
 
     def parse_style(self, stroke_width, style, svg_style):
         # dash
@@ -310,7 +310,7 @@ class SvgLayer(Layer):
             fill = "none"
         svg_style["fill"] = fill
 
-        if "rounded" in style and style["rounded"]:
+        if style.get("rounded"):
             del style["rounded"]
             svg_style["stroke-linejoin"] = "round"
 
@@ -343,7 +343,7 @@ class SvgLayer(Layer):
 
         arrows = style["arrow"].split("-")
 
-        def latex_arrow(reverse=False, first=False):
+        def latex_arrow(reverse, first):
             x = 0.28 * pt + 0.3 * stroke_width
 
             width = 11 * x
@@ -383,7 +383,7 @@ class SvgLayer(Layer):
             arrow.append(arrow_svg_path)
             return arrow
 
-        def default_arrow(reverse=False, first=False):
+        def default_arrow(reverse, first):
             x = 0.28 * pt + 0.3 * stroke_width
             width = 5 * x
             height = 10 * x
@@ -421,7 +421,7 @@ class SvgLayer(Layer):
             arrow.append(arrow_svg_path)
             return arrow
 
-        def x_arrow(reverse=False, first=False):
+        def x_arrow(reverse, first):
             width = 3 * pt + 4 * stroke_width
 
             arrow = ET.Element(
@@ -558,7 +558,7 @@ class SvgLayer(Layer):
 
     def rectangle(self, p1, p2, z_index=1, **style):
         r = Rectangle(p1, p2)
-        self.polygon([r.northwest, r.northeast, r.southeast, r.southwest], z_index=1, **style)
+        self.polygon([r.northwest, r.northeast, r.southeast, r.southwest], z_index=z_index, **style)
 
     def text(self, point, text, z_index=1, **style):
 
@@ -609,15 +609,15 @@ class SvgLayer(Layer):
         text_node.text = str(text)
         self.add_to_layer(z_index, text_node)
 
-    def edge(self, points, labels=None, closed=False, z_index=0, **style):
+    def edge(self, points, labels=None, *, closed=False, z_index=0, **style):
 
         tf = self.svgtransform * self.transform
-        list_angles = self.find_angles(points, closed)
+        list_angles = self.find_angles(points, closed=closed)
         if closed:
             points.append(points[0])
             list_angles.append(list_angles[0])
 
-        angles = list(map(lambda x: x * math.pi / 180, list_angles))
+        angles = [x * math.pi / 180 for x in list_angles]
 
         if "looseness" in style:
             looseness = style["looseness"]
@@ -637,7 +637,7 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
-    def polyline(self, points, labels=None, closed=False, z_index=0, **style):
+    def polyline(self, points, labels=None, *, closed=False, z_index=0, **style):
         tf = self.svgtransform * self.transform
 
         def corners(p0, p1, p2):
@@ -690,7 +690,7 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
-    def draw(self, rect, fs=None, options=None, preamble=False):
+    def draw(self, rect, fs=None, options=None, *, preamble=False):
         tf = self.svgtransform * self.transform
         rect = Rectangle.bounding_box(
             [*map(tf, [rect.northwest, rect.northeast, rect.southeast, rect.southwest])]

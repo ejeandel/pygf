@@ -1,9 +1,11 @@
-import sys
-from pygf.Layer import MultiLayer
-from pygf.Tikz import TikzLayer
-from pygf.Svg import SvgLayer
-from pygf.Geometry import Point as p, Rectangle
 import argparse
+from contextlib import ExitStack
+
+from pygf.geometry import Point as p
+from pygf.geometry import Rectangle
+from pygf.layer import MultiLayer
+from pygf.svg import SvgLayer
+from pygf.tikz import TikzLayer
 
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("--tex", dest="tex", action="store_true", help="tex or svg output")
@@ -12,16 +14,16 @@ args = parser.parse_args()
 
 if args.tex:
     layer1, layer2, layer3, layer4 = TikzLayer(), TikzLayer(), TikzLayer(), TikzLayer()
-    fns = [f"cable1.tex", f"cable2.tex", f"cable3.tex", f"cable4.tex"]
+    fns = ["cable1.tex", "cable2.tex", "cable3.tex", "cable4.tex"]
 else:
     layer1, layer2, layer3, layer4 = SvgLayer(), SvgLayer(), SvgLayer(), SvgLayer()
-    fns = [f"cable1.svg", f"cable2.svg", f"cable3.svg", f"cable4.svg"]
+    fns = ["cable1.svg", "cable2.svg", "cable3.svg", "cable4.svg"]
 layer = MultiLayer([layer1, layer2, layer3, layer4])
 layer123 = MultiLayer([layer1, layer2, layer3])
 
 color = "Yellow"
 
-for i in range(0, 2):
+for i in range(2):
     x = 0 - 4 * i
 
     layer.polyline(
@@ -227,45 +229,47 @@ layer.polyline([p(0, -2.4), p(3, -2.4), p(3, -4.1), p(0, -4.1)], closed=True)
 
 
 # PC au dessus
-for l in layer1, layer3, layer4:
-    l.text(p(-4, 1), "PC")
-    l.text(p(-2, 1.35), "Envoi")
-    l.line(p(-1, 1.45), p(-0.5, 1.45), arrow="->")
-    l.line(p(-1, 1.25), p(-0.5, 1.25), arrow="->")
-    l.text(p(-2, 0.725), "Réception")
-    l.line(p(-0.5, 1.05), p(-1, 1.05), arrow="->")
-    l.line(p(-0.5, 0.45), p(-1, 0.45), arrow="->")
+for p_layer in layer1, layer3, layer4:
+    p_layer.text(p(-4, 1), "PC")
+    p_layer.text(p(-2, 1.35), "Envoi")
+    p_layer.line(p(-1, 1.45), p(-0.5, 1.45), arrow="->")
+    p_layer.line(p(-1, 1.25), p(-0.5, 1.25), arrow="->")
+    p_layer.text(p(-2, 0.725), "Réception")
+    p_layer.line(p(-0.5, 1.05), p(-1, 1.05), arrow="->")
+    p_layer.line(p(-0.5, 0.45), p(-1, 0.45), arrow="->")
 
 # HUB au dessus
-for l in (layer2,):
-    l.text(p(-4, 1), "HUB")
-    l.text(p(-2, 1.35), "Réception")
-    l.line(p(-0.5, 1.45), p(-1, 1.45), arrow="->")
-    l.line(p(-0.5, 1.25), p(-1, 1.25), arrow="->")
-    l.text(p(-2, 0.725), "Envoi")
-    l.line(p(-1, 1.05), p(-0.5, 1.05), arrow="->")
-    l.line(p(-1, 0.45), p(-0.5, 0.45), arrow="->")
+for p_layer in (layer2,):
+    p_layer.text(p(-4, 1), "HUB")
+    p_layer.text(p(-2, 1.35), "Réception")
+    p_layer.line(p(-0.5, 1.45), p(-1, 1.45), arrow="->")
+    p_layer.line(p(-0.5, 1.25), p(-1, 1.25), arrow="->")
+    p_layer.text(p(-2, 0.725), "Envoi")
+    p_layer.line(p(-1, 1.05), p(-0.5, 1.05), arrow="->")
+    p_layer.line(p(-1, 0.45), p(-0.5, 0.45), arrow="->")
 
 # PC en dessous:
-for l in layer2, layer3, layer4:
-    l.text(p(-4, -3), "PC")
-    l.text(p(-2, 1.35 - 4), "Envoi")
-    l.line(p(-1, 1.45 - 4), p(-0.5, 1.45 - 4), arrow="->")
-    l.line(p(-1, 1.25 - 4), p(-0.5, 1.25 - 4), arrow="->")
-    l.text(p(-2, 0.725 - 4), "Réception")
-    l.line(p(-0.5, 1.05 - 4), p(-1, 1.05 - 4), arrow="->")
-    l.line(p(-0.5, 0.45 - 4), p(-1, 0.45 - 4), arrow="->")
+for p_layer in layer2, layer3, layer4:
+    p_layer.text(p(-4, -3), "PC")
+    p_layer.text(p(-2, 1.35 - 4), "Envoi")
+    p_layer.line(p(-1, 1.45 - 4), p(-0.5, 1.45 - 4), arrow="->")
+    p_layer.line(p(-1, 1.25 - 4), p(-0.5, 1.25 - 4), arrow="->")
+    p_layer.text(p(-2, 0.725 - 4), "Réception")
+    p_layer.line(p(-0.5, 1.05 - 4), p(-1, 1.05 - 4), arrow="->")
+    p_layer.line(p(-0.5, 0.45 - 4), p(-1, 0.45 - 4), arrow="->")
 
 
 # HUB en dessous
-for l in (layer1,):
-    l.text(p(-4, -3), "HUB")
-    l.text(p(-2, 1.35 - 4), "Réception")
-    l.line(p(-0.5, 1.45 - 4), p(-1, 1.45 - 4), arrow="->")
-    l.line(p(-0.5, 1.25 - 4), p(-1, 1.25 - 4), arrow="->")
-    l.text(p(-2, 0.725 - 4), "Envoi")
-    l.line(p(-1, 1.05 - 4), p(-0.5, 1.05 - 4), arrow="->")
-    l.line(p(-1, 0.45 - 4), p(-0.5, 0.45 - 4), arrow="->")
+for p_layer in (layer1,):
+    p_layer.text(p(-4, -3), "HUB")
+    p_layer.text(p(-2, 1.35 - 4), "Réception")
+    p_layer.line(p(-0.5, 1.45 - 4), p(-1, 1.45 - 4), arrow="->")
+    p_layer.line(p(-0.5, 1.25 - 4), p(-1, 1.25 - 4), arrow="->")
+    p_layer.text(p(-2, 0.725 - 4), "Envoi")
+    p_layer.line(p(-1, 1.05 - 4), p(-0.5, 1.05 - 4), arrow="->")
+    p_layer.line(p(-1, 0.45 - 4), p(-0.5, 0.45 - 4), arrow="->")
 
 
-layer.draw_all(Rectangle(p(-5, 2), p(13.5, -4.5)), [open(fn, "w") for fn in fns], preamble=True)
+with ExitStack() as stack:
+    files = [stack.enter_context(open(fn, 'w')) for fn in fns]
+    layer.draw_all(Rectangle(p(-5, 2), p(13.5, -4.5)), files, preamble=True)

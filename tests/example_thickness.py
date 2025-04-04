@@ -1,9 +1,7 @@
-import sys
-from pygf.Layer import MultiLayer
-from pygf.Tikz import TikzLayer
-from pygf.Svg import SvgLayer
-from pygf.Geometry import Transform, Point, Rectangle
-import math
+from pygf.geometry import Point, Rectangle
+from pygf.layer import MultiLayer
+from pygf.svg import SvgLayer
+from pygf.tikz import TikzLayer
 
 layer1, layer2 = TikzLayer(), SvgLayer()
 layer = MultiLayer([layer1, layer2])
@@ -14,8 +12,5 @@ for i in range(len(thick)):
     layer.line(Point(0, i), Point(1, i), thickness=thick[i])
     layer.text(Point(-3, i), f"thickness = {thick[i]}")
 
-layer.draw_all(
-    Rectangle(Point(-6, -1), Point(6, 10)),
-    [open("thickness.tex", "w"), open("thickness.svg", "w")],
-    preamble=True,
-)
+with open("thickness.tex", "w") as f1, open("thickness.svg", "w") as f2:
+    layer.draw_all(Rectangle(Point(-6, -1), Point(6, 10)), [f1, f2], preamble=True)

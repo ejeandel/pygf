@@ -1,8 +1,8 @@
-import sys
-from pygf.Tikz import TikzLayer
-from pygf.Svg import SvgLayer
-from pygf.Geometry import Transform, Point, Rectangle
 import argparse
+
+from pygf.geometry import Point, Rectangle
+from pygf.svg import SvgLayer
+from pygf.tikz import TikzLayer
 
 parser = argparse.ArgumentParser(description="")
 parser.add_argument("--tex", dest="tex", action="store_true", help="tex or svg output")
@@ -47,5 +47,5 @@ layer.line(D, A)
 layer.line(A, F, labels={"above": "140.77.128.0/24"})
 layer.line(E, G, labels={"above": "12.10.4.0/24"})
 
-
-layer.draw(Rectangle(Point(-5, 2), Point(10, -2)), open(fn, "w"), preamble=True)
+with open(fn, "w") as f:
+    layer.draw(Rectangle(Point(-5, 2), Point(10, -2)), f, preamble=True)

@@ -1,16 +1,14 @@
 import sys
-from pygf.Tikz import TikzLayer
-from pygf.Svg import SvgLayer
-from pygf.Geometry import Transform, Point as p, Rectangle
-import math
+
+from pygf.geometry import Point as p
+from pygf.geometry import Rectangle
+from pygf.svg import SvgLayer
+from pygf.tikz import TikzLayer
 
 """ choose if you want to you Svg or Tikz to render the picture """
 tikz = False
 
-if tikz:
-    layer = TikzLayer()
-else:
-    layer = SvgLayer()
+layer = TikzLayer() if tikz else SvgLayer()
 
 
 """ add a point """
@@ -41,9 +39,11 @@ layer.rectangle(p(4, -2), p(1, -4), fill="Blue")
 """ draw the result. You need to specify the bounding box you want """
 
 if tikz:
-    layer.draw(Rectangle(p(-2, -10), p(10, 2)), open("test.tex", "w"), preamble=True)
+    with open("test.tex", "w") as f:
+        layer.draw(Rectangle(p(-2, -10), p(10, 2)), f, preamble=True)
 else:
-    layer.draw(Rectangle(p(-2, -10), p(10, 2)), open("test.svg", "w"), preamble=True)
+    with open("test.svg", "w") as f:
+        layer.draw(Rectangle(p(-2, -10), p(10, 2)), f, preamble=True)
 
 
 sys.exit(0)

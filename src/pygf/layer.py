@@ -1,10 +1,13 @@
 """The Layer module"""
 
 # pylint: disable=invalid-name
+from __future__ import annotations
+
 import math
 from abc import ABC, abstractmethod
-from .Geometry import Transform, Point, Rectangle
-from typing import List, IO
+from typing import IO
+
+from pygf.geometry import Point, Rectangle, Transform
 
 
 class Layer(ABC):
@@ -22,7 +25,7 @@ class Layer(ABC):
         self.transform = transform
 
     @abstractmethod
-    def line(self, p1: Point, p2: Point, labels: dict | None = None, z_index: int = 0, **style):
+    def line(self, p1: Point, p2: Point, labels: dict | None = None, *, z_index: int = 0, **style):
         """Draw a line from one point to the other (edge command)
 
         :param p1: the first point
@@ -39,7 +42,7 @@ class Layer(ABC):
         """
 
     @abstractmethod
-    def text(self, point: Point, text: str, z_index: int = 1, **style):
+    def text(self, point: Point, text: str, *, z_index: int = 1, **style):
         """Place a text at a given point (shape command)
 
         :param point: the point where the text will be placed
@@ -57,7 +60,7 @@ class Layer(ABC):
         """
 
     @abstractmethod
-    def rectangle(self, p1: Point, p2: Point, z_index: int = 1, **style):
+    def rectangle(self, p1: Point, p2: Point, *, z_index: int = 1, **style):
         """Draws a rectangle whose corners are the two given points (shape command)
 
         :param p1: one of the corner of the rectangle
@@ -76,12 +79,12 @@ class Layer(ABC):
 
     @abstractmethod
     def polyline(
-        self, points: List[Point], labels: dict | None = None, closed: bool = False, z_index: int = 0, **style
+            self, points: list[Point], labels: dict | None = None, *, z_index: int = 0, closed: bool = False, **style
     ):
         """Draw line segments from one point to the next (edge command)
 
         :param points: list of points
-        :type points: List[Point]
+        :type points: list[Point]
         :param labels: possible labels to put on the lines
         :type labels: dict
         :param z_index: z-index of the path (0 by default)
@@ -107,7 +110,7 @@ class Layer(ABC):
         closed polylines.
         """
 
-    def polygon(self, points: List[Point], labels: dict | None = None, z_index: int = 1, **style):
+    def polygon(self, points: list[Point], labels: dict | None = None, *, z_index: int = 1, **style):
         """Draw a polygon (shape command)
 
         Alias for ``polyline(..., closed = True)`` with default ``z_index`` of 1
@@ -115,7 +118,7 @@ class Layer(ABC):
         self.polyline(points, labels, closed=True, z_index=z_index, **style)
 
     @abstractmethod
-    def circle(self, p1: Point, radius: float, labels: dict | None = None, z_index: int = 1, **style):
+    def circle(self, p1: Point, radius: float, labels: dict | None = None, *, z_index: int = 1, **style):
         """Draws a circle given a point and a radius (shape command)
 
         :param p1: center of the circle
@@ -137,12 +140,12 @@ class Layer(ABC):
 
     @abstractmethod
     def edge(
-        self, points: List[Point], labels: dict | None = None, closed: bool = False, z_index: int = 0, **style
+            self, points: list[Point], labels: dict | None = None, *, closed: bool = False, z_index: int = 0,  **style
     ):
         """Draw a curve passing through the points (edge command)
 
         :param points: list of points
-        :type points: List[Point]
+        :type points: list[Point]
         :param labels: possible labels to put on the lines
         :type labels: dict
         :param z_index: z-index of the path (0 by default)
@@ -157,7 +160,7 @@ class Layer(ABC):
         should pass through the point.
         """
 
-    def shape(self, points: List[Point], labels: dict | None = None, z_index: int = 1, **style):
+    def shape(self, points: list[Point], labels: dict | None = None, *, z_index: int = 1, **style):
         """Draw a shape passing through the points (shape command)
 
         Alias for ``edge(..., closed = True)`` with ``z_index`` of 1 by default.
@@ -166,7 +169,7 @@ class Layer(ABC):
         self.edge(points, labels, z_index=z_index, closed=True, **style)
 
     @abstractmethod
-    def picture(self, point: Point, img_name: str, width: float, height: float, z_index: int = 1):
+    def picture(self, point: Point, img_name: str, width: float, height: float, *, z_index: int = 1):
         """Draw an image (shape command)
 
         :param point: where the image should be put
@@ -181,10 +184,9 @@ class Layer(ABC):
         :type z_index: int
         """
 
-        pass
 
     @abstractmethod
-    def draw(self, rect: Rectangle, fs: IO | None = None, options=None, preamble: bool = False):
+    def draw(self, rect: Rectangle, fs: IO | None = None, options=None, *, preamble: bool = False):
         """Write the result in a file
 
         :param rect: The bounding box for the picture
@@ -196,9 +198,7 @@ class Layer(ABC):
 
         """
 
-        pass
-
-    def find_angles(self, points: List[Point], closed: bool = False):
+    def find_angles(self, points: list[Point], *, closed: bool = False):
         """Helper function: find the angles for the wires"""
 
         def in_angle(node1: Point, node2: Point) -> int:
@@ -227,11 +227,10 @@ class Layer(ABC):
             current_hint = current_node.get("angle")
             if i != len(points) - 2:
                 next_node = todraw[i + 2]
+            elif not closed:
+                next_node = None
             else:
-                if not closed:
-                    next_node = None
-                else:
-                    next_node = todraw[0]
+                next_node = todraw[0]
             if current_hint is None:
                 new_angle = in_angle(prev_node, next_node if next_node is not None else current_node)
             else:
@@ -247,28 +246,28 @@ class NoLayer(Layer):
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
 
-    def line(self, p1, p2, labels=None, z_index=0, **style):
+    def line(self, p1, p2, labels=None, *, z_index=0, **style):
         pass
 
-    def text(self, point, text, z_index=1, **style):
+    def text(self, point, text, *, z_index=1, **style):
         pass
 
-    def rectangle(self, p1, p2, z_index=1, **style):
+    def rectangle(self, p1, p2, *, z_index=1, **style):
         pass
 
-    def circle(self, p1, radius, labels=None, z_index=1, **style):
+    def circle(self, p1, radius, labels=None, *, z_index=1, **style):
         pass
 
-    def picture(self, point, img_name, width, height, z_index=1):
+    def picture(self, point, img_name, width, height, *, z_index=1):
         pass
 
-    def draw(self, rect, fs=None, options=None, preamble=False):
+    def draw(self, rect, fs=None, options=None, *, preamble=False):
         pass
 
-    def polyline(self, points, labels=None, closed=False, z_index=0, **style):
+    def polyline(self, points, labels=None, *, closed=False, z_index=0, **style):
         pass
 
-    def edge(self, points, labels=None, closed=False, z_index=0, **style):
+    def edge(self, points, labels=None, *, closed=False, z_index=0, **style):
         pass
 
 
@@ -276,7 +275,7 @@ class MultiLayer(Layer):
     """represents multiple layers at once
 
     :param layers: the list of layers
-    :type layers: List[Layer]
+    :type layers: list[Layer]
 
 
     The draw function has a different prototype, to take into account the different layers.
@@ -287,44 +286,44 @@ class MultiLayer(Layer):
         Layer.__init__(self, None)
         self.layers = layers
 
-    def line(self, p1, p2, labels=None, z_index=0, **style):
+    def line(self, p1, p2, labels=None, * ,z_index=0, **style):
         for layer in self.layers:
-            layer.line(p1, p2, labels, z_index, **style)
+            layer.line(p1, p2, labels, z_index=z_index, **style)
 
-    def text(self, point, text, z_index=1, **style):
+    def text(self, point, text, * ,z_index=1, **style):
         for layer in self.layers:
-            layer.text(point, text, z_index, **style)
+            layer.text(point, text, z_index=z_index, **style)
 
-    def rectangle(self, p1, p2, z_index=1, **style):
+    def rectangle(self, p1, p2, *, z_index=1, **style):
         for layer in self.layers:
-            layer.rectangle(p1, p2, z_index, **style)
+            layer.rectangle(p1, p2, z_index=z_index, **style)
 
-    def circle(self, p1, radius, labels=None, z_index=1, **style):
+    def circle(self, p1, radius, labels=None, * ,z_index=1, **style):
         for layer in self.layers:
-            layer.circle(p1, radius, labels, z_index, **style)
+            layer.circle(p1, radius, labels, z_index=z_index, **style)
 
-    def edge(self, points, labels=None, closed=False, z_index=0, **style):
+    def edge(self, points, labels=None, *, closed=False, z_index=0, **style):
         for layer in self.layers:
-            layer.edge(points, labels, closed, z_index, **style)
+            layer.edge(points, labels=labels, closed=closed, z_index=z_index, **style)
 
-    def polyline(self, points, labels=None, closed=False, z_index=0, **style):
+    def polyline(self, points, labels=None, *, closed=False, z_index=0, **style):
         for layer in self.layers:
             layer.polyline(points, labels, z_index=z_index, closed=closed, **style)
 
-    def picture(self, point, img_name, width, height, z_index=1):
+    def picture(self, point, img_name, width, height, *, z_index=1):
         for layer in self.layers:
-            layer.picture(point, img_name, width, height, z_index)
+            layer.picture(point, img_name, width, height, z_index=z_index)
 
-    def draw(self, rect, fs=None, options=None, preamble=False):
+    def draw(self, rect, fs=None, options=None, *, preamble=False):
         raise NotImplementedError
 
-    def draw_all(self, rect: Rectangle, fs: List[IO] | None = None, options=None, preamble=False):
+    def draw_all(self, rect: Rectangle, fs: list[IO] | None = None, options=None, *, preamble=False):
         """Write the result to a list of files
 
         :param rect: The bounding box for the picture
         :type rect: Rectangle
         :param fs: A list of file I/O where to write the result
-        :type fs: List[IO]
+        :type fs: list[IO]
         :param preamble: whether to produce standalone files, or files to be included in another
         :type preamble: bool
 
@@ -332,7 +331,7 @@ class MultiLayer(Layer):
 
         if fs is not None:
             for layer, f in zip(self.layers, fs):
-                layer.draw(rect, f, options, preamble)
+                layer.draw(rect, f, options, preamble=preamble)
         else:
             for layer in self.layers:
-                layer.draw(rect, None, options, preamble)
+                layer.draw(rect, None, options, preamble=preamble)

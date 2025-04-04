@@ -2,9 +2,11 @@
 
 # pylint: disable=invalid-name
 import math
-from .Layer import Layer
-from .Geometry import Point, Rectangle
 
+from pygf.geometry import Point, Rectangle
+from pygf.layer import Layer
+
+ALMOST_ZERO = 0.01
 
 def dic_to_list(d):
     "convert a dictionary to a list string"
@@ -32,7 +34,7 @@ class TikzLayer(Layer):
             self.layers[z_index] = []
         self.layers[z_index].append(x)
 
-    def picture(self, point, img_name, width, height, z_index=1):
+    def picture(self, point, img_name, width, height, *, z_index=1):
         # pictures are NOT subject to the transform (only the position is)
         self.add_to_layer(
             z_index,
@@ -222,7 +224,7 @@ class TikzLayer(Layer):
         self._parse_fillness(style, tikz_style)
         self._parse_arrows(style, tikz_style)
         self._parse_text(style, tikz_style)
-        if "rounded" in style and style["rounded"]:
+        if style.get("rounded"):
             del style["rounded"]
             tikz_style.update({"rounded corners": None})
 
@@ -233,7 +235,7 @@ class TikzLayer(Layer):
         a = p.angle * 180 / math.pi
         return int(a * 10 + 0.5) / 10
 
-    def line(self, p1, p2, labels=None, z_index=0, **style):
+    def line(self, p1, p2, labels=None, *, z_index=0, **style):
         (p1, p2) = map(self.transform, (p1, p2))
         s = ""
         if style is None:
@@ -243,7 +245,7 @@ class TikzLayer(Layer):
         tikz_style.update(style)
         s += f"\\path[{dic_to_list(tikz_style)}] ({p1}) -- ({p2})"
 
-        if (abs((p2 - p1).angle) - math.pi / 2) < 0.01:
+        if (abs((p2 - p1).angle) - math.pi / 2) < ALMOST_ZERO:
             # hack
             reverse_start = False
         else:
@@ -269,8 +271,8 @@ class TikzLayer(Layer):
                 s += f"{{{text}}}"
         self.add_to_layer(z_index, s + ";")
 
-    def edge(self, points, labels=None, closed=False, z_index=0, **style):
-        list_angles = self.find_angles(points, closed)
+    def edge(self, points, labels=None, *, closed=False, z_index=0, **style):
+        list_angles = self.find_angles(points, closed=closed)
         if closed:
             points.append(points[0])
             list_angles.append(list_angles[0])
@@ -338,7 +340,7 @@ class TikzLayer(Layer):
 
         self.add_to_layer(z_index, s + ";")
 
-    def polyline(self, points, labels=None, closed=False, z_index=0, **style):
+    def polyline(self, points, labels=None, *, closed=False, z_index=0, **style):
         points = [*map(self.transform, points)]
 
         if style is None:
@@ -399,7 +401,7 @@ class TikzLayer(Layer):
 
         self.add_to_layer(z_index, s + ";")
 
-    def draw(self, rect, fs=None, options=None, preamble=False):
+    def draw(self, rect, fs=None, options=None, *,preamble=False):
         if options is None:
             options = {}
 
