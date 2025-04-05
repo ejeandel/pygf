@@ -20,7 +20,7 @@ Regardless of their order when you call them, edge commands are always executed 
 The abstract layer
 ==================
 
-.. autoclass:: pygf.Layer.Layer
+.. autoclass:: pygf.layer.Layer
    :members:
    :exclude-members: find_angles
 
@@ -28,10 +28,10 @@ The abstract layer
 Other layers
 ============
 
-.. autoclass:: pygf.Layer.NoLayer
+.. autoclass:: pygf.layer.NoLayer
 
 
-.. autoclass:: pygf.Layer.MultiLayer
-   :members: draw
+.. autoclass:: pygf.layer.MultiLayer
+   :members: draw_all
 	     
 

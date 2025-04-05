@@ -278,7 +278,7 @@ class MultiLayer(Layer):
     :type layers: list[Layer]
 
 
-    The draw function has a different prototype, to take into account the different layers.
+    The draw method is nonimplemented. Instead, the draw_all function is provided, that takes into account the different layers.
 
     """
 
