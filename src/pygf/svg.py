@@ -59,7 +59,7 @@ class SVGEllipse(PathElement):
     large_flag: int
     sweep_flag: int
 
-    def __str__(self, first=None ):
+    def __str__(self, first=None):
         s = ""
         if first:
             s = "M {self.first_point}"
@@ -250,12 +250,7 @@ class SvgLayer(Layer):
         """---------
         thickness
         ---------"""
-
-        if "thickness" in style:
-            thickness = style["thickness"]
-            del style["thickness"]
-        else:
-            thickness = 1
+        thickness = style.pop("thickness", 1)
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
         return 0.4 * pt * thickness
 
@@ -263,8 +258,7 @@ class SvgLayer(Layer):
         # dash
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
         if "dash" in style:
-            dash = style["dash"]
-            del style["dash"]
+            dash = style.pop("dash")
             sw = stroke_width
             dasharray = {
                 "solid": "none",
@@ -290,8 +284,7 @@ class SvgLayer(Layer):
             svg_style["stroke-dasharray"] = dasharray
         # draw
         if "draw" in style:
-            color = style["draw"]
-            del style["draw"]
+            color = style.pop("draw")
             if color is None:
                 color = "none"
         else:
@@ -299,41 +292,36 @@ class SvgLayer(Layer):
         svg_style["stroke"] = color
         # fill
         if "fill" in style:
-            fill = style["fill"]
-            del style["fill"]
+            fill = style.pop("fill")
             if fill is None:
                 fill = "none"
             if "opacity" in style:
-                svg_style["fill-opacity"] = style["opacity"]
-                del style["opacity"]
+                svg_style["fill-opacity"] = style.pop("opacity")
         else:
             fill = "none"
         svg_style["fill"] = fill
 
-        if style.get("rounded"):
-            del style["rounded"]
+        if style.pop("rounded", False):
             svg_style["stroke-linejoin"] = "round"
 
-    def parse_text_style(self, style, text_style):
+    def parse_text_style(self, style):
         """internal function
         computes the text attributes
         """
+        text_style = {}
         if "text_size" in style:
-            if style["text_size"] == "small":
+            size = style.pop("text_size")
+            if size == "small":
                 text_style["font-size"] = "x-small"
-            if style["text_size"] == "large":
+            elif size == "large":
                 text_style["font-size"] = "x-large"
-            del style["text_size"]
 
-        if "font_family" in style:
-            text_style["font-family"] = style["font_family"]
-            del style["font_family"]
-        else:
-            text_style["font-family"] = "sans-serif"
+        text_style["font-family"] = style.pop("font_family", "sans-serif")
 
         if "text_color" in style:
-            text_style["stroke"] = style["text_color"]
-            del style["text_color"]
+            text_style["stroke"] = style.pop("text_color")
+
+        return text_style
 
     def parse_arrows(self, stroke_width, style, svg, sub_path):
         """internal function for arrows"""
@@ -350,10 +338,9 @@ class SvgLayer(Layer):
             height = 10 * x
 
             X = -x if not reverse else x
+            refX = 0.5 * stroke_width
             if not first:
-                refX = width - 0.5 * stroke_width
-            else:
-                refX = 0.5 * stroke_width
+                refX = width - refX
 
             arrow = ET.Element(
                 "marker",
@@ -388,10 +375,9 @@ class SvgLayer(Layer):
             width = 5 * x
             height = 10 * x
             X = -x if not reverse else x
+            refX = 0.4 * stroke_width
             if not reverse:
-                refX = width - 0.4 * stroke_width
-            else:
-                refX = 0.4 * stroke_width
+                refX = width - refX
             arrow = ET.Element(
                 "marker",
                 markerUnits="userSpaceOnUse",
@@ -461,19 +447,17 @@ class SvgLayer(Layer):
             svg.append(arrow)
 
     def __path(self, svg_path, labels=None, style=None, z_index=0):
-        if style is None:
-            style = {}
+        style = {} if style is None else style
+        labels = {} if labels is None else labels
 
         reverse_start = svg_path.is_up()
         reverse_end = not svg_path.reverse().is_up()
 
         stroke_width = self.parse_stroke_width(style)
-
         svg_style = {"stroke-width": f"{stroke_width:2g}"}
         self.parse_style(stroke_width, style, svg_style)
 
-        text_style = {}
-        self.parse_text_style(style, text_style)
+        text_style = self.parse_text_style(style)
 
         _id = self.new_name()
 
@@ -485,52 +469,48 @@ class SvgLayer(Layer):
 
         self.add_to_layer(z_index, svg)
 
-        if labels is not None:
-            need_reverse = False
+        if any(
+            ("start" in position and reverse_start)
+            or ("end" in position and reverse_end)
+            or (position == "above" and reverse_start)
+            or (position == "below" and reverse_end)
+            for position in labels
+        ):
+            self.add_to_layer(
+                z_index,
+                ET.Element("path", id=f"r-{_id}", d=str(svg_path.reverse()), display="none"),
+            )
 
-            for position in labels:
-                if "start" in position and reverse_start:
-                    need_reverse = True
-                if "end" in position and reverse_end:
-                    need_reverse = True
-                if (position == "above" and reverse_start) or (position == "below" and reverse_end):
-                    need_reverse = True
-            if need_reverse:
-                self.add_to_layer(
-                    z_index,
-                    ET.Element("path", id=f"r-{_id}", d=str(svg_path.reverse()), display="none"),
-                )
+        for position in labels:
+            text_svg = ET.Element("text", text_style)
+            if "above" in position:
+                text_svg.set("dy", "-5")
+            else:
+                # below
+                text_svg.set("dy", "5")
+                text_svg.set("dominant-baseline", "hanging")
 
-            for position in labels:
-                text_svg = ET.Element("text", text_style)
-                if "above" in position:
-                    text_svg.set("dy", "-5")
-                else:
-                    # below
-                    text_svg.set("dy", "5")
-                    text_svg.set("dominant-baseline", "hanging")
+            text_path = ET.Element("textPath")
 
-                text_path = ET.Element("textPath")
-
-                if "start" in position:
-                    text_svg.set("text-anchor", "start" if not reverse_start else "end")
-                    text_path.set("startOffset", "0%" if not reverse_start else "100%")
+            if "start" in position:
+                text_svg.set("text-anchor", "start" if not reverse_start else "end")
+                text_path.set("startOffset", "0%" if not reverse_start else "100%")
+                text_path.set("href", f"#{_id}" if not reverse_start else f"#r-{_id}")
+            elif "end" in position:
+                text_svg.set("text-anchor", "end" if not reverse_end else "start")
+                text_path.set("startOffset", "100%" if not reverse_end else "0%")
+                text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
+            else:
+                text_svg.set("text-anchor", "middle")
+                text_path.set("startOffset", "50%")
+                if position == "above":
                     text_path.set("href", f"#{_id}" if not reverse_start else f"#r-{_id}")
-                elif "end" in position:
-                    text_svg.set("text-anchor", "end" if not reverse_end else "start")
-                    text_path.set("startOffset", "100%" if not reverse_end else "0%")
-                    text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
                 else:
-                    text_svg.set("text-anchor", "middle")
-                    text_path.set("startOffset", "50%")
-                    if position == "above":
-                        text_path.set("href", f"#{_id}" if not reverse_start else f"#r-{_id}")
-                    else:
-                        text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
+                    text_path.set("href", f"#{_id}" if not reverse_end else f"#r-{_id}")
 
-                text_path.text = str(labels[position])
-                text_svg.append(text_path)
-                self.add_to_layer(z_index, text_svg)
+            text_path.text = str(labels[position])
+            text_svg.append(text_path)
+            self.add_to_layer(z_index, text_svg)
 
     def line(self, p1, p2, labels=None, z_index=0, **style):
         (p1, p2) = map(self.svgtransform * self.transform, (p1, p2))
@@ -592,15 +572,11 @@ class SvgLayer(Layer):
                 y = -5
             return (x, y, align, valign)
 
-        if "position" in style:
-            position = style["position"]
-            del style["position"]
-        else:
-            position = "center"
+        position = style.pop("position", "center")
+
         (x, y, align, valign) = compute_anchors(position)
 
-        text_style = {}
-        self.parse_text_style(style, text_style)
+        text_style = self.parse_text_style(style)
 
         text_node = ET.Element("text", x=str(x), y=str(y), **text_style)
         text_node.set("text-anchor", align)
@@ -612,27 +588,23 @@ class SvgLayer(Layer):
     def edge(self, points, labels=None, *, closed=False, z_index=0, **style):
 
         tf = self.svgtransform * self.transform
-        list_angles = self.find_angles(points, closed=closed)
+        angles = [x * math.pi / 180 for x in self.find_angles(points, closed=closed)]
         if closed:
             points.append(points[0])
-            list_angles.append(list_angles[0])
+            angles.append(angles[0])
 
-        angles = [x * math.pi / 180 for x in list_angles]
-
-        if "looseness" in style:
-            looseness = style["looseness"]
-            del style["looseness"]
-        else:
-            looseness = 1
+        looseness = style.pop("looseness", 1)
 
         point = points[0]
         svg_path = SvgPath(tf(point))
         for i in range(len(points) - 1):
             newpoint = points[i + 1]
             dst = looseness * 0.3902 * newpoint.distance(point)
-            fstcontrol = point + Point(dst, angles[i], polar=True)
-            sndcontrol = newpoint - Point(dst, angles[i + 1], polar=True)
-            svg_path.curve_to(tf(newpoint), tf(fstcontrol), tf(sndcontrol))
+            svg_path.curve_to(
+                tf(newpoint),
+                tf(point + Point(dst, angles[i], polar=True)),
+                tf(newpoint - Point(dst, angles[i + 1], polar=True)),
+            )
             point = newpoint
 
         self.__path(svg_path, labels, style, z_index)
@@ -650,38 +622,30 @@ class SvgLayer(Layer):
                 ratio = min(12, p0.distance(p1) / p1.distance(p2))
                 t1 = 0.04
                 t2 = 0.04 * ratio
-            beforep1 = p0 * t1 + p1 * (1 - t1)
-            afterp1 = p1 * (1 - t2) + p2 * t2
-            return (beforep1, afterp1)
+            return (p0 * t1 + p1 * (1 - t1), p1 * (1 - t2) + p2 * t2)
 
         if closed:
             points += [points[0]]
 
-        if "rounded" in style and style["rounded"] and len(points) != 2:
-            p2 = p1 = points[0]
+        if style.pop("rounded", False) and len(points) > 2:
+            # first point
             if closed:
-                p0 = points[-2]
-                p2 = points[1]
-                (_, afterp1) = corners(p0, p1, p2)
+                (_, afterp1) = corners(points[-2], points[0], points[1])
                 svg_path = SvgPath(tf(afterp1))
             else:
-                svg_path = SvgPath(tf(p1))
+                svg_path = SvgPath(tf(points[0]))
+            # other points
             for i in range(len(points) - 2):
-                p0 = points[i]
-                p1 = points[i + 1]
-                p2 = points[i + 2]
-                (beforep1, afterp1) = corners(p0, p1, p2)
+                (beforep1, afterp1) = corners(points[i], points[i + 1], points[i + 2])
                 svg_path.line_to(tf(beforep1))
-                svg_path.quadratic_to(tf(afterp1), tf(p1))
+                svg_path.quadratic_to(tf(afterp1), tf(points[i + 1]))
+            # last point
             if not closed:
-                svg_path.line_to(tf(p2))
+                svg_path.line_to(tf(points[-1]))
             else:
-                p0 = points[-2]
-                p1 = points[0]
-                p2 = points[1]
-                (beforep1, afterp1) = corners(p0, p1, p2)
+                (beforep1, afterp1) = corners(points[-2], points[0], points[1])
                 svg_path.line_to(tf(beforep1))
-                svg_path.quadratic_to(tf(afterp1), tf(p1))
+                svg_path.quadratic_to(tf(afterp1), tf(points[0]))
         else:
             # not rounded
             svg_path = SvgPath(tf(points[0]))

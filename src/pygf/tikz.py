@@ -8,6 +8,7 @@ from pygf.layer import Layer
 
 ALMOST_ZERO = 0.01
 
+
 def dic_to_list(d):
     "convert a dictionary to a list string"
     return ",".join(x + "=" + y if y is not None else x for (x, y) in d.items())
@@ -49,8 +50,7 @@ class TikzLayer(Layer):
         opts = {}
         self._parse_text(hints, opts)
         if "position" in hints:
-            x = hints["position"]
-            del hints["position"]
+            x = hints.pop("position")
             if x == "center":
                 pass
             else:
@@ -112,18 +112,17 @@ class TikzLayer(Layer):
             3: "very thick",  # 1.2pt
             4: "ultra thick",  # 1.6pt
         }
-        thick = gen_style["thickness"]
+        thick = gen_style.pop("thickness")
         if thick in dic:
             tikz_style.update({dic[thick]: None})
         else:
             tikz_style.update({"line width": f"{0.4*thick:.3g}pt"})
-        del gen_style["thickness"]
 
     def _parse_dashness(self, gen_style, tikz_style):
         if "dash" not in gen_style:
             return
 
-        dash = gen_style["dash"]
+        dash = gen_style.pop("dash")
         if dash not in [
             "solid",
             "dotted",
@@ -147,27 +146,23 @@ class TikzLayer(Layer):
         ]:
             raise ValueError
 
-        tikz_style.update({gen_style["dash"]: None})
-        del gen_style["dash"]
+        tikz_style.update({dash: None})
 
     def _parse_fillness(self, gen_style, tikz_style):
         if "fill" not in gen_style:
             return
-        fill = gen_style["fill"]
+        fill = gen_style.pop("fill")
         tikz_style.update({"fill": fill})
         if "opacity" in gen_style:
-            tikz_style.update({"fill opacity": gen_style["opacity"]})
-            del gen_style["opacity"]
-        del gen_style["fill"]
+            tikz_style.update({"fill opacity": gen_style.pop("opacity")})
 
     def _parse_drawness(self, gen_style, tikz_style):
         if "draw" not in gen_style:
             tikz_style.update({"draw": "black"})
             return
-        color = gen_style["draw"]
+        color = gen_style.pop("draw")
         if color is not None:
             tikz_style.update({"draw": color})
-        del gen_style["draw"]
 
     def _parse_arrows(self, gen_style, tikz_style):
 
@@ -189,31 +184,27 @@ class TikzLayer(Layer):
         }
         if "arrow" not in gen_style:
             return
-        [first, last] = gen_style["arrow"].split("-")
+        [first, last] = gen_style.pop("arrow").split("-")
 
         arrow = f"{leftarrows[first]}-{rightarrows[last]}"
         tikz_style.update({arrow: None})
-        del gen_style["arrow"]
 
     def _parse_text(self, gen_style, tikz_style):
         if "text_color" in gen_style:
-            text_color = gen_style["text_color"]
+            text_color = gen_style.pop("text_color")
             tikz_style.update({"color": text_color})
-            del gen_style["text_color"]
 
         if not ("font_family" in gen_style or "text_size" in gen_style):
             return
         font = ""
         if "text_size" in gen_style:
-            text_size = gen_style["text_size"]
+            text_size = gen_style.pop("text_size")
             dic = {"small": r"\tiny", "large": r"\large"}
             font = dic[text_size]
-            del gen_style["text_size"]
         if "font_family" in gen_style:
-            family = gen_style["font_family"]
+            family = gen_style.pop("font_family")
             dic = {"monospace": r"\ttfamily"}
             font += dic[family]
-            del gen_style["font_family"]
 
         tikz_style.update({"font": font})
 
@@ -281,11 +272,7 @@ class TikzLayer(Layer):
 
         s = ""
 
-        if "looseness" in style:
-            looseness = style["looseness"]
-            del style["looseness"]
-        else:
-            looseness = 1
+        looseness = style.pop("looseness", 1)
         tikz_style = {}
         self._parse_style(style, tikz_style)
         tikz_style.update(style)
@@ -401,7 +388,7 @@ class TikzLayer(Layer):
 
         self.add_to_layer(z_index, s + ";")
 
-    def draw(self, rect, fs=None, options=None, *,preamble=False):
+    def draw(self, rect, fs=None, options=None, *, preamble=False):
         if options is None:
             options = {}
 
@@ -418,19 +405,14 @@ class TikzLayer(Layer):
 
             print(r"\begin{document}", file=fs)
 
-        if "clip" in options:
-            clip = options["clip"]
-            del options["clip"]
-        else:
-            clip = True
+        clip = options.pop("clip", True)
 
         if options == {}:
             print(r"\begin{tikzpicture}", file=fs)
         else:
             if "center" in options:
-                if options["center"] is True:
+                if options.get("center"):
                     options["baseline"] = "(current bounding box.center)"
-                del options["center"]
             print(rf"\begin{{tikzpicture}}[{dic_to_list(options)}]", file=fs)
 
         tf = self.transform

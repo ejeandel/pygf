@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import math
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from typing import IO
 
 from pygf.geometry import Point, Rectangle, Transform
@@ -79,7 +80,13 @@ class Layer(ABC):
 
     @abstractmethod
     def polyline(
-            self, points: list[Point], labels: dict | None = None, *, z_index: int = 0, closed: bool = False, **style
+        self,
+        points: list[Point],
+        labels: dict | None = None,
+        *,
+        z_index: int = 0,
+        closed: bool = False,
+        **style,
     ):
         """Draw line segments from one point to the next (edge command)
 
@@ -140,7 +147,13 @@ class Layer(ABC):
 
     @abstractmethod
     def edge(
-            self, points: list[Point], labels: dict | None = None, *, closed: bool = False, z_index: int = 0,  **style
+        self,
+        points: list[Point],
+        labels: dict | None = None,
+        *,
+        closed: bool = False,
+        z_index: int = 0,
+        **style,
     ):
         """Draw a curve passing through the points (edge command)
 
@@ -183,7 +196,6 @@ class Layer(ABC):
         :param z_index: z-index of the path (1 by default)
         :type z_index: int
         """
-
 
     @abstractmethod
     def draw(self, rect: Rectangle, fs: IO | None = None, options=None, *, preamble: bool = False):
@@ -286,11 +298,11 @@ class MultiLayer(Layer):
         Layer.__init__(self, None)
         self.layers = layers
 
-    def line(self, p1, p2, labels=None, * ,z_index=0, **style):
+    def line(self, p1, p2, labels=None, *, z_index=0, **style):
         for layer in self.layers:
             layer.line(p1, p2, labels, z_index=z_index, **style)
 
-    def text(self, point, text, * ,z_index=1, **style):
+    def text(self, point, text, *, z_index=1, **style):
         for layer in self.layers:
             layer.text(point, text, z_index=z_index, **style)
 
@@ -298,7 +310,7 @@ class MultiLayer(Layer):
         for layer in self.layers:
             layer.rectangle(p1, p2, z_index=z_index, **style)
 
-    def circle(self, p1, radius, labels=None, * ,z_index=1, **style):
+    def circle(self, p1, radius, labels=None, *, z_index=1, **style):
         for layer in self.layers:
             layer.circle(p1, radius, labels, z_index=z_index, **style)
 
@@ -317,7 +329,7 @@ class MultiLayer(Layer):
     def draw(self, rect, fs=None, options=None, *, preamble=False):
         raise NotImplementedError
 
-    def draw_all(self, rect: Rectangle, fs: list[IO] | None = None, options=None, *, preamble=False):
+    def draw_all(self, rect: Rectangle, fs: Sequence[IO] | None = None, options=None, *, preamble=False):
         """Write the result to a list of files
 
         :param rect: The bounding box for the picture
