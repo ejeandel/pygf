@@ -410,9 +410,8 @@ class TikzLayer(Layer):
         if options == {}:
             print(r"\begin{tikzpicture}", file=fs)
         else:
-            if "center" in options:
-                if options.get("center"):
-                    options["baseline"] = "(current bounding box.center)"
+            if options.get("center", False):
+                options["baseline"] = "(current bounding box.center)"
             print(rf"\begin{{tikzpicture}}[{dic_to_list(options)}]", file=fs)
 
         tf = self.transform

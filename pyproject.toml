@@ -7,14 +7,13 @@ name = "pygf"
 dynamic = ["version"]
 description = "A Python Graphics Format"
 readme = "README.md"
-license = "BSD-2-clause"
+license = { file = "LICENSE", license = "BSD-2-Clause" }
 authors = [
     { name = "Emmanuel Jeandel", email = "emmanuel.jeandel@loria.fr" },
 ]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
@@ -45,3 +44,4 @@ executionEnvironments = [
     'INP001',
     'N813',
 ]
+
