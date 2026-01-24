@@ -319,7 +319,7 @@ class SvgLayer(Layer):
         text_style["font-family"] = style.pop("font_family", "sans-serif")
 
         if "text_color" in style:
-            text_style["stroke"] = style.pop("text_color")
+            text_style["fill"] = style.pop("text_color")
 
         return text_style
 
