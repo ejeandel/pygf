@@ -213,6 +213,7 @@ class SvgLayer(Layer):
 
     def __init__(self, transform=None):
         Layer.__init__(self, transform)
+        self.namespaces = {"xlink": "http://www.w3.org/1999/xlink"}
         self.names = 0
         # node = 1
         # edge = 0
@@ -667,7 +668,8 @@ class SvgLayer(Layer):
             height=str(rect.height),
             viewBox=f"{rect.fst.x} {rect.fst.y} {rect.width} {rect.height}",
         )
-        svg.set("xmlns:xlink", "http://www.w3.org/1999/xlink")
+        for name in self.namespaces:
+            svg.set(f"xmlns:{name}", self.namespaces[name])
 
         for i in sorted(self.layers.keys()):
             svg.extend(self.layers[i])
