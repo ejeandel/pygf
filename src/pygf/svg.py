@@ -218,7 +218,7 @@ class SvgLayer(Layer):
         # node = 1
         # edge = 0
         self.layers = {0: [], 1: []}
-        self.defs = {}
+        self.defs = []
         self.svgtransform = Transform(a=50, d=-50)
 
     def new_name(self):
@@ -291,6 +291,7 @@ class SvgLayer(Layer):
         else:
             color = "black"
         svg_style["stroke"] = color
+
         # fill
         if "fill" in style:
             fill = style.pop("fill")
@@ -301,6 +302,22 @@ class SvgLayer(Layer):
         else:
             fill = "none"
         svg_style["fill"] = fill
+
+        if "shade" in style:
+            (a,b)= style.pop("shade")
+            name = f"grad_{self.new_name()}"
+            grad = ET.Element(
+                "linearGradient",
+                id=name,
+                x1 = "0%",
+                y1 = "0%",
+                x2 = "100%",
+                y2 = "0%"
+            )
+            grad.append(ET.Element("stop", {"offset": "0%", "stop-color":a}))
+            grad.append(ET.Element("stop",  {"offset":"100%","stop-color":b}))
+            self.defs.append(grad)
+            svg_style["fill"] = f"url(#{name})"
 
         if style.pop("rounded", False):
             svg_style["stroke-linejoin"] = "round"
@@ -537,6 +554,7 @@ class SvgLayer(Layer):
 
         self.__path(svg_path, labels, style, z_index)
 
+
     def rectangle(self, p1, p2, z_index=1, **style):
         r = Rectangle(p1, p2)
         self.polygon([r.northwest, r.northeast, r.southeast, r.southwest], z_index=z_index, **style)
@@ -671,6 +689,11 @@ class SvgLayer(Layer):
         for name in self.namespaces:
             svg.set(f"xmlns:{name}", self.namespaces[name])
 
+        if len(self.defs) > 0:
+            e = ET.Element("defs")
+            for i in self.defs:
+                e.append(i)
+            svg.append(e)
         for i in sorted(self.layers.keys()):
             svg.extend(self.layers[i])
 

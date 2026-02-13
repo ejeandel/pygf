@@ -156,6 +156,13 @@ class TikzLayer(Layer):
         if "opacity" in gen_style:
             tikz_style.update({"fill opacity": gen_style.pop("opacity")})
 
+    def _parse_shadeness(self, gen_style, tikz_style):
+        if "shade" not in gen_style:
+            return
+        (a,b)= gen_style.pop("shade")
+        tikz_style.update({"shading": "axis", "left color": a, "right color": b})
+
+            
     def _parse_drawness(self, gen_style, tikz_style):
         if "draw" not in gen_style:
             tikz_style.update({"draw": "black"})
@@ -213,6 +220,7 @@ class TikzLayer(Layer):
         self._parse_dashness(style, tikz_style)
         self._parse_drawness(style, tikz_style)
         self._parse_fillness(style, tikz_style)
+        self._parse_shadeness(style, tikz_style)
         self._parse_arrows(style, tikz_style)
         self._parse_text(style, tikz_style)
         if style.get("rounded"):
