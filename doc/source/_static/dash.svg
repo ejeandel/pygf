@@ -1,0 +1,426 @@
+<svg
+ xmlns="http://www.w3.org/2000/svg"
+ width="600.0"
+ height="950.0"
+ viewBox="-300.0 -925.0 600.0 950.0"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="none"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="1"
+ d="M 0.000,-900.000 L 250.000,-900.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="0.7 3.5"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="2"
+ d="M 0.000,-850.000 L 250.000,-850.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="0.7 1.8"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="3"
+ d="M 0.000,-800.000 L 250.000,-800.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="0.7 7"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="4"
+ d="M 0.000,-750.000 L 250.000,-750.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="5"
+ d="M 0.000,-700.000 L 250.000,-700.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 3.5"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="6"
+ d="M 0.000,-650.000 L 250.000,-650.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 11"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="7"
+ d="M 0.000,-600.000 L 250.000,-600.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 3.5 0.7 3.5"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="8"
+ d="M 0.000,-550.000 L 250.000,-550.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 3.5 0.7 3.5"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="9"
+ d="M 0.000,-500.000 L 250.000,-500.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 1.8 0.7 1.8"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="10"
+ d="M 0.000,-450.000 L 250.000,-450.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 1.8 0.7 1.8"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="11"
+ d="M 0.000,-400.000 L 250.000,-400.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 7 0.7 7"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="12"
+ d="M 0.000,-350.000 L 250.000,-350.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 7 0.7 7"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="13"
+ d="M 0.000,-300.000 L 250.000,-300.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 3.5 0.7 3.5 0.7 3.5"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="14"
+ d="M 0.000,-250.000 L 250.000,-250.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 1.8 0.7 1.8 0.7 1.8"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="15"
+ d="M 0.000,-200.000 L 250.000,-200.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 7 0.7 7 0.7 7"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="16"
+ d="M 0.000,-150.000 L 250.000,-150.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 3.5 0.7 3.5 0.7 3.5"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="17"
+ d="M 0.000,-100.000 L 250.000,-100.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 1.8 0.7 1.8 0.7 1.8"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="18"
+ d="M 0.000,-50.000 L 250.000,-50.000"
+ />
+</g>
+<g
+ stroke-width="0.70292"
+ stroke-dasharray="5.3 7 0.7 7 0.7 7"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="19"
+ d="M 0.000,0.000 L 250.000,0.000"
+ />
+</g>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-900.000)"
+>
+dash="solid"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-850.000)"
+>
+dash="dotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-800.000)"
+>
+dash="densely dotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-750.000)"
+>
+dash="loosely dotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-700.000)"
+>
+dash="dashed"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-650.000)"
+>
+dash="densely dashed"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-600.000)"
+>
+dash="loosely dashed"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-550.000)"
+>
+dash="dashdotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-500.000)"
+>
+dash="dash dot"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-450.000)"
+>
+dash="densely dashdotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-400.000)"
+>
+dash="densely dash dot"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-350.000)"
+>
+dash="loosely dashdotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-300.000)"
+>
+dash="loosely dash dot"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-250.000)"
+>
+dash="dashdotdotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-200.000)"
+>
+dash="densely dashdotdotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-150.000)"
+>
+dash="loosely dashdotdotted"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-100.000)"
+>
+dash="dash dot dot"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-50.000)"
+>
+dash="densely dash dot dot"
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,0.000)"
+>
+dash="loosely dash dot dot"
+</text>
+</svg>

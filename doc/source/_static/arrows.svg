@@ -1,0 +1,283 @@
+<svg
+ xmlns="http://www.w3.org/2000/svg"
+ width="600"
+ height="300"
+ viewBox="-300 -300 600 300"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+<g
+ stroke-width="0.70292"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="1"
+ d="M 0.000,-250.000 L 250.000,-275.000"
+ marker-start="url(#marker_2)"
+ marker-end="url(#marker_3)"
+ />
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="3.514598035145981"
+ markerHeight="7.029196070291962"
+ refX="3.2334301923343025"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.562335685623357"
+ id="marker_2"
+>
+<path
+ d="M 0.879,6.326 C 1.054,5.272 2.987,3.690 3.515,3.515 C 2.987,3.339 1.054,1.757 0.879,0.703"
+ stroke-linecap="round"
+ stroke-linejoin="round"
+ stroke-dasharray="none"
+ />
+</marker>
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="3.514598035145981"
+ markerHeight="7.029196070291962"
+ refX="0.2811678428116785"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.562335685623357"
+ id="marker_3"
+>
+<path
+ d="M 2.636,6.326 C 2.460,5.272 0.527,3.690 0.000,3.515 C 0.527,3.339 2.460,1.757 2.636,0.703"
+ stroke-linecap="round"
+ stroke-linejoin="round"
+ stroke-dasharray="none"
+ />
+</marker>
+</g>
+<g
+ stroke-width="0.70292"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="4"
+ d="M 0.000,-200.000 L 250.000,-225.000"
+ marker-start="url(#marker_5)"
+ marker-end="url(#marker_6)"
+ />
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="3.514598035145981"
+ markerHeight="7.029196070291962"
+ refX="0.2811678428116785"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.562335685623357"
+ id="marker_5"
+>
+<path
+ d="M 2.636,6.326 C 2.460,5.272 0.527,3.690 0.000,3.515 C 0.527,3.339 2.460,1.757 2.636,0.703"
+ stroke-linecap="round"
+ stroke-linejoin="round"
+ stroke-dasharray="none"
+ />
+</marker>
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="3.514598035145981"
+ markerHeight="7.029196070291962"
+ refX="3.2334301923343025"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.562335685623357"
+ id="marker_6"
+>
+<path
+ d="M 0.879,6.326 C 1.054,5.272 2.987,3.690 3.515,3.515 C 2.987,3.339 1.054,1.757 0.879,0.703"
+ stroke-linecap="round"
+ stroke-linejoin="round"
+ stroke-dasharray="none"
+ />
+</marker>
+</g>
+<g
+ stroke-width="0.70292"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="7"
+ d="M 0.000,-150.000 L 250.000,-175.000"
+ marker-start="url(#marker_8)"
+ marker-end="url(#marker_9)"
+ />
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="7.732115677321159"
+ markerHeight="7.029196070291962"
+ refX="0.3514598035145981"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.7029196070291962"
+ id="marker_8"
+>
+<path
+ d="M 7.732,3.515 C 5.858,3.866 2.812,4.920 0.703,6.151 L 0.703,0.879 C 2.812,2.109 5.858,3.163 7.732,3.515"
+ fill="black"
+ />
+</marker>
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="7.732115677321159"
+ markerHeight="7.029196070291962"
+ refX="7.38065587380656"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.7029196070291962"
+ id="marker_9"
+>
+<path
+ d="M 0.000,3.515 C 1.874,3.866 4.920,4.920 7.029,6.151 L 7.029,0.879 C 4.920,2.109 1.874,3.163 0.000,3.515"
+ fill="black"
+ />
+</marker>
+</g>
+<g
+ stroke-width="0.70292"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="10"
+ d="M 0.000,-100.000 L 250.000,-125.000"
+ marker-start="url(#marker_11)"
+ marker-end="url(#marker_12)"
+ />
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="8.083575480835757"
+ markerHeight="8.083575480835757"
+ refX="4.041787740417878"
+ refY="4.041787740417878"
+ orient="auto"
+ id="marker_11"
+>
+<polyline
+ points="0.000,0.000 8.084,8.084"
+ />
+<polyline
+ points="8.084,0.000 0.000,8.084"
+ />
+</marker>
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="8.083575480835757"
+ markerHeight="8.083575480835757"
+ refX="4.041787740417878"
+ refY="4.041787740417878"
+ orient="auto"
+ id="marker_12"
+>
+<polyline
+ points="0.000,0.000 8.084,8.084"
+ />
+<polyline
+ points="8.084,0.000 0.000,8.084"
+ />
+</marker>
+</g>
+<g
+ stroke-width="0.70292"
+ stroke="black"
+ fill="none"
+>
+<path
+ id="13"
+ d="M 0.000,-50.000 L 250.000,-75.000"
+ marker-start="url(#marker_14)"
+ marker-end="url(#marker_15)"
+ />
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="7.732115677321159"
+ markerHeight="7.029196070291962"
+ refX="0.3514598035145981"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.7029196070291962"
+ id="marker_14"
+>
+<path
+ d="M 0.000,3.515 C 1.874,3.866 4.920,4.920 7.029,6.151 L 7.029,0.879 C 4.920,2.109 1.874,3.163 0.000,3.515"
+ fill="black"
+ />
+</marker>
+<marker
+ markerUnits="userSpaceOnUse"
+ markerWidth="7.732115677321159"
+ markerHeight="7.029196070291962"
+ refX="7.38065587380656"
+ refY="3.514598035145981"
+ orient="auto"
+ stroke-width="0.7029196070291962"
+ id="marker_15"
+>
+<path
+ d="M 7.732,3.515 C 5.858,3.866 2.812,4.920 0.703,6.151 L 0.703,0.879 C 2.812,2.109 5.858,3.163 7.732,3.515"
+ fill="black"
+ />
+</marker>
+</g>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-250.000)"
+>
+arrow=&gt;-&lt;
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-200.000)"
+>
+arrow=&lt;-&gt;
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-150.000)"
+>
+arrow=latex-xetal
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-100.000)"
+>
+arrow=x-x
+</text>
+<text
+ x="5"
+ y="0"
+ font-family="sans-serif"
+ fill="black"
+ text-anchor="start"
+ dominant-baseline="middle"
+ transform="translate(-250.000,-50.000)"
+>
+arrow=xetal-latex
+</text>
+</svg>
