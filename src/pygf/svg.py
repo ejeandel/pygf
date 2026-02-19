@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from pygf.geometry import Point, Rectangle, Transform
 from pygf.layer import Layer
+from pygf import params
 
 
 @dataclass
@@ -256,6 +257,8 @@ class SvgLayer(Layer):
         return 0.4 * pt * thickness
 
     def parse_style(self, stroke_width, style, svg_style):
+        
+        
         # dash
         pt = pt_to_cm(1) * self.svgtransform(Point(1, 1)).x
         if "dash" in style:
@@ -284,12 +287,10 @@ class SvgLayer(Layer):
             }.get(dash)
             svg_style["stroke-dasharray"] = dasharray
         # draw
-        if "draw" in style:
-            color = style.pop("draw")
-            if color is None:
-                color = "none"
-        else:
-            color = "black"
+        
+        color = style.pop("draw")
+        if color is None:
+            color = "none"
         svg_style["stroke"] = color
 
         # fill
@@ -464,8 +465,12 @@ class SvgLayer(Layer):
             arrow.set("id", f"marker_{_id}")
             svg.append(arrow)
 
-    def __path(self, svg_path, labels=None, style=None, z_index=0):
-        style = {} if style is None else style
+    def __path(self, svg_path, labels=None, per_style=None, z_index=0):
+        style = {}
+        style.update(params)        
+        if per_style is not None:
+            style.update(per_style)
+            
         labels = {} if labels is None else labels
 
         reverse_start = svg_path.is_up()
@@ -559,7 +564,11 @@ class SvgLayer(Layer):
         r = Rectangle(p1, p2)
         self.polygon([r.northwest, r.northeast, r.southeast, r.southwest], z_index=z_index, **style)
 
-    def text(self, point, text, z_index=1, **style):
+    def text(self, point, text, z_index=1, **per_style):
+        style = {}
+        style.update(params)        
+        if per_style is not None:
+            style.update(per_style)
 
         def compute_anchors(position):
             if position == "center":

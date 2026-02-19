@@ -5,7 +5,7 @@ import math
 
 from pygf.geometry import Point, Rectangle
 from pygf.layer import Layer
-
+from pygf import params
 ALMOST_ZERO = 0.01
 
 
@@ -20,6 +20,14 @@ def _escape(x):
     x = x.replace("^", r"\^{}")
     return x
 
+
+# helper function
+def init_style(style):
+    s = {}
+    s.update(params)
+    if style is not None:
+        s.update(style)
+    return s
 
 class TikzLayer(Layer):
     """The Tikz Layer"""
@@ -48,6 +56,7 @@ class TikzLayer(Layer):
         #  text is NOT subject to the transform (only the position is)
         text = str(text)
         opts = {}
+        hints = init_style(hints)
         self._parse_text(hints, opts)
         if "position" in hints:
             x = hints.pop("position")
@@ -55,7 +64,7 @@ class TikzLayer(Layer):
                 pass
             else:
                 opts.update({x: None})
-        opts.update(hints)
+        #opts.update(hints)
         self.add_to_layer(
             z_index,
             f"\\node[{dic_to_list(opts)}] at ({self.transform(point)})" f"{{{_escape(text)}}};",
@@ -75,7 +84,10 @@ class TikzLayer(Layer):
         x_axis_rotation = tf(Point(radius, 0)).angle * 180 / math.pi
 
         tikz_style = {}
+        style = init_style(style)
+        text_style = {}        
         self._parse_style(style, tikz_style)
+        self._parse_text(style, text_style)        
         tikz_style.update(style)
         if rx != ry:
             self.add_to_layer(
@@ -92,8 +104,11 @@ class TikzLayer(Layer):
     def rectangle(self, p1, p2, z_index=1, **style):
         r = Rectangle(p1, p2)
         tikz_style = {}
+        style = init_style(style)
+        text_style = {}
         self._parse_style(style, tikz_style)
-        tikz_style.update(style)
+        self._parse_text(style, text_style)
+        tikz_style.update(style)        
         (sw, se, nw, ne) = map(self.transform, (r.southwest, r.southeast, r.northwest, r.northeast))
         self.add_to_layer(
             z_index,
@@ -164,9 +179,6 @@ class TikzLayer(Layer):
 
             
     def _parse_drawness(self, gen_style, tikz_style):
-        if "draw" not in gen_style:
-            tikz_style.update({"draw": "black"})
-            return
         color = gen_style.pop("draw")
         if color is not None:
             tikz_style.update({"draw": color})
@@ -197,9 +209,8 @@ class TikzLayer(Layer):
         tikz_style.update({arrow: None})
 
     def _parse_text(self, gen_style, tikz_style):
-        if "text_color" in gen_style:
-            text_color = gen_style.pop("text_color")
-            tikz_style.update({"color": text_color})
+        text_color = gen_style.pop("text_color")
+        tikz_style.update({"color": text_color})
 
         if not ("font_family" in gen_style or "text_size" in gen_style):
             return
@@ -222,7 +233,6 @@ class TikzLayer(Layer):
         self._parse_fillness(style, tikz_style)
         self._parse_shadeness(style, tikz_style)
         self._parse_arrows(style, tikz_style)
-        self._parse_text(style, tikz_style)
         if style.get("rounded"):
             del style["rounded"]
             tikz_style.update({"rounded corners": None})
@@ -237,10 +247,11 @@ class TikzLayer(Layer):
     def line(self, p1, p2, labels=None, *, z_index=0, **style):
         (p1, p2) = map(self.transform, (p1, p2))
         s = ""
-        if style is None:
-            style = {}
+        style = init_style(style)        
         tikz_style = {}
+        text_style = {}
         self._parse_style(style, tikz_style)
+        self._parse_text(style, text_style)
         tikz_style.update(style)
         s += f"\\path[{dic_to_list(tikz_style)}] ({p1}) -- ({p2})"
 
@@ -256,17 +267,17 @@ class TikzLayer(Layer):
                 text = _escape(labels[label])
 
                 if label == "above":
-                    s += " node [sloped,pos=0.5,above]"
+                    s += f" node [{dic_to_list(text_style)},sloped,pos=0.5,above]"
                 elif label == "below":
-                    s += " node [sloped,pos=0.5,below]"
+                    s += f" node [{dic_to_list(text_style)},sloped,pos=0.5,below]"
                 elif label == "above start":
-                    s += f" node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                    s += f" node [{dic_to_list(text_style)},sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
                 elif label == "below start":
-                    s += f" node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                    s += f" node [{dic_to_list(text_style)},sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
                 elif label == "above end":
-                    s += f" node [sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
+                    s += f" node [{dic_to_list(text_style)},sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
                 elif label == "below end":
-                    s += f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
+                    s += f" node [{dic_to_list(text_style)},sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
                 s += f"{{{text}}}"
         self.add_to_layer(z_index, s + ";")
 
@@ -282,8 +293,13 @@ class TikzLayer(Layer):
 
         looseness = style.pop("looseness", 1)
         tikz_style = {}
-        self._parse_style(style, tikz_style)
+        text_style = {}
+        style = init_style(style)                
+        self._parse_style(style, tikz_style)        
+        self._parse_text(style, text_style)        
         tikz_style.update(style)
+
+        
 
         list_edges = [f"({points[0]})"]
         for i in range(len(points) - 1):
@@ -303,31 +319,31 @@ class TikzLayer(Layer):
             for label in labels:
                 text = _escape(labels[label])
                 if label == "above start":
-                    code = f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                    code = f"node [{dic_to_list(text_style)},sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
                     code += f"{{{text}}} "
                     list_edges[1] = list_edges[1] + code
                 elif label == "below start":
-                    code = f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                    code = f"node [{dic_to_list(text_style)},sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
                     code += f"{{{text}}} "
                     list_edges[1] = list_edges[1] + code
                 elif label == "above":
-                    code = "node [sloped,pos=0.5,above]"
+                    code = f"node [{dic_to_list(text_style)},sloped,pos=0.5,above]"
                     code += f"{{{text}}} "
                     n = (len(list_edges) - 1) // 2
                     n = 2 * (n // 2) + 1
                     list_edges[n] = list_edges[n] + code
                 elif label == "below":
-                    code = "node [sloped,pos=0.5,below]"
+                    code = f"node [{dic_to_list(text_style)},sloped,pos=0.5,below]"
                     code += f"{{{text}}} "
                     n = (len(list_edges) - 1) // 2
                     n = 2 * (n // 2) + 1
                     list_edges[n] = list_edges[n] + code
                 elif label == "above end":
-                    code = f" node [sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
+                    code = f" node [{dic_to_list(text_style)},sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
                     code += f"{{{text}}}"
                     list_edges[-2] = list_edges[-2] + code
                 elif label == "below end":
-                    code = f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
+                    code = f" node [{dic_to_list(text_style)},sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
                     code += f"{{{text}}}"
                     list_edges[-2] = list_edges[-2] + code
 
@@ -338,11 +354,11 @@ class TikzLayer(Layer):
     def polyline(self, points, labels=None, *, closed=False, z_index=0, **style):
         points = [*map(self.transform, points)]
 
-        if style is None:
-            style = {}
-
+        style = init_style(style)
+        text_style = {}        
         tikz_style = {}
         self._parse_style(style, tikz_style)
+        self._parse_text(style, text_style)        
         tikz_style.update(style)
 
         reverse_start = abs((points[1] - points[0]).angle) > math.pi / 2
@@ -364,31 +380,31 @@ class TikzLayer(Layer):
             for label in labels:
                 text = _escape(labels[label])
                 if label == "above start":
-                    code = f"node [sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
+                    code = f"node [{dic_to_list(text_style)},sloped,pos=0,above {'right' if not reverse_start else 'left'}]"
                     code += f"{{{text}}} "
                     list_edges[1] = list_edges[1] + code
                 elif label == "below start":
-                    code = f"node [sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
+                    code = f"node [{dic_to_list(text_style)},sloped,pos=0,below {'right' if not reverse_start else 'left'}]"
                     code += f"{{{text}}} "
                     list_edges[1] = list_edges[1] + code
                 elif label == "above":
-                    code = "node [centered, sloped,pos=0.5,above]"
+                    code = f"node [{dic_to_list(text_style)},centered, sloped,pos=0.5,above]"
                     code += f"{{{text}}} "
                     n = (len(list_edges) - 1) // 2
                     n = 2 * (n // 2) + 1
                     list_edges[n] = list_edges[n] + code
                 elif label == "below":
-                    code = "node [centered, sloped,pos=0.5,below]"
+                    code = f"node [{dic_to_list(text_style)},centered, sloped,pos=0.5,below]"
                     code += f"{{{text}}} "
                     n = (len(list_edges) - 1) // 2
                     n = 2 * (n // 2) + 1
                     list_edges[n] = list_edges[n] + code
                 elif label == "above end":
-                    code = f" node [sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
+                    code = f" node [{dic_to_list(text_style)},sloped,pos=1,above {'left' if not reverse_end else 'right'}]"
                     code += f"{{{text}}}"
                     list_edges[-2] = list_edges[-2] + code
                 elif label == "below end":
-                    code = f" node [sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
+                    code = f" node [{dic_to_list(text_style)},sloped,pos=1,below {'left' if not reverse_end else 'right'}]"
                     code += f"{{{text}}}"
                     list_edges[-2] = list_edges[-2] + code
 
