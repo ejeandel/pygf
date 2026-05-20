@@ -596,7 +596,7 @@ class SvgLayer(Layer):
                 valign = "hanging"
                 y = 5
             else:
-                valign = "text-top"
+                valign = "auto"
                 y = -5
             return (x, y, align, valign)
 
